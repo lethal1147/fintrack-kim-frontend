@@ -11,6 +11,7 @@ import {
   IconCamera,
 } from "@tabler/icons-react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { FeatureGate } from "@/components/feature-gate"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -200,37 +201,41 @@ function SecurityTab() {
       </div>
 
       {/* 2FA */}
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium">Two-factor authentication</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Add an extra layer of security with a one-time code on login.
-          </p>
+      <FeatureGate feature="two_factor_auth">
+        <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium">Two-factor authentication</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Add an extra layer of security with a one-time code on login.
+            </p>
+          </div>
+          <Switch checked={twoFa} onCheckedChange={setTwoFa} />
         </div>
-        <Switch checked={twoFa} onCheckedChange={setTwoFa} />
-      </div>
+      </FeatureGate>
 
-      {/* Active sessions — static */}
-      <div>
-        <p className="text-sm font-semibold mb-3">Active sessions</p>
-        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-          {[
-            { device: "MacBook Pro — Chrome", location: "New York, US", current: true },
-            { device: "iPhone 16 — Safari", location: "New York, US", current: false },
-          ].map((s) => (
-            <div key={s.device} className="px-4 py-3 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium">{s.device}</p>
-                <p className="text-xs text-muted-foreground">{s.location}</p>
+      {/* Active sessions */}
+      <FeatureGate feature="active_sessions">
+        <div>
+          <p className="text-sm font-semibold mb-3">Active sessions</p>
+          <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+            {[
+              { device: "MacBook Pro — Chrome", location: "New York, US", current: true },
+              { device: "iPhone 16 — Safari", location: "New York, US", current: false },
+            ].map((s) => (
+              <div key={s.device} className="px-4 py-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium">{s.device}</p>
+                  <p className="text-xs text-muted-foreground">{s.location}</p>
+                </div>
+                {s.current
+                  ? <span className="text-xs text-emerald-600 font-medium">This device</span>
+                  : <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive h-7 px-2">Sign out</Button>
+                }
               </div>
-              {s.current
-                ? <span className="text-xs text-emerald-600 font-medium">This device</span>
-                : <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive h-7 px-2">Sign out</Button>
-              }
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </FeatureGate>
 
       <div className="flex justify-end">
         <Button type="submit">Save security settings</Button>
