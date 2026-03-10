@@ -127,6 +127,51 @@ export const allTransactions: Transaction[] = [
 // First 5 for the dashboard widget
 export const recentTransactions: Transaction[] = allTransactions.slice(0, 5)
 
+// ─── Accounts ────────────────────────────────────────────────────────────────
+
+export type AccountType = "checking" | "savings" | "credit_card" | "loan" | "investment"
+
+export type Account = {
+  id: string
+  name: string
+  institution: string
+  type: AccountType
+  /** Positive = asset balance. Negative = amount owed (liability). */
+  balance: number
+  lastFour?: string
+}
+
+export const accounts: Account[] = [
+  // Cash
+  { id: "ac1", name: "Chase Checking",     institution: "Chase",           type: "checking",    balance: 8420.50,  lastFour: "4821" },
+  { id: "ac2", name: "Chase Savings",      institution: "Chase",           type: "savings",     balance: 12340.00, lastFour: "9034" },
+  // Credit Cards
+  { id: "ac3", name: "Sapphire Reserve",   institution: "Chase",           type: "credit_card", balance: -1240.75, lastFour: "5731" },
+  { id: "ac4", name: "Freedom Unlimited",  institution: "Chase",           type: "credit_card", balance: -320.50,  lastFour: "2219" },
+  // Loans
+  { id: "ac5", name: "Auto Loan",          institution: "Toyota Financial", type: "loan",        balance: -9800.00 },
+  // Investments
+  { id: "ac6", name: "Roth IRA",           institution: "Fidelity",        type: "investment",  balance: 24580.00 },
+  { id: "ac7", name: "401(k)",             institution: "Vanguard",        type: "investment",  balance: 38400.00 },
+]
+
+// ─── Monthly trend (for Reports) ─────────────────────────────────────────────
+
+export type MonthlyTrend = {
+  month: string
+  income: number
+  expense: number
+}
+
+export const monthlyTrend: MonthlyTrend[] = [
+  { month: "Oct", income: 4280, expense: 2410 },
+  { month: "Nov", income: 4280, expense: 2780 },
+  { month: "Dec", income: 5100, expense: 3240 },
+  { month: "Jan", income: 4280, expense: 1950 },
+  { month: "Feb", income: 4280, expense: 2310 },
+  { month: "Mar", income: 5250, expense: 1887 },
+]
+
 export type Goal = {
   name: string
   target: number
