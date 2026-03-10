@@ -34,19 +34,32 @@ export const spendingData: SpendingPoint[] = [
   { day: "Mar 9",  thisMonth: 2105, lastMonth: 2300 },
 ]
 
+export type BudgetGroup = "Fixed" | "Flexible" | "Non-Monthly"
+
 export type BudgetCategory = {
   name: string
   budgeted: number
   spent: number
   color: string
+  group: BudgetGroup
 }
 
 export const budgetCategories: BudgetCategory[] = [
-  { name: "Housing",       budgeted: 1200, spent: 1200, color: "var(--chart-1)" },
-  { name: "Food & Dining", budgeted: 500,  spent: 420,  color: "var(--chart-2)" },
-  { name: "Transport",     budgeted: 200,  spent: 185,  color: "var(--chart-3)" },
-  { name: "Entertainment", budgeted: 150,  spent: 210,  color: "var(--chart-4)" }, // over budget
-  { name: "Health",        budgeted: 100,  spent: 60,   color: "var(--chart-5)" },
+  // Fixed
+  { name: "Housing",       budgeted: 1200, spent: 1200, color: "var(--chart-1)", group: "Fixed" },
+  { name: "Utilities",     budgeted: 150,  spent: 134,  color: "var(--chart-2)", group: "Fixed" },
+  { name: "Internet",      budgeted: 60,   spent: 60,   color: "var(--chart-3)", group: "Fixed" },
+  { name: "Subscriptions", budgeted: 50,   spent: 26,   color: "var(--chart-4)", group: "Fixed" },
+  // Flexible
+  { name: "Food & Dining", budgeted: 500,  spent: 420,  color: "var(--chart-2)", group: "Flexible" },
+  { name: "Transport",     budgeted: 200,  spent: 185,  color: "var(--chart-3)", group: "Flexible" },
+  { name: "Entertainment", budgeted: 150,  spent: 210,  color: "var(--chart-4)", group: "Flexible" }, // over budget
+  { name: "Health",        budgeted: 100,  spent: 60,   color: "var(--chart-5)", group: "Flexible" },
+  { name: "Shopping",      budgeted: 200,  spent: 155,  color: "var(--chart-1)", group: "Flexible" },
+  // Non-Monthly
+  { name: "Education",     budgeted: 100,  spent: 39,   color: "var(--chart-5)", group: "Non-Monthly" },
+  { name: "Travel",        budgeted: 300,  spent: 0,    color: "var(--chart-2)", group: "Non-Monthly" },
+  { name: "Gifts",         budgeted: 100,  spent: 0,    color: "var(--chart-3)", group: "Non-Monthly" },
 ]
 
 export type Transaction = {
