@@ -13,21 +13,13 @@ import {
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { accounts as initialAccounts, type Account, type AccountType } from "@/lib/mock-data"
+import { type Account, type AccountType } from "@/lib/mock-data"
 import { AddAccountDialog } from "@/components/app/accounts/add-account-dialog"
+import { useAccountsStore } from "@/store/accounts-store"
+import { stringUtil } from "@/lib/string-util"
 import { cn } from "@/lib/utils"
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-function fmt(n: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency", currency: "USD", maximumFractionDigits: 2,
-  }).format(Math.abs(n))
-}
-
-function initials(str: string) {
-  return str.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
-}
+// ─── constants ────────────────────────────────────────────────────────────────
 
 const GROUP_CONFIG: {
   label: string
@@ -57,7 +49,7 @@ function AccountRow({ account }: { account: Account }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors">
       <div className="size-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-        <span className="text-xs font-bold text-muted-foreground">{initials(account.institution)}</span>
+        <span className="text-xs font-bold text-muted-foreground">{stringUtil.initials(account.institution)}</span>
       </div>
 
       <div className="flex-1 min-w-0">
@@ -77,7 +69,7 @@ function AccountRow({ account }: { account: Account }) {
         "text-sm font-semibold tabular-nums shrink-0",
         isLiability ? "text-destructive" : "text-foreground"
       )}>
-        {isLiability ? "-" : ""}{fmt(account.balance)}
+        {isLiability ? "-" : ""}{stringUtil.formatMoneyFull(Math.abs(account.balance))}
       </p>
     </div>
   )
@@ -116,7 +108,7 @@ function GroupSection({
           "text-sm font-semibold tabular-nums",
           isLiability ? "text-destructive" : "text-foreground"
         )}>
-          {isLiability ? "-" : ""}{fmt(subtotal)}
+          {isLiability ? "-" : ""}{stringUtil.formatMoneyFull(Math.abs(subtotal))}
         </p>
         {open
           ? <IconChevronUp className="size-4 text-muted-foreground ml-2" />
@@ -136,12 +128,8 @@ function GroupSection({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState<Account[]>(initialAccounts)
+  const { accounts, addAccount } = useAccountsStore()
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  function handleAdd(account: Account) {
-    setAccounts((prev) => [...prev, account])
-  }
 
   const totalAssets      = accounts.filter((a) => a.balance > 0).reduce((s, a) => s + a.balance, 0)
   const totalLiabilities = accounts.filter((a) => a.balance < 0).reduce((s, a) => s + Math.abs(a.balance), 0)
@@ -174,7 +162,7 @@ export default function AccountsPage() {
       <div className="rounded-xl border border-border bg-card p-5 space-y-4">
         <div>
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Net Worth</p>
-          <p className="text-3xl font-bold tabular-nums mt-1">{fmt(netWorth)}</p>
+          <p className="text-3xl font-bold tabular-nums mt-1">{stringUtil.formatMoneyFull(netWorth)}</p>
         </div>
 
         {/* Assets vs Liabilities bar */}
@@ -191,14 +179,14 @@ export default function AccountsPage() {
               <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
               <p className="text-xs text-muted-foreground">Total Assets</p>
             </div>
-            <p className="text-xl font-bold tabular-nums text-emerald-600">{fmt(totalAssets)}</p>
+            <p className="text-xl font-bold tabular-nums text-emerald-600">{stringUtil.formatMoneyFull(totalAssets)}</p>
           </div>
           <div>
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="size-2 rounded-full bg-destructive shrink-0" />
               <p className="text-xs text-muted-foreground">Total Liabilities</p>
             </div>
-            <p className="text-xl font-bold tabular-nums text-destructive">{fmt(totalLiabilities)}</p>
+            <p className="text-xl font-bold tabular-nums text-destructive">{stringUtil.formatMoneyFull(totalLiabilities)}</p>
           </div>
         </div>
       </div>
@@ -220,7 +208,7 @@ export default function AccountsPage() {
       <AddAccountDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onAdd={handleAdd}
+        onAdd={addAccount}
       />
     </div>
   )

@@ -10,28 +10,24 @@ import {
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { budgetCategories as initialCategories, type BudgetCategory, type BudgetGroup } from "@/lib/mock-data"
+import { type BudgetCategory, type BudgetGroup } from "@/lib/mock-data"
 import { AddBudgetCategoryDialog } from "@/components/app/budget/add-budget-category-dialog"
+import { useBudgetStore } from "@/store/budget-store"
+import { stringUtil } from "@/lib/string-util"
+import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n)
-}
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-]
+// ─── constants ────────────────────────────────────────────────────────────────
 
 const GROUPS: BudgetGroup[] = ["Fixed", "Flexible", "Non-Monthly"]
 
-const groupDescriptions: Record<BudgetGroup, string> = {
-  Fixed:        "Same amount every month",
-  Flexible:     "Varies month to month",
+const GROUP_DESCRIPTIONS: Record<BudgetGroup, string> = {
+  Fixed:         "Same amount every month",
+  Flexible:      "Varies month to month",
   "Non-Monthly": "Occasional or seasonal expenses",
 }
+
+const CURRENT_YEAR = 2026
 
 // ─── sub-components ───────────────────────────────────────────────────────────
 
@@ -63,18 +59,18 @@ function CategoryRow({ cat }: { cat: BudgetCategory }) {
       <div className="flex gap-6 shrink-0 text-sm tabular-nums text-right">
         <div className="w-20">
           <p className="text-xs text-muted-foreground leading-none mb-0.5">Budgeted</p>
-          <p className="font-medium">{formatCurrency(cat.budgeted)}</p>
+          <p className="font-medium">{stringUtil.formatMoney(cat.budgeted)}</p>
         </div>
         <div className="w-20">
           <p className="text-xs text-muted-foreground leading-none mb-0.5">Spent</p>
           <p className={cn("font-medium", over ? "text-destructive" : "text-foreground")}>
-            {formatCurrency(cat.spent)}
+            {stringUtil.formatMoney(cat.spent)}
           </p>
         </div>
         <div className="w-20">
           <p className="text-xs text-muted-foreground leading-none mb-0.5">Remaining</p>
           <p className={cn("font-medium", over ? "text-destructive" : "text-emerald-600")}>
-            {over ? "-" : ""}{formatCurrency(Math.abs(remaining))}
+            {over ? "-" : ""}{stringUtil.formatMoney(Math.abs(remaining))}
           </p>
         </div>
       </div>
@@ -106,12 +102,12 @@ function GroupSection({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold">{group}</span>
-            <span className="text-xs text-muted-foreground">{groupDescriptions[group]}</span>
+            <span className="text-xs text-muted-foreground">{GROUP_DESCRIPTIONS[group]}</span>
           </div>
         </div>
         <div className="flex items-center gap-6 text-sm tabular-nums shrink-0">
           <span className="text-muted-foreground text-xs">
-            {formatCurrency(totalSpent)} / {formatCurrency(totalBudgeted)}
+            {stringUtil.formatMoney(totalSpent)} / {stringUtil.formatMoney(totalBudgeted)}
           </span>
           <span className={cn("text-xs font-medium", over ? "text-destructive" : "text-muted-foreground")}>
             {totalPct}%
@@ -138,19 +134,16 @@ function GroupSection({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function BudgetPage() {
-  const [monthIdx, setMonthIdx]   = useState(2) // March (0-indexed)
-  const [categories, setCategories] = useState<BudgetCategory[]>(initialCategories)
+  // UI-only state
+  const [monthIdx, setMonthIdx] = useState(2) // March (0-indexed)
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  function handleAddCategory(cat: BudgetCategory) {
-    setCategories((prev) => [...prev, cat])
-  }
-  const year = 2026
+  const { categories, addCategory } = useBudgetStore()
 
-  const totalBudgeted = categories.reduce((s, c) => s + c.budgeted, 0)
-  const totalSpent    = categories.reduce((s, c) => s + c.spent, 0)
+  const totalBudgeted  = categories.reduce((s, c) => s + c.budgeted, 0)
+  const totalSpent     = categories.reduce((s, c) => s + c.spent, 0)
   const totalRemaining = totalBudgeted - totalSpent
-  const overallPct    = Math.min(Math.round((totalSpent / totalBudgeted) * 100), 100)
+  const overallPct     = Math.min(Math.round((totalSpent / totalBudgeted) * 100), 100)
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -178,7 +171,7 @@ export default function BudgetPage() {
           <IconChevronLeft className="size-3.5" />
         </Button>
         <span className="text-sm font-semibold w-36 text-center">
-          {MONTHS[monthIdx]} {year}
+          {dateUtil.formatMonth(monthIdx, CURRENT_YEAR)}
         </span>
         <Button
           variant="outline"
@@ -195,11 +188,11 @@ export default function BudgetPage() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-xs text-muted-foreground">Total Budgeted</p>
-            <p className="text-lg font-bold tabular-nums">{formatCurrency(totalBudgeted)}</p>
+            <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalBudgeted)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Total Spent</p>
-            <p className="text-lg font-bold tabular-nums">{formatCurrency(totalSpent)}</p>
+            <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalSpent)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Remaining</p>
@@ -207,14 +200,14 @@ export default function BudgetPage() {
               "text-lg font-bold tabular-nums",
               totalRemaining < 0 ? "text-destructive" : "text-emerald-600"
             )}>
-              {totalRemaining < 0 ? "-" : ""}{formatCurrency(Math.abs(totalRemaining))}
+              {totalRemaining < 0 ? "-" : ""}{stringUtil.formatMoney(Math.abs(totalRemaining))}
             </p>
           </div>
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{overallPct}% of budget used</span>
-            <span>{formatCurrency(totalSpent)} / {formatCurrency(totalBudgeted)}</span>
+            <span>{stringUtil.formatMoney(totalSpent)} / {stringUtil.formatMoney(totalBudgeted)}</span>
           </div>
           <Progress
             value={overallPct}
@@ -235,7 +228,7 @@ export default function BudgetPage() {
       <AddBudgetCategoryDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onAdd={handleAddCategory}
+        onAdd={addCategory}
       />
     </div>
   )

@@ -1,177 +1,39 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import {
-  IconPlus,
-  IconPlayerPause,
-  IconPlayerPlay,
-  IconTrash,
-  IconRepeat,
-  IconSearch,
-} from "@tabler/icons-react"
+import { IconPlus, IconSearch } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { recurringItems as initialItems, type RecurringItem, type RecurringKind } from "@/lib/mock-data"
 import { AddRecurringDialog } from "@/components/app/recurring/add-recurring-dialog"
+import { RecurringRow } from "@/components/app/recurring/recurring-row"
+import { useRecurringStore } from "@/store/recurring-store"
+import { stringUtil } from "@/lib/string-util"
+import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-const TODAY = new Date(2026, 2, 11) // March 11 2026
-
-function fmt(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n)
-}
-
-function daysUntil(dateStr: string) {
-  const due  = new Date(dateStr)
-  const diff = Math.round((due.getTime() - TODAY.getTime()) / (1000 * 60 * 60 * 24))
-  return diff
-}
-
-function dueBadge(days: number) {
-  if (days < 0)  return { label: `${Math.abs(days)}d overdue`, cls: "bg-destructive/10 text-destructive border-destructive/20" }
-  if (days === 0) return { label: "Due today",    cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
-  if (days <= 5)  return { label: `in ${days}d`,  cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
-  return              { label: `in ${days}d`,  cls: "bg-muted text-muted-foreground border-border" }
-}
-
-function monthlyEquivalent(item: RecurringItem) {
-  if (item.frequency === "monthly") return item.amount
-  if (item.frequency === "weekly")  return item.amount * 4.33
-  if (item.frequency === "annual")  return item.amount / 12
-  return item.amount
-}
-
-const FREQ_LABEL: Record<string, string> = {
-  weekly: "Weekly", monthly: "Monthly", annual: "Annual",
-}
+// ─── constants ────────────────────────────────────────────────────────────────
 
 const KIND_TABS = ["all", "expense", "income"] as const
 type KindTab = (typeof KIND_TABS)[number]
 
-// ─── Row ─────────────────────────────────────────────────────────────────────
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
-function RecurringRow({
-  item,
-  onToggleStatus,
-  onDelete,
-}: {
-  item: RecurringItem
-  onToggleStatus: (id: string) => void
-  onDelete: (id: string) => void
-}) {
-  const days  = daysUntil(item.nextDue)
-  const due   = dueBadge(days)
-  const paused = item.status === "paused"
-
-  return (
-    <div className={cn(
-      "flex items-center gap-3 px-4 py-3.5 hover:bg-muted/30 transition-colors group",
-      paused && "opacity-60"
-    )}>
-      {/* Color avatar */}
-      <div
-        className="size-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0"
-        style={{ background: item.color }}
-      >
-        {item.name.slice(0, 2).toUpperCase()}
-      </div>
-
-      {/* Name + meta */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={cn("text-sm font-medium", paused && "line-through")}>{item.name}</span>
-          <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md font-normal">
-            {item.category}
-          </Badge>
-          <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md font-normal gap-0.5">
-            <IconRepeat className="size-2.5" />
-            {FREQ_LABEL[item.frequency]}
-          </Badge>
-          {paused && (
-            <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md text-muted-foreground">
-              Paused
-            </Badge>
-          )}
-        </div>
-        {/* Next due chip */}
-        {!paused && (
-          <div className="flex items-center gap-1.5 mt-1">
-            <span className="text-xs text-muted-foreground">Next:</span>
-            <span className="text-xs text-muted-foreground">
-              {new Date(item.nextDue).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-            </span>
-            <span className={cn("text-xs px-1.5 py-0.5 rounded-full border", due.cls)}>
-              {due.label}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Amount */}
-      <div className="text-right shrink-0 mr-2">
-        <p className={cn(
-          "text-sm font-semibold tabular-nums",
-          item.kind === "income" ? "text-emerald-600" : "text-foreground"
-        )}>
-          {item.kind === "income" ? "+" : "-"}{fmt(item.amount)}
-        </p>
-        {item.frequency !== "monthly" && (
-          <p className="text-xs text-muted-foreground">
-            ≈ {fmt(monthlyEquivalent(item))}/mo
-          </p>
-        )}
-      </div>
-
-      {/* Actions (visible on hover) */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button
-          onClick={() => onToggleStatus(item.id)}
-          title={paused ? "Resume" : "Pause"}
-          className="size-7 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {paused
-            ? <IconPlayerPlay className="size-3.5" />
-            : <IconPlayerPause className="size-3.5" />
-          }
-        </button>
-        <button
-          onClick={() => onDelete(item.id)}
-          title="Delete"
-          className="size-7 rounded-md hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
-        >
-          <IconTrash className="size-3.5" />
-        </button>
-      </div>
-    </div>
-  )
+function monthlyEquivalent(amount: number, frequency: string) {
+  if (frequency === "monthly") return amount
+  if (frequency === "weekly")  return amount * 4.33
+  if (frequency === "annual")  return amount / 12
+  return amount
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function RecurringPage() {
-  const [items, setItems]       = useState<RecurringItem[]>(initialItems)
-  const [addOpen, setAddOpen]   = useState(false)
-  const [search, setSearch]     = useState("")
-  const [kindTab, setKindTab]   = useState<KindTab>("all")
+  const { items, addItem, toggleStatus, deleteItem } = useRecurringStore()
 
-  function handleAdd(item: RecurringItem) {
-    setItems((prev) => [...prev, item])
-  }
-
-  function handleToggleStatus(id: string) {
-    setItems((prev) =>
-      prev.map((i) =>
-        i.id === id ? { ...i, status: i.status === "active" ? "paused" : "active" } : i
-      )
-    )
-  }
-
-  function handleDelete(id: string) {
-    setItems((prev) => prev.filter((i) => i.id !== id))
-  }
+  // UI-only state
+  const [addOpen, setAddOpen] = useState(false)
+  const [search, setSearch]   = useState("")
+  const [kindTab, setKindTab] = useState<KindTab>("all")
 
   // Filtered + sorted
   const filtered = useMemo(() => {
@@ -189,10 +51,13 @@ export default function RecurringPage() {
   }, [items, kindTab, search])
 
   // Summary numbers (active only)
-  const active       = items.filter((i) => i.status === "active")
-  const monthlyOut   = active.filter((i) => i.kind === "expense").reduce((s, i) => s + monthlyEquivalent(i), 0)
-  const monthlyIn    = active.filter((i) => i.kind === "income").reduce((s, i) => s + monthlyEquivalent(i), 0)
-  const upcomingCount = active.filter((i) => daysUntil(i.nextDue) <= 7 && daysUntil(i.nextDue) >= 0).length
+  const active        = items.filter((i) => i.status === "active")
+  const monthlyOut    = active.filter((i) => i.kind === "expense").reduce((s, i) => s + monthlyEquivalent(i.amount, i.frequency), 0)
+  const monthlyIn     = active.filter((i) => i.kind === "income").reduce((s, i) => s + monthlyEquivalent(i.amount, i.frequency), 0)
+  const upcomingCount = active.filter((i) => {
+    const d = dateUtil.daysUntil(i.nextDue)
+    return d >= 0 && d <= 7
+  }).length
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -213,11 +78,11 @@ export default function RecurringPage() {
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-border bg-card px-4 py-3">
           <p className="text-xs text-muted-foreground">Monthly out</p>
-          <p className="text-lg font-bold tabular-nums text-destructive mt-0.5">-{fmt(monthlyOut)}</p>
+          <p className="text-lg font-bold tabular-nums text-destructive mt-0.5">-{stringUtil.formatMoneyFull(monthlyOut)}</p>
         </div>
         <div className="rounded-xl border border-border bg-card px-4 py-3">
           <p className="text-xs text-muted-foreground">Monthly in</p>
-          <p className="text-lg font-bold tabular-nums text-emerald-600 mt-0.5">+{fmt(monthlyIn)}</p>
+          <p className="text-lg font-bold tabular-nums text-emerald-600 mt-0.5">+{stringUtil.formatMoneyFull(monthlyIn)}</p>
         </div>
         <div className="rounded-xl border border-border bg-card px-4 py-3">
           <p className="text-xs text-muted-foreground">Due this week</p>
@@ -270,8 +135,8 @@ export default function RecurringPage() {
             <RecurringRow
               key={item.id}
               item={item}
-              onToggleStatus={handleToggleStatus}
-              onDelete={handleDelete}
+              onToggleStatus={toggleStatus}
+              onDelete={deleteItem}
             />
           ))
         )}
@@ -288,7 +153,7 @@ export default function RecurringPage() {
       <AddRecurringDialog
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        onAdd={handleAdd}
+        onAdd={addItem}
       />
     </div>
   )
