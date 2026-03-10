@@ -58,13 +58,61 @@ export type Transaction = {
   type: "income" | "expense"
 }
 
-export const recentTransactions: Transaction[] = [
-  { id: "1", merchant: "Salary",         category: "Income",      date: "Mar 25", amount: 4280,  type: "income"  },
-  { id: "2", merchant: "Netflix",         category: "Entertainment", date: "Mar 22", amount: 15.99, type: "expense" },
-  { id: "3", merchant: "Whole Foods",     category: "Food",        date: "Mar 21", amount: 87.40, type: "expense" },
-  { id: "4", merchant: "Shell Gas",       category: "Transport",   date: "Mar 20", amount: 62.00, type: "expense" },
-  { id: "5", merchant: "Gym Membership",  category: "Health",      date: "Mar 18", amount: 45.00, type: "expense" },
+export const CATEGORIES = [
+  "Income",
+  "Housing",
+  "Food & Dining",
+  "Transport",
+  "Entertainment",
+  "Health",
+  "Shopping",
+  "Utilities",
+  "Education",
+  "Other",
+] as const
+
+export type Category = (typeof CATEGORIES)[number]
+
+export const allTransactions: Transaction[] = [
+  // March 25
+  { id: "1",  merchant: "Salary Deposit",    category: "Income",        date: "2026-03-25", amount: 4280.00, type: "income"  },
+  // March 22
+  { id: "2",  merchant: "Netflix",           category: "Entertainment", date: "2026-03-22", amount: 15.99,  type: "expense" },
+  { id: "3",  merchant: "Spotify",           category: "Entertainment", date: "2026-03-22", amount: 9.99,   type: "expense" },
+  // March 21
+  { id: "4",  merchant: "Whole Foods",       category: "Food & Dining", date: "2026-03-21", amount: 87.40,  type: "expense" },
+  { id: "5",  merchant: "Starbucks",         category: "Food & Dining", date: "2026-03-21", amount: 6.50,   type: "expense" },
+  // March 20
+  { id: "6",  merchant: "Shell Gas",         category: "Transport",     date: "2026-03-20", amount: 62.00,  type: "expense" },
+  { id: "7",  merchant: "Uber",              category: "Transport",     date: "2026-03-20", amount: 14.25,  type: "expense" },
+  // March 18
+  { id: "8",  merchant: "Gym Membership",    category: "Health",        date: "2026-03-18", amount: 45.00,  type: "expense" },
+  // March 16
+  { id: "9",  merchant: "Freelance Project", category: "Income",        date: "2026-03-16", amount: 850.00, type: "income"  },
+  { id: "10", merchant: "Amazon",            category: "Shopping",      date: "2026-03-16", amount: 43.99,  type: "expense" },
+  // March 15
+  { id: "11", merchant: "Rent",              category: "Housing",       date: "2026-03-15", amount: 1200.00,type: "expense" },
+  { id: "12", merchant: "Electric Bill",     category: "Utilities",     date: "2026-03-15", amount: 74.20,  type: "expense" },
+  // March 14
+  { id: "13", merchant: "McDonald's",        category: "Food & Dining", date: "2026-03-14", amount: 12.80,  type: "expense" },
+  // March 12
+  { id: "14", merchant: "Coursera",          category: "Education",     date: "2026-03-12", amount: 39.00,  type: "expense" },
+  // March 10
+  { id: "15", merchant: "Pharmacy",          category: "Health",        date: "2026-03-10", amount: 28.50,  type: "expense" },
+  { id: "16", merchant: "Target",            category: "Shopping",      date: "2026-03-10", amount: 65.00,  type: "expense" },
+  // March 8
+  { id: "17", merchant: "Internet Bill",     category: "Utilities",     date: "2026-03-08", amount: 59.99,  type: "expense" },
+  // March 6
+  { id: "18", merchant: "Chipotle",          category: "Food & Dining", date: "2026-03-06", amount: 14.75,  type: "expense" },
+  // March 4
+  { id: "19", merchant: "Parking",           category: "Transport",     date: "2026-03-04", amount: 18.00,  type: "expense" },
+  // March 2
+  { id: "20", merchant: "Side Project Sale", category: "Income",        date: "2026-03-02", amount: 120.00, type: "income"  },
+  { id: "21", merchant: "Zara",              category: "Shopping",      date: "2026-03-02", amount: 89.90,  type: "expense" },
 ]
+
+// First 5 for the dashboard widget
+export const recentTransactions: Transaction[] = allTransactions.slice(0, 5)
 
 export type Goal = {
   name: string
