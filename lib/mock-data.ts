@@ -207,3 +207,38 @@ export const goals: Goal[] = [
     monthlyContribution: 800, color: "#10b981",
   },
 ]
+
+// ─── Recurring ────────────────────────────────────────────────────────────────
+
+export type RecurringFrequency = "weekly" | "monthly" | "annual"
+export type RecurringStatus    = "active" | "paused"
+export type RecurringKind      = "expense" | "income"
+
+export type RecurringItem = {
+  id: string
+  name: string
+  category: string
+  amount: number
+  frequency: RecurringFrequency
+  nextDue: string        // ISO date "YYYY-MM-DD"
+  kind: RecurringKind
+  status: RecurringStatus
+  color: string
+}
+
+export const recurringItems: RecurringItem[] = [
+  // Expenses – monthly
+  { id: "r1",  name: "Rent",           category: "Housing",       amount: 1200,   frequency: "monthly", nextDue: "2026-04-01", kind: "expense", status: "active", color: "#0ea5e9" },
+  { id: "r2",  name: "Netflix",        category: "Entertainment", amount: 15.99,  frequency: "monthly", nextDue: "2026-03-18", kind: "expense", status: "active", color: "#ef4444" },
+  { id: "r3",  name: "Spotify",        category: "Entertainment", amount: 9.99,   frequency: "monthly", nextDue: "2026-03-22", kind: "expense", status: "active", color: "#22c55e" },
+  { id: "r4",  name: "Gym Membership", category: "Health",        amount: 40,     frequency: "monthly", nextDue: "2026-03-15", kind: "expense", status: "active", color: "#f97316" },
+  { id: "r5",  name: "Internet Bill",  category: "Utilities",     amount: 59.99,  frequency: "monthly", nextDue: "2026-04-08", kind: "expense", status: "active", color: "#64748b" },
+  { id: "r6",  name: "Phone Plan",     category: "Utilities",     amount: 45,     frequency: "monthly", nextDue: "2026-03-25", kind: "expense", status: "active", color: "#8b5cf6" },
+  { id: "r7",  name: "iCloud+",        category: "Subscriptions", amount: 2.99,   frequency: "monthly", nextDue: "2026-03-30", kind: "expense", status: "paused", color: "#94a3b8" },
+  // Expenses – annual
+  { id: "r8",  name: "Amazon Prime",   category: "Subscriptions", amount: 139,    frequency: "annual",  nextDue: "2026-11-14", kind: "expense", status: "active", color: "#f59e0b" },
+  { id: "r9",  name: "Adobe CC",       category: "Subscriptions", amount: 599.88, frequency: "annual",  nextDue: "2026-08-01", kind: "expense", status: "paused", color: "#ec4899" },
+  // Income – monthly
+  { id: "r10", name: "Salary",         category: "Income",        amount: 4500,   frequency: "monthly", nextDue: "2026-03-31", kind: "income",  status: "active", color: "#10b981" },
+  { id: "r11", name: "Freelance",      category: "Income",        amount: 750,    frequency: "monthly", nextDue: "2026-04-05", kind: "income",  status: "active", color: "#14b8a6" },
+]
