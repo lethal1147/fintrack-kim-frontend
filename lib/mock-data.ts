@@ -173,14 +173,37 @@ export const monthlyTrend: MonthlyTrend[] = [
 ]
 
 export type Goal = {
+  id: string
   name: string
+  emoji: string
   target: number
   current: number
-  emoji: string
+  /** ISO date string e.g. "2026-09-01" */
+  targetDate: string
+  /** Monthly amount being set aside */
+  monthlyContribution: number
+  color: string
 }
 
 export const goals: Goal[] = [
-  { name: "Emergency Fund", target: 10000, current: 6800,  emoji: "🛡️" },
-  { name: "Vacation",       target: 3000,  current: 1240,  emoji: "✈️" },
-  { name: "New Laptop",     target: 1500,  current: 900,   emoji: "💻" },
+  {
+    id: "g1", name: "Emergency Fund", emoji: "🛡️",
+    target: 10000, current: 6800, targetDate: "2026-09-01",
+    monthlyContribution: 400, color: "#0ea5e9",
+  },
+  {
+    id: "g2", name: "Vacation to Japan", emoji: "✈️",
+    target: 3000, current: 1240, targetDate: "2026-08-01",
+    monthlyContribution: 250, color: "#8b5cf6",
+  },
+  {
+    id: "g3", name: "New Laptop", emoji: "💻",
+    target: 1500, current: 900, targetDate: "2026-05-01",
+    monthlyContribution: 150, color: "#f97316",
+  },
+  {
+    id: "g4", name: "House Down Payment", emoji: "🏠",
+    target: 50000, current: 12400, targetDate: "2029-01-01",
+    monthlyContribution: 800, color: "#10b981",
+  },
 ]
