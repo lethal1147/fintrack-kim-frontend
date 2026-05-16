@@ -1,27 +1,25 @@
-"use client"
+"use client";
 
 import {
   IconUser,
   IconLock,
   IconBell,
-  IconSettings,
   IconAlertTriangle,
-} from "@tabler/icons-react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { ProfileTab } from "@/components/app/settings/profile-tab"
-import { SecurityTab } from "@/components/app/settings/security-tab"
-import { NotificationsTab } from "@/components/app/settings/notifications-tab"
-import { PreferencesTab } from "@/components/app/settings/preferences-tab"
-import { DangerZone } from "@/components/app/settings/danger-zone"
+} from "@tabler/icons-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ProfileTab } from "@/components/app/settings/profile-tab";
+import { SecurityTab } from "@/components/app/settings/security-tab";
+import { NotificationsTab } from "@/components/app/settings/notifications-tab";
+import { DangerZone } from "@/components/app/settings/danger-zone";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
 const SETTINGS_TABS = [
-  { value: "profile",       label: "Profile",       icon: IconUser },
-  { value: "security",      label: "Security",      icon: IconLock },
+  { value: "profile", label: "Profile", icon: IconUser },
+  { value: "security", label: "Security", icon: IconLock },
   { value: "notifications", label: "Notifications", icon: IconBell },
-  { value: "preferences",   label: "Preferences",   icon: IconSettings },
-]
+  // { value: "preferences", label: "Preferences", icon: IconSettings },
+];
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
@@ -31,10 +29,16 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your account and preferences</p>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Manage your account and preferences
+        </p>
       </div>
 
-      <Tabs defaultValue="profile" orientation="vertical" className="gap-8 items-start">
+      <Tabs
+        defaultValue="profile"
+        orientation="vertical"
+        className="gap-8 items-start"
+      >
         {/* Left nav */}
         <TabsList className="w-44 shrink-0 bg-transparent p-0 gap-0.5 rounded-none h-auto">
           {SETTINGS_TABS.map(({ value, label, icon: Icon }) => (
@@ -64,12 +68,20 @@ export default function SettingsPage() {
         </TabsList>
 
         {/* Content panels */}
-        <TabsContent value="profile"       className="mt-0 min-w-0"><ProfileTab /></TabsContent>
-        <TabsContent value="security"      className="mt-0 min-w-0"><SecurityTab /></TabsContent>
-        <TabsContent value="notifications" className="mt-0 min-w-0"><NotificationsTab /></TabsContent>
-        <TabsContent value="preferences"   className="mt-0 min-w-0"><PreferencesTab /></TabsContent>
-        <TabsContent value="danger"        className="mt-0 min-w-0"><DangerZone /></TabsContent>
+        <TabsContent value="profile" className="mt-0 min-w-0">
+          <ProfileTab />
+        </TabsContent>
+        <TabsContent value="security" className="mt-0 min-w-0">
+          <SecurityTab />
+        </TabsContent>
+        <TabsContent value="notifications" className="mt-0 min-w-0">
+          <NotificationsTab />
+        </TabsContent>
+        {/* <TabsContent value="preferences"   className="mt-0 min-w-0"><PreferencesTab /></TabsContent> */}
+        <TabsContent value="danger" className="mt-0 min-w-0">
+          <DangerZone />
+        </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
