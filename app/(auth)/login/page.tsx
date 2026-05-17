@@ -1,14 +1,33 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { IconEye, IconEyeOff, IconBrandGoogle } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthStore } from "@/store/auth-store"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { login, isLoading } = useAuthStore()
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    try {
+      await login(email, password)
+      router.push("/dashboard")
+    } catch {
+      setError(useAuthStore.getState().error ?? "Invalid email or password")
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -21,7 +40,7 @@ export default function LoginPage() {
       </div>
 
       {/* Social login */}
-      <Button variant="outline" className="w-full gap-2" size="lg">
+      <Button variant="outline" className="w-full gap-2" size="lg" disabled>
         <IconBrandGoogle className="size-4" />
         Continue with Google
       </Button>
@@ -37,7 +56,7 @@ export default function LoginPage() {
       </div>
 
       {/* Form */}
-      <form className="space-y-5">
+      <form className="space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -45,6 +64,10 @@ export default function LoginPage() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            required
           />
         </div>
 
@@ -65,6 +88,10 @@ export default function LoginPage() {
               placeholder="••••••••"
               autoComplete="current-password"
               className="pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              required
             />
             <button
               type="button"
@@ -81,8 +108,16 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
-          Sign in
+        {error && (
+          <p className="text-sm text-destructive">{error}</p>
+        )}
+
+        <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+          {isLoading ? (
+            <><IconLoader2 className="size-4 animate-spin" /> Signing in…</>
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </form>
 

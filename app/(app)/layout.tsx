@@ -1,6 +1,33 @@
+"use client"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/app/sidebar"
+import { useAuthStore } from "@/store/auth-store"
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const { isLoading, accessToken, refreshAccessToken, loadUser } = useAuthStore()
+
+  useEffect(() => {
+    refreshAccessToken().then((ok) => {
+      if (!ok) {
+        router.replace("/login")
+      } else {
+        loadUser()
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (isLoading || !accessToken) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
