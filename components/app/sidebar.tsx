@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   IconChartPie,
   IconLayoutDashboard,
@@ -12,10 +12,13 @@ import {
   IconRepeat,
   IconSettings,
   IconWallet,
+  IconLogout,
 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { stringUtil } from "@/lib/string-util"
+import { useAuthStore } from "@/store/auth-store"
 
-const primaryNav = [
+const PRIMARY_NAV = [
   { label: "Dashboard",    href: "/dashboard",    icon: IconLayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: IconArrowsExchange },
   { label: "Budget",       href: "/budget",       icon: IconWallet },
@@ -27,6 +30,15 @@ const primaryNav = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, logout } = useAuthStore()
+
+  async function handleLogout() {
+    await logout()
+    router.replace("/login")
+  }
+
+  const initials = user?.name ? stringUtil.initials(user.name) : "?"
 
   return (
     <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-sidebar-border bg-sidebar h-screen sticky top-0">
@@ -40,7 +52,7 @@ export function Sidebar() {
 
       {/* Primary nav */}
       <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-        {primaryNav.map(({ label, href, icon: Icon }) => {
+        {PRIMARY_NAV.map(({ label, href, icon: Icon }) => {
           const active = pathname === href
           return (
             <Link
@@ -78,13 +90,26 @@ export function Sidebar() {
         {/* User identity */}
         <div className="flex items-center gap-2.5 px-2.5 py-2 mt-1">
           <div className="flex items-center justify-center size-7 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0">
-            K
+            {initials}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-sidebar-foreground truncate">Kim Joakim</p>
-            <p className="text-xs text-sidebar-foreground/50 truncate">kim@example.com</p>
+            <p className="text-xs font-medium text-sidebar-foreground truncate">
+              {user?.name ?? "—"}
+            </p>
+            <p className="text-xs text-sidebar-foreground/50 truncate">
+              {user?.email ?? "—"}
+            </p>
           </div>
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+        >
+          <IconLogout className="size-4 shrink-0" />
+          Sign out
+        </button>
       </div>
     </aside>
   )
