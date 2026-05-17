@@ -1,0 +1,92 @@
+import { create } from "zustand"
+import { authApi, ApiError, type UserProfile } from "@/lib/api-client"
+
+type AuthState = {
+  user: UserProfile | null
+  accessToken: string | null
+  isLoading: boolean
+  error: string | null
+
+  login(email: string, password: string): Promise<void>
+  register(name: string, email: string, password: string): Promise<void>
+  logout(): Promise<void>
+  refreshAccessToken(): Promise<boolean>
+  loadUser(): Promise<void>
+  clearError(): void
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user: null,
+  accessToken: null,
+  isLoading: false,
+  error: null,
+
+  async login(email, password) {
+    set({ isLoading: true, error: null })
+    try {
+      const resp = await authApi.login(email, password)
+      set({ accessToken: resp.access_token, user: resp.user, isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
+    }
+  },
+
+  async register(name, email, password) {
+    set({ isLoading: true, error: null })
+    try {
+      const resp = await authApi.register(name, email, password)
+      set({ accessToken: resp.access_token, user: resp.user, isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
+    }
+  },
+
+  async logout() {
+    const { accessToken } = get()
+    set({ isLoading: true })
+    try {
+      await authApi.logout()
+      if (accessToken) {
+        await authApi.logoutAll(accessToken).catch(() => {})
+      }
+    } catch {
+      // best-effort — always clear local state
+    } finally {
+      set({ user: null, accessToken: null, isLoading: false, error: null })
+    }
+  },
+
+  async refreshAccessToken() {
+    set({ isLoading: true })
+    try {
+      const resp = await authApi.refresh()
+      set({ accessToken: resp.access_token, isLoading: false })
+      return true
+    } catch {
+      set({ user: null, accessToken: null, isLoading: false })
+      return false
+    }
+  },
+
+  async loadUser() {
+    const { accessToken } = get()
+    if (!accessToken) return
+    try {
+      const user = await authApi.me(accessToken)
+      set({ user })
+    } catch {
+      // if /me fails, keep existing user state — access token may still be valid
+    }
+  },
+
+  clearError() {
+    set({ error: null })
+  },
+}))
+
+function errorMessage(err: unknown): string {
+  if (err instanceof ApiError) return err.message
+  return "Something went wrong. Please try again."
+}
