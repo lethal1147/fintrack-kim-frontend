@@ -44,7 +44,9 @@ export default function TransactionsPage() {
     pages,
     isLoading,
     filter,
+    monthlySummary,
     fetchTransactions,
+    fetchMonthlySummary,
     setFilter,
     addTransaction,
     updateTransaction,
@@ -55,11 +57,13 @@ export default function TransactionsPage() {
   const [dialogOpen, setDialogOpen]   = useState(false)
   const [editTarget, setEditTarget]   = useState<Transaction | null>(null)
 
-  useEffect(() => { fetchTransactions() }, [fetchTransactions])
+  useEffect(() => {
+    fetchTransactions()
+    fetchMonthlySummary()
+  }, [fetchTransactions, fetchMonthlySummary])
 
-  // ── summary (current page) ─────────────────────────────────────────────────
-  const totalIncome  = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
-  const totalExpense = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
+  const totalIncome  = monthlySummary?.totalIncome  ?? 0
+  const totalExpense = monthlySummary?.totalExpense ?? 0
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -83,7 +87,7 @@ export default function TransactionsPage() {
             <IconArrowDown className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Total income</p>
+            <p className="text-xs text-muted-foreground">Income this month</p>
             <p className="text-base font-bold text-emerald-600">{stringUtil.formatMoneyFull(totalIncome)}</p>
           </div>
         </div>
@@ -92,7 +96,7 @@ export default function TransactionsPage() {
             <IconArrowUp className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Total spent</p>
+            <p className="text-xs text-muted-foreground">Spent this month</p>
             <p className="text-base font-bold">{stringUtil.formatMoneyFull(totalExpense)}</p>
           </div>
         </div>
