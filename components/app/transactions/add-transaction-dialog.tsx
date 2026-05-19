@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils"
 type Props = {
   open: boolean
   onClose: () => void
-  onAdd: (tx: { merchant: string; category: string; note: string; date: string; amount: number; type: "income" | "expense" }) => void
+  onAdd: (tx: { merchant: string; category: string; note: string; date: string; amount: number; type: "income" | "expense" }) => Promise<void>
 }
 
 export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
@@ -34,27 +34,31 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [category, setCategory] = useState("")
   const [notes, setNotes] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!merchant || !amount || !category) return
 
-    onAdd({
-      merchant,
-      category,
-      note: notes,
-      date,
-      amount: parseFloat(amount),
-      type,
-    })
-
-    // Reset
-    setMerchant("")
-    setAmount("")
-    setCategory("")
-    setNotes("")
-    setType("expense")
-    onClose()
+    setIsSubmitting(true)
+    try {
+      await onAdd({
+        merchant,
+        category,
+        note: notes,
+        date,
+        amount: parseFloat(amount),
+        type,
+      })
+      setMerchant("")
+      setAmount("")
+      setCategory("")
+      setNotes("")
+      setType("expense")
+      onClose()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -152,14 +156,14 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
           </div>
 
           <DialogFooter className="gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={!merchant || !amount || !category}
+              disabled={!merchant || !amount || !category || isSubmitting}
             >
-              Add transaction
+              {isSubmitting ? "Adding…" : "Add transaction"}
             </Button>
           </DialogFooter>
         </form>

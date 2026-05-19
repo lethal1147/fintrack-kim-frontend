@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 import {
   IconPlus,
   IconSearch,
@@ -29,53 +29,32 @@ import { cn } from "@/lib/utils"
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
-const PAGE_SIZE    = 8
 const TYPE_FILTERS = ["all", "income", "expense"] as const
-const VIEW_LIST = "list" as const
+const VIEW_LIST  = "list" as const
 const VIEW_TABLE = "table" as const
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function TransactionsPage() {
-  const { transactions, addTransaction } = useTransactionsStore()
+  const {
+    transactions,
+    total,
+    pages,
+    isLoading,
+    filter,
+    fetchTransactions,
+    setFilter,
+    addTransaction,
+  } = useTransactionsStore()
 
-  // UI-only state
-  const [search, setSearch] = useState("")
-  const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [view, setView] = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
-  const [page, setPage] = useState(1)
+  const [view, setView]           = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  // reset to page 1 on any filter change
-  function updateSearch(v: string)              { setSearch(v);        setPage(1) }
-  function updateType(v: typeof typeFilter)     { setTypeFilter(v);    setPage(1) }
-  function updateCategory(v: string)            { setCategoryFilter(v); setPage(1) }
-  function updateView(v: typeof view)           { setView(v);          setPage(1) }
+  useEffect(() => { fetchTransactions() }, [])
 
-  // ── filtered list (sorted newest first) ──────────────────────────────────
-  const filtered = useMemo(() => {
-    return transactions
-      .filter((tx) => {
-        const matchSearch =
-          !search ||
-          tx.merchant.toLowerCase().includes(search.toLowerCase()) ||
-          tx.category.toLowerCase().includes(search.toLowerCase())
-        const matchType = typeFilter === "all" || tx.type === typeFilter
-        const matchCat  = categoryFilter === "all" || tx.category === categoryFilter
-        return matchSearch && matchType && matchCat
-      })
-      .sort((a, b) => b.date.localeCompare(a.date))
-  }, [transactions, search, typeFilter, categoryFilter])
-
-  // ── pagination ────────────────────────────────────────────────────────────
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const safePage   = Math.min(page, totalPages)
-  const paginated  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
-
-  // ── summary (over full filtered set, not just current page) ──────────────
-  const totalIncome  = filtered.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
-  const totalExpense = filtered.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
+  // ── summary (current page) ─────────────────────────────────────────────────
+  const totalIncome  = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
+  const totalExpense = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -84,7 +63,7 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Transactions</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{filtered.length} entries</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{total} entries</p>
         </div>
         <Button onClick={() => setDialogOpen(true)} className="gap-1.5">
           <IconPlus className="size-4" />
@@ -121,8 +100,8 @@ export default function TransactionsPage() {
           <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
             placeholder="Search transactions..."
-            value={search}
-            onChange={(e) => updateSearch(e.target.value)}
+            value={filter.search}
+            onChange={(e) => setFilter({ search: e.target.value })}
             className="pl-8"
           />
         </div>
@@ -132,10 +111,10 @@ export default function TransactionsPage() {
           {TYPE_FILTERS.map((t) => (
             <button
               key={t}
-              onClick={() => updateType(t)}
+              onClick={() => setFilter({ type: t })}
               className={cn(
                 "px-3 py-1.5 capitalize transition-colors",
-                typeFilter === t
+                filter.type === t
                   ? "bg-primary text-primary-foreground"
                   : "bg-background text-muted-foreground hover:bg-muted"
               )}
@@ -146,7 +125,10 @@ export default function TransactionsPage() {
         </div>
 
         {/* Category filter */}
-        <Select value={categoryFilter} onValueChange={updateCategory}>
+        <Select
+          value={filter.category || "all"}
+          onValueChange={(v) => setFilter({ category: v === "all" ? "" : v })}
+        >
           <SelectTrigger className="w-44 shrink-0">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
@@ -161,7 +143,7 @@ export default function TransactionsPage() {
         {/* View toggle */}
         <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
           <button
-            onClick={() => updateView(VIEW_LIST)}
+            onClick={() => setView(VIEW_LIST)}
             className={cn(
               "flex items-center justify-center px-2.5 py-1.5 transition-colors",
               view === VIEW_LIST
@@ -173,7 +155,7 @@ export default function TransactionsPage() {
             <IconLayoutList className="size-4" />
           </button>
           <button
-            onClick={() => updateView(VIEW_TABLE)}
+            onClick={() => setView(VIEW_TABLE)}
             className={cn(
               "flex items-center justify-center px-2.5 py-1.5 transition-colors",
               view === VIEW_TABLE
@@ -188,23 +170,25 @@ export default function TransactionsPage() {
       </div>
 
       {/* ── Content ── */}
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="py-20 text-center text-muted-foreground text-sm">Loading…</div>
+      ) : transactions.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground text-sm">
           No transactions match your filters.
         </div>
       ) : view === VIEW_LIST ? (
-        <TransactionListView paginated={paginated} />
+        <TransactionListView paginated={transactions} />
       ) : (
-        <TransactionTableView paginated={paginated} />
+        <TransactionTableView paginated={transactions} />
       )}
 
       {/* ── Pagination ── */}
-      {filtered.length > 0 && (
+      {total > 0 && (
         <TransactionPagination
-          safePage={safePage}
-          totalPages={totalPages}
-          filteredCount={filtered.length}
-          onPageChange={setPage}
+          safePage={filter.page}
+          totalPages={pages}
+          filteredCount={total}
+          onPageChange={(p) => setFilter({ page: p })}
         />
       )}
 
@@ -212,7 +196,7 @@ export default function TransactionsPage() {
       <AddTransactionDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onAdd={(body) => addTransaction({ id: Date.now().toString(), ...body })}
+        onAdd={addTransaction}
       />
     </div>
   )

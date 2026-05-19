@@ -1,22 +1,34 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { type Transaction } from "@/lib/mock-data"
+import { type Transaction } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Income:          "bg-emerald-500",
-  Housing:         "bg-sky-500",
-  "Food & Dining": "bg-orange-500",
-  Transport:       "bg-blue-500",
-  Entertainment:   "bg-violet-500",
-  Health:          "bg-pink-500",
-  Shopping:        "bg-amber-500",
-  Utilities:       "bg-slate-500",
-  Education:       "bg-teal-500",
-  Other:           "bg-gray-400",
+  // Income
+  Salary:               "bg-emerald-500",
+  Freelance:            "bg-green-500",
+  Business:             "bg-lime-500",
+  "Gift Received":      "bg-teal-400",
+  "Investment Returns": "bg-cyan-500",
+  "Rental Income":      "bg-emerald-400",
+  "Other Income":       "bg-green-400",
+  // Expense
+  Housing:              "bg-sky-500",
+  "Food & Dining":      "bg-orange-500",
+  Transport:            "bg-blue-500",
+  Entertainment:        "bg-violet-500",
+  Health:               "bg-pink-500",
+  Shopping:             "bg-amber-500",
+  Utilities:            "bg-slate-500",
+  Education:            "bg-teal-500",
+  Investment:           "bg-indigo-500",
+  Travel:               "bg-purple-500",
+  "Gifts & Donations":  "bg-rose-500",
+  Subscriptions:        "bg-slate-400",
+  Other:                "bg-gray-400",
 }
 
 function groupByDate(txs: Transaction[]): [string, Transaction[]][] {
