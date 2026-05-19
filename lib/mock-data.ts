@@ -71,21 +71,6 @@ export type Transaction = {
   type: "income" | "expense"
 }
 
-export const CATEGORIES = [
-  "Income",
-  "Housing",
-  "Food & Dining",
-  "Transport",
-  "Entertainment",
-  "Health",
-  "Shopping",
-  "Utilities",
-  "Education",
-  "Other",
-] as const
-
-export type Category = (typeof CATEGORIES)[number]
-
 export const allTransactions: Transaction[] = [
   // March 25
   { id: "1",  merchant: "Salary Deposit",    category: "Income",        date: "2026-03-25", amount: 4280.00, type: "income"  },

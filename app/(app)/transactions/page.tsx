@@ -22,7 +22,7 @@ import { AddTransactionDialog } from "@/components/app/transactions/add-transact
 import { TransactionListView } from "@/components/app/transactions/transaction-list-view"
 import { TransactionTableView } from "@/components/app/transactions/transaction-table-view"
 import { TransactionPagination } from "@/components/app/transactions/transaction-pagination"
-import { CATEGORIES } from "@/lib/mock-data"
+import { ALL_CATEGORIES } from "@/lib/categories"
 import { stringUtil } from "@/lib/string-util"
 import { useTransactionsStore } from "@/store/transactions-store"
 import { cn } from "@/lib/utils"
@@ -152,7 +152,7 @@ export default function TransactionsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
-            {CATEGORIES.map((c) => (
+            {ALL_CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
             ))}
           </SelectContent>
@@ -212,7 +212,7 @@ export default function TransactionsPage() {
       <AddTransactionDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onAdd={addTransaction}
+        onAdd={(body) => addTransaction({ id: Date.now().toString(), ...body })}
       />
     </div>
   )

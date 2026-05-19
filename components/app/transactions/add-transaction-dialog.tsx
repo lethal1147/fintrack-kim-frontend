@@ -18,13 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CATEGORIES, type Transaction } from "@/lib/mock-data"
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
 
 type Props = {
   open: boolean
   onClose: () => void
-  onAdd: (tx: Transaction) => void
+  onAdd: (tx: { merchant: string; category: string; note: string; date: string; amount: number; type: "income" | "expense" }) => void
 }
 
 export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
@@ -40,9 +40,9 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
     if (!merchant || !amount || !category) return
 
     onAdd({
-      id: Date.now().toString(),
       merchant,
       category,
+      note: notes,
       date,
       amount: parseFloat(amount),
       type,
@@ -71,7 +71,7 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
               <button
                 key={t}
                 type="button"
-                onClick={() => setType(t)}
+                onClick={() => { setType(t); setCategory("") }}
                 className={cn(
                   "py-1.5 rounded-md text-sm font-medium transition-colors capitalize",
                   type === t
@@ -101,7 +101,7 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
           {/* Amount + Date side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="amount">Amount ($)</Label>
+              <Label htmlFor="amount">Amount (฿)</Label>
               <Input
                 id="amount"
                 type="number"
@@ -133,9 +133,7 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.filter((c) =>
-                  type === "income" ? c === "Income" : c !== "Income"
-                ).map((c) => (
+                {(type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>

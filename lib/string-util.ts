@@ -1,14 +1,14 @@
 import numeral from "numeral"
 
 export const stringUtil = {
-  /** "$1,235" — rounded, no cents */
+  /** "฿1,235" — rounded, no cents */
   formatMoney(value: number): string {
-    return numeral(value).format("$0,0")
+    return "฿" + numeral(value).format("0,0")
   },
 
-  /** "$1,234.56" — full precision */
+  /** "฿1,234.56" — full precision */
   formatMoneyFull(value: number): string {
-    return numeral(value).format("$0,0.00")
+    return "฿" + numeral(value).format("0,0.00")
   },
 
   /** "1,234" — plain number with thousands separator */
