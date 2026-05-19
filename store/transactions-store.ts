@@ -84,11 +84,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
   async addTransaction(body) {
     const token = useAuthStore.getState().accessToken
-    if (!token) return
+    if (!token) throw new Error("Not authenticated")
     set({ isLoading: true, error: null })
     try {
       await transactionApi.create(body, token)
-      set({ isLoading: false })
       await get().fetchTransactions()
     } catch (err) {
       set({ isLoading: false, error: (err as Error).message ?? "Failed to create transaction" })
@@ -98,11 +97,10 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
   async updateTransaction(id, body) {
     const token = useAuthStore.getState().accessToken
-    if (!token) return
+    if (!token) throw new Error("Not authenticated")
     set({ isLoading: true, error: null })
     try {
       await transactionApi.update(id, body, token)
-      set({ isLoading: false })
       await get().fetchTransactions()
     } catch (err) {
       set({ isLoading: false, error: (err as Error).message ?? "Failed to update transaction" })
@@ -112,7 +110,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
 
   async deleteTransaction(id) {
     const token = useAuthStore.getState().accessToken
-    if (!token) return
+    if (!token) throw new Error("Not authenticated")
     try {
       await transactionApi.delete(id, token)
       await get().fetchTransactions()

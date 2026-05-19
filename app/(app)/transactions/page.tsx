@@ -145,6 +145,25 @@ export default function TransactionsPage() {
           </SelectContent>
         </Select>
 
+        {/* Date range */}
+        <div className="flex items-center gap-1 shrink-0">
+          <Input
+            type="date"
+            value={filter.from}
+            onChange={(e) => setFilter({ from: e.target.value })}
+            className="w-36"
+            title="From date"
+          />
+          <span className="text-xs text-muted-foreground px-0.5">–</span>
+          <Input
+            type="date"
+            value={filter.to}
+            onChange={(e) => setFilter({ to: e.target.value })}
+            className="w-36"
+            title="To date"
+          />
+        </div>
+
         {/* View toggle */}
         <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
           <button
