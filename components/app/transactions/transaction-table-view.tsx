@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { IconPencil, IconTrash } from "@tabler/icons-react"
 import { type Transaction } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
@@ -33,9 +34,11 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 type Props = {
   paginated: Transaction[]
+  onEdit: (tx: Transaction) => void
+  onDelete: (id: string) => Promise<void>
 }
 
-export function TransactionTableView({ paginated }: Props) {
+export function TransactionTableView({ paginated, onEdit, onDelete }: Props) {
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <table className="w-full text-sm">
@@ -46,11 +49,12 @@ export function TransactionTableView({ paginated }: Props) {
             <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-36">Category</th>
             <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-24">Type</th>
             <th className="text-right px-4 py-2.5 font-medium text-muted-foreground w-32">Amount</th>
+            <th className="w-16" />
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
           {paginated.map((tx) => (
-            <tr key={tx.id} className="hover:bg-muted/40 transition-colors">
+            <tr key={tx.id} className="group hover:bg-muted/40 transition-colors">
               <td className="px-4 py-3 text-muted-foreground tabular-nums whitespace-nowrap">
                 {dateUtil.format(tx.date, "MMM D, YYYY")}
               </td>
@@ -77,6 +81,24 @@ export function TransactionTableView({ paginated }: Props) {
                 tx.type === "income" ? "text-emerald-600" : "text-foreground"
               )}>
                 {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
+              </td>
+              <td className="px-2 py-3">
+                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => onEdit(tx)}
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    title="Edit"
+                  >
+                    <IconPencil className="size-3.5" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(tx.id)}
+                    className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    title="Delete"
+                  >
+                    <IconTrash className="size-3.5" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

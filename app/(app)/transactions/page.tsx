@@ -19,9 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AddTransactionDialog } from "@/components/app/transactions/add-transaction-dialog"
+import { EditTransactionDialog } from "@/components/app/transactions/edit-transaction-dialog"
 import { TransactionListView } from "@/components/app/transactions/transaction-list-view"
 import { TransactionTableView } from "@/components/app/transactions/transaction-table-view"
 import { TransactionPagination } from "@/components/app/transactions/transaction-pagination"
+import { type Transaction } from "@/lib/api-client"
 import { ALL_CATEGORIES } from "@/lib/categories"
 import { stringUtil } from "@/lib/string-util"
 import { useTransactionsStore } from "@/store/transactions-store"
@@ -45,10 +47,13 @@ export default function TransactionsPage() {
     fetchTransactions,
     setFilter,
     addTransaction,
+    updateTransaction,
+    deleteTransaction,
   } = useTransactionsStore()
 
-  const [view, setView]           = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [view, setView]               = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
+  const [dialogOpen, setDialogOpen]   = useState(false)
+  const [editTarget, setEditTarget]   = useState<Transaction | null>(null)
 
   useEffect(() => { fetchTransactions() }, [])
 
@@ -177,9 +182,17 @@ export default function TransactionsPage() {
           No transactions match your filters.
         </div>
       ) : view === VIEW_LIST ? (
-        <TransactionListView paginated={transactions} />
+        <TransactionListView
+          paginated={transactions}
+          onEdit={setEditTarget}
+          onDelete={deleteTransaction}
+        />
       ) : (
-        <TransactionTableView paginated={transactions} />
+        <TransactionTableView
+          paginated={transactions}
+          onEdit={setEditTarget}
+          onDelete={deleteTransaction}
+        />
       )}
 
       {/* ── Pagination ── */}
@@ -192,11 +205,17 @@ export default function TransactionsPage() {
         />
       )}
 
-      {/* ── Dialog ── */}
+      {/* ── Dialogs ── */}
       <AddTransactionDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onAdd={addTransaction}
+      />
+      <EditTransactionDialog
+        open={editTarget !== null}
+        transaction={editTarget}
+        onClose={() => setEditTarget(null)}
+        onUpdate={updateTransaction}
       />
     </div>
   )

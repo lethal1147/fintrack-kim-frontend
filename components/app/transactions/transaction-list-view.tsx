@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { IconPencil, IconTrash } from "@tabler/icons-react"
 import { type Transaction } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
@@ -42,9 +43,11 @@ function groupByDate(txs: Transaction[]): [string, Transaction[]][] {
 
 type Props = {
   paginated: Transaction[]
+  onEdit: (tx: Transaction) => void
+  onDelete: (id: string) => Promise<void>
 }
 
-export function TransactionListView({ paginated }: Props) {
+export function TransactionListView({ paginated, onEdit, onDelete }: Props) {
   const grouped = groupByDate(paginated)
 
   return (
@@ -58,7 +61,7 @@ export function TransactionListView({ paginated }: Props) {
             {txs.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+                className="group flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
               >
                 <div className={cn("size-2.5 rounded-full shrink-0", CATEGORY_COLORS[tx.category] ?? "bg-muted-foreground")} />
                 <div className="flex-1 min-w-0">
@@ -76,6 +79,22 @@ export function TransactionListView({ paginated }: Props) {
                 )}>
                   {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
                 </p>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <button
+                    onClick={() => onEdit(tx)}
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    title="Edit"
+                  >
+                    <IconPencil className="size-3.5" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(tx.id)}
+                    className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    title="Delete"
+                  >
+                    <IconTrash className="size-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
