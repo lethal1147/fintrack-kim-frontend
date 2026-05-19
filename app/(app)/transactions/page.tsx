@@ -55,7 +55,7 @@ export default function TransactionsPage() {
   const [dialogOpen, setDialogOpen]   = useState(false)
   const [editTarget, setEditTarget]   = useState<Transaction | null>(null)
 
-  useEffect(() => { fetchTransactions() }, [])
+  useEffect(() => { fetchTransactions() }, [fetchTransactions])
 
   // ── summary (current page) ─────────────────────────────────────────────────
   const totalIncome  = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
