@@ -50,7 +50,7 @@ function BarTooltip({
 export function TrendBarChart({ data }: Props) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
-      <p className="text-sm font-semibold mb-4">6-Month Trend</p>
+      <p className="text-sm font-semibold mb-4">12-Month Trend</p>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barGap={4}>
           <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" />

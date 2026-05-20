@@ -119,6 +119,32 @@ export type SummaryParams = {
   to?: string
 }
 
+// ── Analytics types ───────────────────────────────────────────────────────
+
+export type CategoryStatWithPct = CategoryStat & { pct: number }
+
+export type MerchantStat = {
+  merchant: string
+  total: number
+  count: number
+}
+
+export type AnalyticsData = {
+  total_income:  number
+  total_expense: number
+  net:           number
+  tx_count:      number
+  savings_rate:  number
+  by_category:   CategoryStatWithPct[]
+  by_month:      MonthStat[]
+  top_merchants: MerchantStat[]
+}
+
+export type AnalyticsParams = {
+  from?: string
+  to?: string
+}
+
 // ── Transaction API helpers ───────────────────────────────────────────────
 
 export const transactionApi = {
@@ -168,6 +194,14 @@ export const transactionApi = {
     if (params.to)   q.set("to", params.to)
     const qs = q.toString() ? "?" + q.toString() : ""
     return apiFetch(`/api/transactions/summary${qs}`, { headers: authHeaders(token) })
+  },
+
+  analytics(params: AnalyticsParams, token: string): Promise<AnalyticsData> {
+    const q = new URLSearchParams()
+    if (params.from) q.set("from", params.from)
+    if (params.to)   q.set("to", params.to)
+    const qs = q.toString() ? "?" + q.toString() : ""
+    return apiFetch(`/api/transactions/analytics${qs}`, { headers: authHeaders(token) })
   },
 }
 
