@@ -5,9 +5,10 @@ import {
   IconPlayerPlay,
   IconTrash,
   IconRepeat,
+  IconPencil,
 } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
-import { type RecurringItem } from "@/lib/mock-data"
+import { type RecurringItem } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
@@ -40,10 +41,11 @@ type Props = {
   item: RecurringItem
   onToggleStatus: (id: string) => void
   onDelete: (id: string) => void
+  onEdit: (item: RecurringItem) => void
 }
 
-export function RecurringRow({ item, onToggleStatus, onDelete }: Props) {
-  const days   = dateUtil.daysUntil(item.nextDue)
+export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) {
+  const days   = dateUtil.daysUntil(item.next_due)
   const due    = dueBadge(days)
   const paused = item.status === "paused"
 
@@ -82,7 +84,7 @@ export function RecurringRow({ item, onToggleStatus, onDelete }: Props) {
           <div className="flex items-center gap-1.5 mt-1">
             <span className="text-xs text-muted-foreground">Next:</span>
             <span className="text-xs text-muted-foreground">
-              {dateUtil.format(item.nextDue, "MMM D")}
+              {dateUtil.format(item.next_due, "MMM D")}
             </span>
             <span className={cn("text-xs px-1.5 py-0.5 rounded-full border", due.cls)}>
               {due.label}
@@ -108,6 +110,13 @@ export function RecurringRow({ item, onToggleStatus, onDelete }: Props) {
 
       {/* Actions (visible on hover) */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <button
+          onClick={() => onEdit(item)}
+          title="Edit"
+          className="size-7 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <IconPencil className="size-3.5" />
+        </button>
         <button
           onClick={() => onToggleStatus(item.id)}
           title={paused ? "Resume" : "Pause"}

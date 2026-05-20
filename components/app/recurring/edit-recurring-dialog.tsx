@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,8 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { type RecurringItem, type RecurringFrequency, type RecurringKind, type CreateRecurringBody } from "@/lib/api-client"
+import { type RecurringItem, type RecurringFrequency, type RecurringKind, type UpdateRecurringBody } from "@/lib/api-client"
 import { cn } from "@/lib/utils"
+
+// ─── constants ────────────────────────────────────────────────────────────────
 
 const CATEGORIES = [
   "Housing", "Utilities", "Entertainment", "Health",
@@ -31,13 +33,16 @@ const COLOR_OPTIONS = [
   "#8b5cf6", "#10b981", "#f59e0b", "#ec4899",
 ]
 
+// ─── component ────────────────────────────────────────────────────────────────
+
 type Props = {
   open: boolean
+  item: RecurringItem | null
   onClose: () => void
-  onAdd: (body: CreateRecurringBody) => void
+  onEdit: (id: string, body: UpdateRecurringBody) => void
 }
 
-export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
+export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
   const [kind, setKind]           = useState<RecurringKind>("expense")
   const [name, setName]           = useState("")
   const [category, setCategory]   = useState("")
@@ -46,11 +51,23 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
   const [nextDue, setNextDue]     = useState("")
   const [color, setColor]         = useState(COLOR_OPTIONS[0])
 
+  useEffect(() => {
+    if (item) {
+      setKind(item.kind)
+      setName(item.name)
+      setCategory(item.category)
+      setAmount(String(item.amount))
+      setFrequency(item.frequency)
+      setNextDue(item.next_due)
+      setColor(item.color)
+    }
+  }, [item])
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name || !category || !amount || !frequency || !nextDue) return
+    if (!item || !name || !category || !amount || !frequency || !nextDue) return
 
-    onAdd({
+    onEdit(item.id, {
       name,
       category,
       amount:    parseFloat(amount),
@@ -59,9 +76,6 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
       kind,
       color,
     })
-
-    setName(""); setCategory(""); setAmount(""); setFrequency(""); setNextDue("")
-    setColor(COLOR_OPTIONS[0])
     onClose()
   }
 
@@ -71,7 +85,7 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Recurring Item</DialogTitle>
+          <DialogTitle>Edit Recurring Item</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
@@ -95,9 +109,9 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
 
           {/* Name */}
           <div className="space-y-1.5">
-            <Label htmlFor="rec-name">Name</Label>
+            <Label htmlFor="edit-rec-name">Name</Label>
             <Input
-              id="rec-name"
+              id="edit-rec-name"
               placeholder="e.g. Netflix, Rent, Salary…"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -119,9 +133,9 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
           {/* Amount + Frequency */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="rec-amount">Amount ($)</Label>
+              <Label htmlFor="edit-rec-amount">Amount</Label>
               <Input
-                id="rec-amount"
+                id="edit-rec-amount"
                 type="number" min="0.01" step="0.01" placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -143,9 +157,9 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
 
           {/* Next due date */}
           <div className="space-y-1.5">
-            <Label htmlFor="rec-due">Next due date</Label>
+            <Label htmlFor="edit-rec-due">Next due date</Label>
             <Input
-              id="rec-due"
+              id="edit-rec-due"
               type="date"
               value={nextDue}
               onChange={(e) => setNextDue(e.target.value)}
@@ -174,7 +188,7 @@ export function AddRecurringDialog({ open, onClose, onAdd }: Props) {
 
           <DialogFooter className="gap-2 pt-1">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={!valid}>Add item</Button>
+            <Button type="submit" disabled={!valid}>Save changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>

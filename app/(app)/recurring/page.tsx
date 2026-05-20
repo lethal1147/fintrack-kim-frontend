@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { IconPlus, IconSearch } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AddRecurringDialog } from "@/components/app/recurring/add-recurring-dialog"
+import { EditRecurringDialog } from "@/components/app/recurring/edit-recurring-dialog"
 import { RecurringRow } from "@/components/app/recurring/recurring-row"
 import { useRecurringStore } from "@/store/recurring-store"
+import { type RecurringItem } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
@@ -28,12 +30,15 @@ function monthlyEquivalent(amount: number, frequency: string) {
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function RecurringPage() {
-  const { items, addItem, toggleStatus, deleteItem } = useRecurringStore()
+  const { items, fetchItems, addItem, editItem, toggleStatus, deleteItem } = useRecurringStore()
+
+  useEffect(() => { fetchItems() }, [fetchItems])
 
   // UI-only state
-  const [addOpen, setAddOpen] = useState(false)
-  const [search, setSearch]   = useState("")
-  const [kindTab, setKindTab] = useState<KindTab>("all")
+  const [addOpen, setAddOpen]       = useState(false)
+  const [editItem_, setEditItem]    = useState<RecurringItem | null>(null)
+  const [search, setSearch]         = useState("")
+  const [kindTab, setKindTab]       = useState<KindTab>("all")
 
   // Filtered + sorted
   const filtered = useMemo(() => {
@@ -46,7 +51,7 @@ export default function RecurringPage() {
       .sort((a, b) => {
         // Active before paused, then by next due date
         if (a.status !== b.status) return a.status === "active" ? -1 : 1
-        return new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime()
+        return new Date(a.next_due).getTime() - new Date(b.next_due).getTime()
       })
   }, [items, kindTab, search])
 
@@ -55,7 +60,7 @@ export default function RecurringPage() {
   const monthlyOut    = active.filter((i) => i.kind === "expense").reduce((s, i) => s + monthlyEquivalent(i.amount, i.frequency), 0)
   const monthlyIn     = active.filter((i) => i.kind === "income").reduce((s, i) => s + monthlyEquivalent(i.amount, i.frequency), 0)
   const upcomingCount = active.filter((i) => {
-    const d = dateUtil.daysUntil(i.nextDue)
+    const d = dateUtil.daysUntil(i.next_due)
     return d >= 0 && d <= 7
   }).length
 
@@ -137,6 +142,7 @@ export default function RecurringPage() {
               item={item}
               onToggleStatus={toggleStatus}
               onDelete={deleteItem}
+              onEdit={setEditItem}
             />
           ))
         )}
@@ -154,6 +160,13 @@ export default function RecurringPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onAdd={addItem}
+      />
+
+      <EditRecurringDialog
+        open={editItem_ !== null}
+        item={editItem_}
+        onClose={() => setEditItem(null)}
+        onEdit={(id, body) => { editItem(id, body); setEditItem(null) }}
       />
     </div>
   )

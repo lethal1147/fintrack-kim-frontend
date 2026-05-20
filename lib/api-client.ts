@@ -205,6 +205,83 @@ export const transactionApi = {
   },
 }
 
+// ── Recurring types ───────────────────────────────────────────────────────
+
+export type RecurringFrequency = "weekly" | "monthly" | "annual"
+export type RecurringKind      = "expense" | "income"
+export type RecurringStatus    = "active" | "paused"
+
+export type RecurringItem = {
+  id:         string
+  name:       string
+  category:   string
+  amount:     number
+  frequency:  RecurringFrequency
+  kind:       RecurringKind
+  status:     RecurringStatus
+  next_due:   string   // "YYYY-MM-DD"
+  color:      string
+  created_at: string
+  updated_at: string
+}
+
+export type CreateRecurringBody = {
+  name:      string
+  category:  string
+  amount:    number
+  frequency: RecurringFrequency
+  kind:      RecurringKind
+  next_due:  string
+  color:     string
+}
+
+export type UpdateRecurringBody = CreateRecurringBody
+
+// ── Recurring API helpers ─────────────────────────────────────────────────
+
+export const recurringApi = {
+  list(token: string): Promise<RecurringItem[]> {
+    return apiFetch("/api/recurring", { headers: authHeaders(token) })
+  },
+
+  create(body: CreateRecurringBody, token: string): Promise<RecurringItem> {
+    return apiFetch("/api/recurring", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: authHeaders(token),
+    })
+  },
+
+  update(id: string, body: UpdateRecurringBody, token: string): Promise<RecurringItem> {
+    return apiFetch(`/api/recurring/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+      headers: authHeaders(token),
+    })
+  },
+
+  toggleStatus(id: string, token: string): Promise<RecurringItem> {
+    return apiFetch(`/api/recurring/${id}/status`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+    })
+  },
+
+  delete(id: string, token: string): Promise<void> {
+    return apiFetch(`/api/recurring/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    })
+  },
+
+  process(token: string): Promise<{ generated: number }> {
+    return apiFetch("/api/recurring/process", {
+      method: "POST",
+      headers: authHeaders(token),
+    })
+  },
+}
+
 // ── Auth API helpers ──────────────────────────────────────────────────────
 
 export const authApi = {

@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/app/sidebar"
 import { useAuthStore } from "@/store/auth-store"
+import { recurringApi } from "@/lib/api-client"
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -15,6 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         router.replace("/login")
       } else {
         loadUser()
+        const token = useAuthStore.getState().accessToken
+        if (token) recurringApi.process(token).catch(() => {})
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
