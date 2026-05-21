@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import dayjs from "dayjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,19 +20,25 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { type RecurringItem, type RecurringFrequency, type RecurringKind, type UpdateRecurringBody } from "@/lib/api-client"
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
 
 // ─── constants ────────────────────────────────────────────────────────────────
-
-const CATEGORIES = [
-  "Housing", "Utilities", "Entertainment", "Health",
-  "Subscriptions", "Food & Dining", "Transport", "Education", "Income", "Other",
-]
 
 const COLOR_OPTIONS = [
   "#0ea5e9", "#ef4444", "#22c55e", "#f97316",
   "#8b5cf6", "#10b981", "#f59e0b", "#ec4899",
 ]
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+function firstOfNextMonth() {
+  return dayjs().add(1, "month").date(1).format("YYYY-MM-DD")
+}
+
+function endOfNextMonth() {
+  return dayjs().add(1, "month").endOf("month").format("YYYY-MM-DD")
+}
 
 // ─── component ────────────────────────────────────────────────────────────────
 
@@ -63,19 +70,18 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
     }
   }, [item])
 
+  const categories = kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+  const showMonthHelper = frequency === "monthly" || frequency === "annual"
+
+  function handleKindChange(k: RecurringKind) {
+    setKind(k)
+    setCategory("")
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!item || !name || !category || !amount || !frequency || !nextDue) return
-
-    onEdit(item.id, {
-      name,
-      category,
-      amount:    parseFloat(amount),
-      frequency: frequency as RecurringFrequency,
-      next_due:  nextDue,
-      kind,
-      color,
-    })
+    onEdit(item.id, { name, category, amount: parseFloat(amount), frequency: frequency as RecurringFrequency, next_due: nextDue, kind, color })
     onClose()
   }
 
@@ -93,30 +99,18 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
           {/* Kind toggle */}
           <div className="flex rounded-lg border border-border overflow-hidden text-sm">
             {(["expense", "income"] as RecurringKind[]).map((k) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setKind(k)}
-                className={cn(
-                  "flex-1 py-1.5 capitalize transition-colors",
+              <button key={k} type="button" onClick={() => handleKindChange(k)}
+                className={cn("flex-1 py-1.5 capitalize transition-colors",
                   kind === k ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"
-                )}
-              >
-                {k}
-              </button>
+                )}>{k}</button>
             ))}
           </div>
 
           {/* Name */}
           <div className="space-y-1.5">
             <Label htmlFor="edit-rec-name">Name</Label>
-            <Input
-              id="edit-rec-name"
-              placeholder="e.g. Netflix, Rent, Salary…"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <Input id="edit-rec-name" placeholder="e.g. Netflix, Rent, Salary…"
+              value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
 
           {/* Category */}
@@ -125,7 +119,7 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -134,13 +128,8 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="edit-rec-amount">Amount</Label>
-              <Input
-                id="edit-rec-amount"
-                type="number" min="0.01" step="0.01" placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
+              <Input id="edit-rec-amount" type="number" min="0.01" step="0.01" placeholder="0.00"
+                value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </div>
             <div className="space-y-1.5">
               <Label>Frequency</Label>
@@ -155,16 +144,23 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
             </div>
           </div>
 
-          {/* Next due date */}
+          {/* Next due date + month helpers */}
           <div className="space-y-1.5">
             <Label htmlFor="edit-rec-due">Next due date</Label>
-            <Input
-              id="edit-rec-due"
-              type="date"
-              value={nextDue}
-              onChange={(e) => setNextDue(e.target.value)}
-              required
-            />
+            {showMonthHelper && (
+              <div className="flex gap-1.5 mb-1.5">
+                <button type="button" onClick={() => setNextDue(firstOfNextMonth())}
+                  className="text-xs px-2.5 py-1 rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                  1st of month
+                </button>
+                <button type="button" onClick={() => setNextDue(endOfNextMonth())}
+                  className="text-xs px-2.5 py-1 rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                  End of month
+                </button>
+              </div>
+            )}
+            <Input id="edit-rec-due" type="date" value={nextDue}
+              onChange={(e) => setNextDue(e.target.value)} required />
           </div>
 
           {/* Color */}
@@ -172,16 +168,11 @@ export function EditRecurringDialog({ open, item, onClose, onEdit }: Props) {
             <Label>Colour</Label>
             <div className="flex gap-2">
               {COLOR_OPTIONS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setColor(c)}
-                  className={cn(
-                    "size-7 rounded-full border-2 transition-transform",
+                <button key={c} type="button" onClick={() => setColor(c)}
+                  className={cn("size-7 rounded-full border-2 transition-transform",
                     color === c ? "border-foreground scale-110" : "border-transparent"
                   )}
-                  style={{ background: c }}
-                />
+                  style={{ background: c }} />
               ))}
             </div>
           </div>
