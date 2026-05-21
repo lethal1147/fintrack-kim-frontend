@@ -1,10 +1,16 @@
 export type UserProfile = {
-  id: string
-  email: string
-  name: string
-  avatar_url: string
-  provider: string
-  created_at: string
+  id:           string
+  email:        string
+  name:         string
+  avatar_url:   string
+  provider:     string
+  totp_enabled: boolean
+  created_at:   string
+}
+
+export type TOTPChallenge = {
+  totp_required:   true
+  challenge_token: string
 }
 
 export type AuthResponse = {
@@ -377,6 +383,72 @@ export const profileApi = {
   },
 }
 
+// ── Security types + API ──────────────────────────────────────────────────────
+
+export type SessionInfo = {
+  id:             string
+  device:         string
+  last_active_at: string
+  is_current:     boolean
+}
+
+export type TOTPSetupResult = {
+  secret:       string
+  qr_code_uri:  string
+  backup_codes: string[]
+}
+
+export const securityApi = {
+  listSessions(token: string): Promise<SessionInfo[]> {
+    return apiFetch("/api/security/sessions", { headers: authHeaders(token) })
+  },
+
+  revokeSession(id: string, token: string): Promise<void> {
+    return apiFetch(`/api/security/sessions/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    })
+  },
+
+  requestPasswordChange(token: string): Promise<void> {
+    return apiFetch("/api/security/password/request", {
+      method: "POST",
+      headers: authHeaders(token),
+    })
+  },
+
+  changePassword(otp: string, newPassword: string, token: string): Promise<void> {
+    return apiFetch("/api/security/password/change", {
+      method: "POST",
+      body: JSON.stringify({ otp, new_password: newPassword }),
+      headers: authHeaders(token),
+    })
+  },
+
+  setupTOTP(token: string): Promise<TOTPSetupResult> {
+    return apiFetch("/api/security/totp/setup", {
+      method: "POST",
+      headers: authHeaders(token),
+    })
+  },
+
+  confirmTOTP(code: string, token: string): Promise<{ backup_codes: string[] }> {
+    return apiFetch("/api/security/totp/confirm", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+      headers: authHeaders(token),
+    })
+  },
+
+  disableTOTP(code: string, token: string): Promise<void> {
+    return apiFetch("/api/security/totp", {
+      method: "DELETE",
+      body: JSON.stringify({ code }),
+      headers: authHeaders(token),
+    })
+  },
+}
+
 // ── Auth API helpers ──────────────────────────────────────────────────────
 
 export const authApi = {
@@ -387,10 +459,17 @@ export const authApi = {
     })
   },
 
-  login(email: string, password: string): Promise<AuthResponse> {
+  login(email: string, password: string): Promise<AuthResponse | TOTPChallenge> {
     return apiFetch("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
+    })
+  },
+
+  totpVerify(challengeToken: string, code: string): Promise<AuthResponse> {
+    return apiFetch("/api/auth/totp-verify", {
+      method: "POST",
+      body: JSON.stringify({ challenge_token: challengeToken, code }),
     })
   },
 

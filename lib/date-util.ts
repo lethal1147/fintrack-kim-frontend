@@ -1,4 +1,7 @@
 import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+
+dayjs.extend(relativeTime)
 
 const TODAY = dayjs("2026-03-11") // fixed mock date — replace with dayjs() in production
 
@@ -32,5 +35,10 @@ export const dateUtil = {
   monthsUntil(isoDate: string): number {
     const diff = dayjs(isoDate).diff(TODAY, "month")
     return Math.max(0, diff)
+  },
+
+  /** "2 hours ago", "3 days ago", etc. */
+  fromNow(date: string | Date): string {
+    return dayjs(date).fromNow()
   },
 }

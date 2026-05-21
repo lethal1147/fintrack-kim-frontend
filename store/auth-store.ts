@@ -2,10 +2,11 @@ import { create } from "zustand"
 import { authApi, profileApi, ApiError, type UserProfile } from "@/lib/api-client"
 
 type AuthState = {
-  user: UserProfile | null
-  accessToken: string | null
-  isLoading: boolean
-  error: string | null
+  user:                UserProfile | null
+  accessToken:         string | null
+  totpChallengeToken:  string | null
+  isLoading:           boolean
+  error:               string | null
 
   login(email: string, password: string): Promise<void>
   register(name: string, email: string, password: string): Promise<void>
@@ -14,20 +15,26 @@ type AuthState = {
   loadUser(): Promise<void>
   updateProfile(name: string, email: string): Promise<void>
   uploadAvatar(file: File): Promise<void>
+  verifyTOTP(code: string): Promise<void>
   clearError(): void
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  accessToken: null,
-  isLoading: false,
-  error: null,
+  user:               null,
+  accessToken:        null,
+  totpChallengeToken: null,
+  isLoading:          false,
+  error:              null,
 
   async login(email, password) {
     set({ isLoading: true, error: null })
     try {
       const resp = await authApi.login(email, password)
-      set({ accessToken: resp.access_token, user: resp.user, isLoading: false })
+      if ("totp_required" in resp) {
+        set({ totpChallengeToken: resp.challenge_token, isLoading: false })
+      } else {
+        set({ accessToken: resp.access_token, user: resp.user, totpChallengeToken: null, isLoading: false })
+      }
     } catch (err) {
       set({ isLoading: false, error: errorMessage(err) })
       throw err
@@ -106,6 +113,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
         user: s.user ? { ...s.user, avatar_url } : s.user,
       }))
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
+    }
+  },
+
+  async verifyTOTP(code) {
+    const { totpChallengeToken } = get()
+    if (!totpChallengeToken) return
+    set({ isLoading: true, error: null })
+    try {
+      const resp = await authApi.totpVerify(totpChallengeToken, code)
+      set({ accessToken: resp.access_token, user: resp.user, totpChallengeToken: null, isLoading: false })
     } catch (err) {
       set({ isLoading: false, error: errorMessage(err) })
       throw err

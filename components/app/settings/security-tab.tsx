@@ -1,47 +1,60 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { IconAlertTriangle } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { SectionHeader } from "./section-header";
-import { SaveToast } from "./save-toast";
-
-// ─── constants ────────────────────────────────────────────────────────────────
-
-const MOCK_SESSIONS = [
-  { device: "MacBook Pro — Chrome", location: "New York, US", current: true },
-  { device: "iPhone 16 — Safari", location: "New York, US", current: false },
-];
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { IconAlertTriangle, IconLoader2 } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { useAuthStore } from "@/store/auth-store"
+import { useSecurityStore } from "@/store/security-store"
+import { dateUtil } from "@/lib/date-util"
+import { SectionHeader } from "./section-header"
+import { ChangePasswordDialog } from "./change-password-dialog"
+import { TOTPSetupDialog } from "./totp-setup-dialog"
+import { TOTPDisableDialog } from "./totp-disable-dialog"
 
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function SecurityTab() {
-  const [current, setCurrent] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [twoFa, setTwoFa] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
+  const router = useRouter()
+  const { user, logout } = useAuthStore()
+  const { sessions, isLoading, error, fetchSessions, revokeSession } = useSecurityStore()
 
-  function handleSave(e: React.FormEvent) {
-    e.preventDefault();
-    if (newPw && newPw !== confirm) {
-      setError("New passwords don't match.");
-      return;
+  const [changePwOpen, setChangePwOpen]   = useState(false)
+  const [totpSetupOpen, setTotpSetupOpen] = useState(false)
+  const [totpDisableOpen, setTotpDisableOpen] = useState(false)
+  const [revoking, setRevoking] = useState<string | null>(null)
+
+  const totpEnabled = user?.totp_enabled ?? false
+
+  useEffect(() => {
+    fetchSessions()
+  }, [fetchSessions])
+
+  async function handleRevoke(id: string) {
+    setRevoking(id)
+    try {
+      await revokeSession(id)
+    } finally {
+      setRevoking(null)
     }
-    setError("");
-    setSaved(true);
-    setCurrent("");
-    setNewPw("");
-    setConfirm("");
-    setTimeout(() => setSaved(false), 2500);
+  }
+
+  async function handleLogoutAll() {
+    await logout()
+    router.push("/login")
+  }
+
+  function handleTOTPToggle() {
+    if (totpEnabled) {
+      setTotpDisableOpen(true)
+    } else {
+      setTotpSetupOpen(true)
+    }
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <SectionHeader
         title="Security"
         description="Manage your password and account security."
@@ -50,44 +63,73 @@ export function SecurityTab() {
       {/* Password */}
       <div>
         <p className="text-sm font-semibold mb-3">Change password</p>
-        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-          <div className="p-4 grid grid-cols-[160px_1fr] gap-4 items-center">
-            <Label htmlFor="s-current" className="text-sm font-medium">
-              Current password
-            </Label>
-            <Input
-              id="s-current"
-              type="password"
-              placeholder="••••••••"
-              value={current}
-              onChange={(e) => setCurrent(e.target.value)}
-            />
+        <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium">Password</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Use a verification code sent to your email to set a new password.
+            </p>
           </div>
-          <div className="p-4 grid grid-cols-[160px_1fr] gap-4 items-center">
-            <Label htmlFor="s-new" className="text-sm font-medium">
-              New password
-            </Label>
-            <Input
-              id="s-new"
-              type="password"
-              placeholder="••••••••"
-              value={newPw}
-              onChange={(e) => setNewPw(e.target.value)}
-            />
-          </div>
-          <div className="p-4 grid grid-cols-[160px_1fr] gap-4 items-center">
-            <Label htmlFor="s-confirm" className="text-sm font-medium">
-              Confirm password
-            </Label>
-            <Input
-              id="s-confirm"
-              type="password"
-              placeholder="••••••••"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
-          </div>
+          <Button variant="outline" size="sm" onClick={() => setChangePwOpen(true)}>
+            Change password
+          </Button>
         </div>
+      </div>
+
+      {/* 2FA */}
+      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium">Two-factor authentication</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {totpEnabled
+              ? "2FA is enabled — your account requires an authenticator code on login."
+              : "Add an extra layer of security with a one-time code on login."}
+          </p>
+        </div>
+        <Switch checked={totpEnabled} onCheckedChange={handleTOTPToggle} />
+      </div>
+
+      {/* Active sessions */}
+      <div>
+        <p className="text-sm font-semibold mb-3">Active sessions</p>
+        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+          {isLoading && sessions.length === 0 ? (
+            <div className="px-4 py-6 flex justify-center">
+              <IconLoader2 className="size-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : sessions.length === 0 ? (
+            <div className="px-4 py-4 text-sm text-muted-foreground">No active sessions.</div>
+          ) : (
+            sessions.map((s) => (
+              <div key={s.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium">{s.device}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {s.is_current ? "Current session" : `Last active ${dateUtil.fromNow(s.last_active_at)}`}
+                  </p>
+                </div>
+                {s.is_current ? (
+                  <span className="text-xs text-emerald-600 font-medium">This device</span>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={revoking === s.id}
+                    onClick={() => handleRevoke(s.id)}
+                    className="text-xs text-destructive hover:text-destructive h-7 px-2"
+                  >
+                    {revoking === s.id ? (
+                      <IconLoader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      "Sign out"
+                    )}
+                  </Button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
         {error && (
           <div className="flex items-center gap-1.5 mt-2 text-sm text-destructive">
             <IconAlertTriangle className="size-3.5" />
@@ -96,53 +138,15 @@ export function SecurityTab() {
         )}
       </div>
 
-      {/* 2FA */}
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium">Two-factor authentication</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Add an extra layer of security with a one-time code on login.
-          </p>
-        </div>
-        <Switch checked={twoFa} onCheckedChange={setTwoFa} />
-      </div>
-
-      {/* Active sessions */}
-      <div>
-        <p className="text-sm font-semibold mb-3">Active sessions</p>
-        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-          {MOCK_SESSIONS.map((s) => (
-            <div
-              key={s.device}
-              className="px-4 py-3 flex items-center justify-between gap-3"
-            >
-              <div>
-                <p className="text-sm font-medium">{s.device}</p>
-                <p className="text-xs text-muted-foreground">{s.location}</p>
-              </div>
-              {s.current ? (
-                <span className="text-xs text-emerald-600 font-medium">
-                  This device
-                </span>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-destructive hover:text-destructive h-7 px-2"
-                >
-                  Sign out
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="flex justify-end">
-        <Button type="submit">Save security settings</Button>
+        <Button variant="destructive" size="sm" onClick={handleLogoutAll}>
+          Sign out all devices
+        </Button>
       </div>
 
-      <SaveToast visible={saved} />
-    </form>
-  );
+      <ChangePasswordDialog open={changePwOpen} onClose={() => setChangePwOpen(false)} />
+      <TOTPSetupDialog open={totpSetupOpen} onClose={() => setTotpSetupOpen(false)} />
+      <TOTPDisableDialog open={totpDisableOpen} onClose={() => setTotpDisableOpen(false)} />
+    </div>
+  )
 }

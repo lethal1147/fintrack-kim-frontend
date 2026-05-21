@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { IconCamera, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,12 +22,19 @@ export function ProfileTab() {
 
   const [name, setName]         = useState(user?.name ?? "")
   const [email, setEmail]       = useState(user?.email ?? "")
-  const [phone, setPhone]       = useState("")
   const [saved, setSaved]       = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [error, setError]       = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Sync fields when user loads from store (async hydration)
+  useEffect(() => {
+    if (user) {
+      setName(user.name)
+      setEmail(user.email)
+    }
+  }, [user])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -127,10 +134,6 @@ export function ProfileTab() {
         <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
           <Label htmlFor="p-email" className="text-sm font-medium">Email</Label>
           <Input id="p-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
-        <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
-          <Label htmlFor="p-phone" className="text-sm font-medium">Phone</Label>
-          <Input id="p-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Coming soon" />
         </div>
       </div>
 
