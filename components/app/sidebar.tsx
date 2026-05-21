@@ -11,6 +11,7 @@ import {
   IconRepeat,
   IconSettings,
   IconLogout,
+  IconWallet,
 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { stringUtil } from "@/lib/string-util"
@@ -19,6 +20,7 @@ import { useAuthStore } from "@/store/auth-store"
 const PRIMARY_NAV = [
   { label: "Dashboard",    href: "/dashboard",    icon: IconLayoutDashboard },
   { label: "Transactions", href: "/transactions", icon: IconArrowsExchange },
+  { label: "Budget",       href: "/budget",       icon: IconWallet },
   { label: "Reports",      href: "/reports",      icon: IconChartBar },
   { label: "Goals",        href: "/goals",        icon: IconTarget },
   { label: "Recurring",    href: "/recurring",    icon: IconRepeat },

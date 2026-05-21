@@ -1,17 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import dayjs from "dayjs"
 import {
   IconChevronLeft,
   IconChevronRight,
   IconChevronDown,
   IconChevronUp,
   IconPlus,
+  IconPencil,
+  IconTrash,
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { type BudgetCategory, type BudgetGroup } from "@/lib/mock-data"
+import { type BudgetCategory, type BudgetGroup } from "@/lib/api-client"
 import { AddBudgetCategoryDialog } from "@/components/app/budget/add-budget-category-dialog"
+import { EditBudgetCategoryDialog } from "@/components/app/budget/edit-budget-category-dialog"
 import { useBudgetStore } from "@/store/budget-store"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
@@ -27,32 +31,32 @@ const GROUP_DESCRIPTIONS: Record<BudgetGroup, string> = {
   "Non-Monthly": "Occasional or seasonal expenses",
 }
 
-const CURRENT_YEAR = 2026
-
 // ─── sub-components ───────────────────────────────────────────────────────────
 
-function CategoryRow({ cat }: { cat: BudgetCategory }) {
+function CategoryRow({
+  cat,
+  onEdit,
+  onDelete,
+}: {
+  cat: BudgetCategory
+  onEdit: (cat: BudgetCategory) => void
+  onDelete: (id: string) => void
+}) {
   const pct      = cat.budgeted === 0 ? 0 : Math.min(Math.round((cat.spent / cat.budgeted) * 100), 100)
   const over     = cat.spent > cat.budgeted
   const remaining = cat.budgeted - cat.spent
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors">
+    <div className="group flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors">
       {/* Dot + name */}
       <div className="flex items-center gap-2.5 w-36 shrink-0">
-        <span
-          className="size-2.5 rounded-full shrink-0"
-          style={{ background: cat.color }}
-        />
+        <span className="size-2.5 rounded-full shrink-0" style={{ background: cat.color }} />
         <span className="text-sm font-medium truncate">{cat.name}</span>
       </div>
 
       {/* Progress bar */}
       <div className="flex-1 min-w-0">
-        <Progress
-          value={pct}
-          className={cn("h-2", over && "[&>div]:bg-destructive")}
-        />
+        <Progress value={pct} className={cn("h-2", over && "[&>div]:bg-destructive")} />
       </div>
 
       {/* Numbers */}
@@ -74,6 +78,22 @@ function CategoryRow({ cat }: { cat: BudgetCategory }) {
           </p>
         </div>
       </div>
+
+      {/* Actions */}
+      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <button
+          onClick={() => onEdit(cat)}
+          className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <IconPencil className="size-3.5" />
+        </button>
+        <button
+          onClick={() => onDelete(cat.id)}
+          className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
+        >
+          <IconTrash className="size-3.5" />
+        </button>
+      </div>
     </div>
   )
 }
@@ -81,9 +101,13 @@ function CategoryRow({ cat }: { cat: BudgetCategory }) {
 function GroupSection({
   group,
   categories,
+  onEdit,
+  onDelete,
 }: {
   group: BudgetGroup
   categories: BudgetCategory[]
+  onEdit: (cat: BudgetCategory) => void
+  onDelete: (id: string) => void
 }) {
   const [open, setOpen] = useState(true)
 
@@ -94,7 +118,6 @@ function GroupSection({
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      {/* Group header */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-3 px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-left"
@@ -119,11 +142,10 @@ function GroupSection({
         </div>
       </button>
 
-      {/* Category rows */}
       {open && (
         <div className="divide-y divide-border">
           {categories.map((cat) => (
-            <CategoryRow key={cat.name} cat={cat} />
+            <CategoryRow key={cat.id} cat={cat} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </div>
       )}
@@ -134,16 +156,22 @@ function GroupSection({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function BudgetPage() {
-  // UI-only state
-  const [monthIdx, setMonthIdx] = useState(2) // March (0-indexed)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const currentYear = dayjs().year()
 
-  const { categories, addCategory } = useBudgetStore()
+  const [monthIdx, setMonthIdx]   = useState(dayjs().month()) // 0-indexed
+  const [addOpen, setAddOpen]     = useState(false)
+  const [editItem, setEditItem]   = useState<BudgetCategory | null>(null)
+
+  const { categories, fetchCategories, addCategory, editCategory, deleteCategory } = useBudgetStore()
+
+  useEffect(() => {
+    fetchCategories(currentYear, monthIdx + 1)
+  }, [monthIdx, fetchCategories, currentYear])
 
   const totalBudgeted  = categories.reduce((s, c) => s + c.budgeted, 0)
   const totalSpent     = categories.reduce((s, c) => s + c.spent, 0)
   const totalRemaining = totalBudgeted - totalSpent
-  const overallPct     = Math.min(Math.round((totalSpent / totalBudgeted) * 100), 100)
+  const overallPct     = totalBudgeted === 0 ? 0 : Math.min(Math.round((totalSpent / totalBudgeted) * 100), 100)
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -154,7 +182,7 @@ export default function BudgetPage() {
           <h1 className="text-2xl font-bold tracking-tight">Budget</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Plan and track your monthly spending</p>
         </div>
-        <Button className="gap-1.5" onClick={() => setDialogOpen(true)}>
+        <Button className="gap-1.5" onClick={() => setAddOpen(true)}>
           <IconPlus className="size-4" />
           Add category
         </Button>
@@ -171,7 +199,7 @@ export default function BudgetPage() {
           <IconChevronLeft className="size-3.5" />
         </Button>
         <span className="text-sm font-semibold w-36 text-center">
-          {dateUtil.formatMonth(monthIdx, CURRENT_YEAR)}
+          {dateUtil.formatMonth(monthIdx, currentYear)}
         </span>
         <Button
           variant="outline"
@@ -221,14 +249,29 @@ export default function BudgetPage() {
         {GROUPS.map((group) => {
           const cats = categories.filter((c) => c.group === group)
           if (cats.length === 0) return null
-          return <GroupSection key={group} group={group} categories={cats} />
+          return (
+            <GroupSection
+              key={group}
+              group={group}
+              categories={cats}
+              onEdit={setEditItem}
+              onDelete={deleteCategory}
+            />
+          )
         })}
       </div>
 
       <AddBudgetCategoryDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
         onAdd={addCategory}
+      />
+
+      <EditBudgetCategoryDialog
+        open={editItem !== null}
+        item={editItem}
+        onClose={() => setEditItem(null)}
+        onEdit={(id, body) => { editCategory(id, body); setEditItem(null) }}
       />
     </div>
   )

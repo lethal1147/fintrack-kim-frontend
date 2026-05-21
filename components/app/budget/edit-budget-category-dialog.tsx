@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { type BudgetGroup, type CreateBudgetBody } from "@/lib/api-client"
+import { type BudgetCategory, type BudgetGroup, type UpdateBudgetBody } from "@/lib/api-client"
 import { EXPENSE_CATEGORIES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
 
@@ -38,31 +38,35 @@ const COLOR_OPTIONS = [
 
 type Props = {
   open: boolean
+  item: BudgetCategory | null
   onClose: () => void
-  onAdd: (body: CreateBudgetBody) => void
+  onEdit: (id: string, body: UpdateBudgetBody) => void
 }
 
-export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
+export function EditBudgetCategoryDialog({ open, item, onClose, onEdit }: Props) {
   const [name, setName]     = useState("")
   const [group, setGroup]   = useState<BudgetGroup | "">("")
   const [amount, setAmount] = useState("")
   const [color, setColor]   = useState(COLOR_OPTIONS[0].value)
 
+  useEffect(() => {
+    if (item) {
+      setName(item.name)
+      setGroup(item.group)
+      setAmount(String(item.budgeted))
+      setColor(item.color)
+    }
+  }, [item])
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name || !group || !amount) return
-
-    onAdd({
+    if (!item || !name || !group || !amount) return
+    onEdit(item.id, {
       name,
       group: group as BudgetGroup,
       budgeted: parseFloat(amount),
       color,
     })
-
-    setName("")
-    setGroup("")
-    setAmount("")
-    setColor(COLOR_OPTIONS[0].value)
     onClose()
   }
 
@@ -72,12 +76,12 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Budget Category</DialogTitle>
+          <DialogTitle>Edit Budget Category</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
 
-          {/* Category name — dropdown of canonical expense categories */}
+          {/* Category name */}
           <div className="space-y-1.5">
             <Label>Category name</Label>
             <Select value={name} onValueChange={setName}>
@@ -109,9 +113,9 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
 
           {/* Monthly budget */}
           <div className="space-y-1.5">
-            <Label htmlFor="cat-amount">Monthly budget ($)</Label>
+            <Label htmlFor="edit-cat-amount">Monthly budget ($)</Label>
             <Input
-              id="cat-amount"
+              id="edit-cat-amount"
               type="number"
               min="0"
               step="1"
@@ -147,7 +151,7 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
               Cancel
             </Button>
             <Button type="submit" disabled={!valid}>
-              Add category
+              Save changes
             </Button>
           </DialogFooter>
         </form>

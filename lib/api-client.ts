@@ -282,6 +282,62 @@ export const recurringApi = {
   },
 }
 
+// ── Budget types ──────────────────────────────────────────────────────────────
+
+export type BudgetGroup = "Fixed" | "Flexible" | "Non-Monthly"
+
+export type BudgetCategory = {
+  id:         string
+  name:       string
+  group:      BudgetGroup
+  budgeted:   number
+  spent:      number   // computed by backend for requested month
+  color:      string
+  created_at: string
+  updated_at: string
+}
+
+export type CreateBudgetBody = {
+  name:     string
+  group:    BudgetGroup
+  budgeted: number
+  color:    string
+}
+
+export type UpdateBudgetBody = CreateBudgetBody
+
+// ── Budget API helpers ────────────────────────────────────────────────────────
+
+export const budgetApi = {
+  list(year: number, month: number, token: string): Promise<BudgetCategory[]> {
+    const q = new URLSearchParams({ year: String(year), month: String(month) })
+    return apiFetch(`/api/budget?${q.toString()}`, { headers: authHeaders(token) })
+  },
+
+  create(body: CreateBudgetBody, token: string): Promise<BudgetCategory> {
+    return apiFetch("/api/budget", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: authHeaders(token),
+    })
+  },
+
+  update(id: string, body: UpdateBudgetBody, token: string): Promise<BudgetCategory> {
+    return apiFetch(`/api/budget/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+      headers: authHeaders(token),
+    })
+  },
+
+  delete(id: string, token: string): Promise<void> {
+    return apiFetch(`/api/budget/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    })
+  },
+}
+
 // ── Auth API helpers ──────────────────────────────────────────────────────
 
 export const authApi = {
