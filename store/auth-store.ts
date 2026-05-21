@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { authApi, ApiError, type UserProfile } from "@/lib/api-client"
+import { authApi, profileApi, ApiError, type UserProfile } from "@/lib/api-client"
 
 type AuthState = {
   user: UserProfile | null
@@ -12,6 +12,8 @@ type AuthState = {
   logout(): Promise<void>
   refreshAccessToken(): Promise<boolean>
   loadUser(): Promise<void>
+  updateProfile(name: string, email: string): Promise<void>
+  uploadAvatar(file: File): Promise<void>
   clearError(): void
 }
 
@@ -78,6 +80,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user })
     } catch {
       // if /me fails, keep existing user state — access token may still be valid
+    }
+  },
+
+  async updateProfile(name, email) {
+    const { accessToken } = get()
+    if (!accessToken) return
+    set({ isLoading: true, error: null })
+    try {
+      const user = await profileApi.update({ name, email }, accessToken)
+      set({ user, isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
+    }
+  },
+
+  async uploadAvatar(file) {
+    const { accessToken } = get()
+    if (!accessToken) return
+    set({ isLoading: true, error: null })
+    try {
+      const { avatar_url } = await profileApi.uploadAvatar(file, accessToken)
+      set((s) => ({
+        isLoading: false,
+        user: s.user ? { ...s.user, avatar_url } : s.user,
+      }))
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
     }
   },
 

@@ -48,6 +48,18 @@ function authHeaders(accessToken: string): Record<string, string> {
   return { Authorization: `Bearer ${accessToken}` }
 }
 
+// apiFetchRaw is like apiFetch but does NOT inject Content-Type (needed for FormData uploads).
+async function apiFetchRaw<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const res = await fetch(path, { ...init, credentials: "include" })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const code = json?.error?.code ?? "UNKNOWN_ERROR"
+    const message = json?.error?.message ?? res.statusText
+    throw new ApiError(code, message, res.status)
+  }
+  return json.data as T
+}
+
 // ── Transaction types ─────────────────────────────────────────────────────
 
 export type Transaction = {
@@ -334,6 +346,33 @@ export const budgetApi = {
     return apiFetch(`/api/budget/${id}`, {
       method: "DELETE",
       headers: authHeaders(token),
+    })
+  },
+}
+
+// ── Profile types + API ───────────────────────────────────────────────────────
+
+export type UpdateProfileBody = {
+  name:  string
+  email: string
+}
+
+export const profileApi = {
+  update(body: UpdateProfileBody, token: string): Promise<UserProfile> {
+    return apiFetch("/api/profile", {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      headers: authHeaders(token),
+    })
+  },
+
+  uploadAvatar(file: File, token: string): Promise<{ avatar_url: string }> {
+    const form = new FormData()
+    form.append("avatar", file)
+    return apiFetchRaw("/api/profile/avatar", {
+      method: "POST",
+      body: form,
+      headers: authHeaders(token), // no Content-Type — browser sets multipart boundary
     })
   },
 }

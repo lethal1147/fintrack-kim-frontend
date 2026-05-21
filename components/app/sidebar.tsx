@@ -6,7 +6,6 @@ import {
   IconChartPie,
   IconLayoutDashboard,
   IconArrowsExchange,
-  IconTarget,
   IconChartBar,
   IconRepeat,
   IconSettings,
@@ -22,7 +21,6 @@ const PRIMARY_NAV = [
   { label: "Transactions", href: "/transactions", icon: IconArrowsExchange },
   { label: "Budget",       href: "/budget",       icon: IconWallet },
   { label: "Reports",      href: "/reports",      icon: IconChartBar },
-  { label: "Goals",        href: "/goals",        icon: IconTarget },
   { label: "Recurring",    href: "/recurring",    icon: IconRepeat },
 ]
 
