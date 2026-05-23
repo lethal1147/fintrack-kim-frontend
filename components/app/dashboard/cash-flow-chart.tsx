@@ -1,5 +1,6 @@
 "use client"
 
+import dayjs from "dayjs"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
@@ -10,24 +11,26 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { monthlyTrend } from "@/lib/mock-data"
+import { type MonthStat } from "@/lib/api-client"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
 const CHART_CONFIG = {
-  income: {
-    label: "Income",
-    color: "var(--chart-2)",
-  },
-  expense: {
-    label: "Expenses",
-    color: "var(--chart-5)",
-  },
+  income:  { label: "Income",   color: "var(--chart-2)" },
+  expense: { label: "Expenses", color: "var(--chart-5)" },
 } satisfies ChartConfig
+
+function formatMonthLabel(yyyyMM: string): string {
+  return dayjs(yyyyMM + "-01").format("MMM")
+}
 
 // ─── component ────────────────────────────────────────────────────────────────
 
-export function CashFlowChart() {
+type Props = { data: MonthStat[] }
+
+export function CashFlowChart({ data }: Props) {
+  const chartData = data.map((m) => ({ ...m, month: formatMonthLabel(m.month) }))
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -35,8 +38,8 @@ export function CashFlowChart() {
         <CardDescription>Income vs expenses — last 6 months</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <ChartContainer config={CHART_CONFIG} className="h-[220px] w-full">
-          <BarChart data={monthlyTrend} margin={{ top: 4, right: 4, bottom: 0, left: 0 }} barGap={4}>
+        <ChartContainer config={CHART_CONFIG} className="h-55 w-full">
+          <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }} barGap={4}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis
               dataKey="month"
@@ -51,9 +54,7 @@ export function CashFlowChart() {
               tickFormatter={(v: number) => `฿${(v / 1000).toFixed(0)}k`}
               width={44}
             />
-            <ChartTooltip
-              content={<ChartTooltipContent />}
-            />
+            <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
             <Bar dataKey="income"  fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={36} />
             <Bar dataKey="expense" fill="var(--chart-5)" radius={[3, 3, 0, 0]} maxBarSize={36} />

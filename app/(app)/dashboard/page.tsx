@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import dayjs from "dayjs"
 import {
   IconTrendingDown,
   IconTrendingUp,
@@ -14,66 +15,90 @@ import { CashFlowChart } from "@/components/app/dashboard/cash-flow-chart"
 import { CategoryDonut } from "@/components/app/dashboard/category-donut"
 import { BudgetPerformance } from "@/components/app/dashboard/budget-performance"
 import { RecurringSummary } from "@/components/app/dashboard/recurring-summary"
-import { monthlyTrend } from "@/lib/mock-data"
+import { CategoryGrowthChart } from "@/components/app/dashboard/category-growth-chart"
+import { useDashboardStore } from "@/store/dashboard-store"
+import { useBudgetStore } from "@/store/budget-store"
+import { useRecurringStore } from "@/store/recurring-store"
+import { useTransactionsStore } from "@/store/transactions-store"
 import { stringUtil } from "@/lib/string-util"
 
-// ─── constants ────────────────────────────────────────────────────────────────
+// ─── types ────────────────────────────────────────────────────────────────────
 
 type Period = "month" | "year"
 
-const YEAR_INCOME  = monthlyTrend.reduce((s, m) => s + m.income,  0)
-const YEAR_EXPENSE = monthlyTrend.reduce((s, m) => s + m.expense, 0)
-const YEAR_SAVINGS_RATE = Math.round((1 - YEAR_EXPENSE / YEAR_INCOME) * 100)
-
-const SPARK_INCOME  = monthlyTrend.map((m) => m.income)
-const SPARK_EXPENSE = monthlyTrend.map((m) => m.expense)
-const SPARK_NET     = monthlyTrend.map((m) => m.income - m.expense)
-const SPARK_SAVINGS = monthlyTrend.map((m) => Math.round((1 - m.expense / m.income) * 100))
-
-// Growth rates: last month vs previous month
-const CURR = monthlyTrend[monthlyTrend.length - 1]
-const PREV = monthlyTrend[monthlyTrend.length - 2]
+// ─── helpers ──────────────────────────────────────────────────────────────────
 
 function pctChange(curr: number, prev: number): number {
   if (prev === 0) return 0
   return Math.round(((curr - prev) / Math.abs(prev)) * 1000) / 10
 }
 
-const CURR_NET     = CURR.income - CURR.expense
-const PREV_NET     = PREV.income - PREV.expense
-const CURR_SAVINGS = Math.round((1 - CURR.expense / CURR.income) * 100)
-const PREV_SAVINGS = Math.round((1 - PREV.expense / PREV.income) * 100)
-
-const DELTA_INCOME  = pctChange(CURR.income,  PREV.income)
-const DELTA_EXPENSE = pctChange(CURR.expense, PREV.expense)
-const DELTA_NET     = pctChange(CURR_NET,     PREV_NET)
-const DELTA_SAVINGS = pctChange(CURR_SAVINGS, PREV_SAVINGS)
-
-// ─── helpers ──────────────────────────────────────────────────────────────────
-
-function kpiData(period: Period) {
-  if (period === "year") {
-    const net = YEAR_INCOME - YEAR_EXPENSE
-    return {
-      income:      YEAR_INCOME,
-      expense:     YEAR_EXPENSE,
-      net,
-      savingsRate: YEAR_SAVINGS_RATE,
-    }
-  }
-  return {
-    income:      CURR.income,
-    expense:     CURR.expense,
-    net:         CURR_NET,
-    savingsRate: CURR_SAVINGS,
-  }
+function savingsRate(income: number, expense: number): number {
+  if (income <= 0) return 0
+  return Math.round((1 - expense / income) * 100)
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>("month")
-  const kpi = kpiData(period)
+
+  const { monthly, prevMonth, trend, isLoading, fetchDashboard } = useDashboardStore()
+  const { fetchCategories } = useBudgetStore()
+  const { fetchItems } = useRecurringStore()
+  const { fetchRecent } = useTransactionsStore()
+
+  const today = dayjs()
+
+  useEffect(() => {
+    fetchDashboard()
+    fetchCategories(today.year(), today.month() + 1)
+    fetchItems()
+    fetchRecent()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (isLoading && !trend) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+      </div>
+    )
+  }
+
+  const byMonth = trend?.by_month ?? []
+  const curr = byMonth[byMonth.length - 1] ?? { income: 0, expense: 0, net: 0 }
+  const prev = byMonth[byMonth.length - 2] ?? { income: 0, expense: 0, net: 0 }
+
+  const currSavings = savingsRate(curr.income, curr.expense)
+  const prevSavings = savingsRate(prev.income, prev.expense)
+
+  const yearIncome  = byMonth.reduce((s, m) => s + m.income, 0)
+  const yearExpense = byMonth.reduce((s, m) => s + m.expense, 0)
+
+  const monthKpi = {
+    income:      monthly?.total_income ?? 0,
+    expense:     monthly?.total_expense ?? 0,
+    net:         monthly?.net ?? 0,
+    savingsRate: Math.round(monthly?.savings_rate ?? currSavings),
+  }
+  const yearKpi = {
+    income:      yearIncome,
+    expense:     yearExpense,
+    net:         yearIncome - yearExpense,
+    savingsRate: savingsRate(yearIncome, yearExpense),
+  }
+  const kpi = period === "year" ? yearKpi : monthKpi
+
+  const sparkIncome  = byMonth.map((m) => m.income)
+  const sparkExpense = byMonth.map((m) => m.expense)
+  const sparkNet     = byMonth.map((m) => m.net)
+  const sparkSavings = byMonth.map((m) => savingsRate(m.income, m.expense))
+
+  const deltaIncome  = pctChange(curr.income,  prev.income)
+  const deltaExpense = pctChange(curr.expense, prev.expense)
+  const deltaNet     = pctChange(curr.net,     prev.net)
+  const deltaSavings = pctChange(currSavings,  prevSavings)
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -82,7 +107,9 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {period === "month" ? "March 2026 overview" : "2026 year-to-date overview"}
+            {period === "month"
+              ? `${today.format("MMMM YYYY")} overview`
+              : `${today.format("YYYY")} year-to-date overview`}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -108,47 +135,53 @@ export default function DashboardPage() {
         <StatCard
           title="Total Income"
           value={stringUtil.formatMoney(kpi.income)}
-          delta={DELTA_INCOME}
+          delta={deltaIncome}
           deltaLabel="vs last month"
           icon={IconTrendingUp}
-          sparkData={SPARK_INCOME}
+          sparkData={sparkIncome}
           sparkColor="var(--chart-2)"
         />
         <StatCard
           title="Total Expenses"
           value={stringUtil.formatMoney(kpi.expense)}
-          delta={DELTA_EXPENSE}
+          delta={deltaExpense}
           deltaLabel="vs last month"
           icon={IconTrendingDown}
-          sparkData={SPARK_EXPENSE}
+          sparkData={sparkExpense}
           sparkColor="var(--chart-5)"
         />
         <StatCard
           title="Net Cash Flow"
           value={stringUtil.formatMoney(kpi.net)}
-          delta={DELTA_NET}
+          delta={deltaNet}
           deltaLabel="vs last month"
           icon={IconWallet}
-          sparkData={SPARK_NET}
+          sparkData={sparkNet}
           sparkColor="var(--chart-1)"
         />
         <StatCard
           title="Savings Rate"
           value={`${kpi.savingsRate}%`}
-          delta={DELTA_SAVINGS}
+          delta={deltaSavings}
           deltaLabel="vs last month"
           icon={IconPigMoney}
-          sparkData={SPARK_SAVINGS}
+          sparkData={sparkSavings}
           sparkColor="var(--chart-3)"
         />
       </div>
 
       {/* Row 2 — Cash Flow Chart */}
-      <CashFlowChart />
+      <CashFlowChart data={trend?.by_month ?? []} />
 
-      {/* Row 3 — Category Donut + Budget Performance (stubs) */}
+      {/* Row 2b — Category Growth */}
+      <CategoryGrowthChart
+        current={monthly?.by_category ?? []}
+        previous={prevMonth?.by_category ?? []}
+      />
+
+      {/* Row 3 — Category Donut + Budget Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
-        <CategoryDonut />
+        <CategoryDonut data={monthly?.by_category ?? []} />
         <BudgetPerformance />
       </div>
 

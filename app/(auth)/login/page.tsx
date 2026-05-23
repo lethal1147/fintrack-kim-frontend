@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2 } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2, IconShieldLock } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,11 +11,12 @@ import { useAuthStore } from "@/store/auth-store"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, isLoading } = useAuthStore()
+  const { login, verifyTOTP, isLoading, totpChallengeToken } = useAuthStore()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [totpCode, setTotpCode] = useState("")
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,10 +24,66 @@ export default function LoginPage() {
     setError(null)
     try {
       await login(email, password)
-      router.push("/dashboard")
+      // If TOTP is required, totpChallengeToken is now set — stay on page to show 2FA step.
+      // If not, we're logged in.
+      if (!useAuthStore.getState().totpChallengeToken) {
+        router.push("/dashboard")
+      }
     } catch {
       setError(useAuthStore.getState().error ?? "Invalid email or password")
     }
+  }
+
+  async function handleTOTPSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    try {
+      await verifyTOTP(totpCode)
+      router.push("/dashboard")
+    } catch {
+      setError(useAuthStore.getState().error ?? "Invalid code")
+    }
+  }
+
+  if (totpChallengeToken) {
+    return (
+      <div className="space-y-8">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <IconShieldLock className="size-6 text-primary" />
+            <h2 className="text-2xl font-bold tracking-tight">Two-factor authentication</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Enter the 6-digit code from your authenticator app, or a backup code.
+          </p>
+        </div>
+
+        <form className="space-y-5" onSubmit={handleTOTPSubmit}>
+          <div className="space-y-1.5">
+            <Label htmlFor="totp-code">Verification code</Label>
+            <Input
+              id="totp-code"
+              placeholder="123456 or XXXXX-XXXXX"
+              value={totpCode}
+              onChange={(e) => setTotpCode(e.target.value.trim())}
+              autoFocus
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <Button type="submit" className="w-full" size="lg" disabled={isLoading || !totpCode}>
+            {isLoading ? (
+              <><IconLoader2 className="size-4 animate-spin" /> Verifying…</>
+            ) : (
+              "Verify"
+            )}
+          </Button>
+        </form>
+      </div>
+    )
   }
 
   return (

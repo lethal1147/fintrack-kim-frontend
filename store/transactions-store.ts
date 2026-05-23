@@ -43,9 +43,11 @@ type TransactionsState = {
   error: string | null
   filter: FilterState
   monthlySummary: MonthlySummary | null
+  recentTransactions: Transaction[]
 
   fetchTransactions(): Promise<void>
   fetchMonthlySummary(): Promise<void>
+  fetchRecent(limit?: number): Promise<void>
   setFilter(patch: Partial<FilterState>): void
   addTransaction(body: CreateTransactionBody): Promise<void>
   updateTransaction(id: string, body: UpdateTransactionBody): Promise<void>
@@ -60,6 +62,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   error: null,
   filter: DEFAULT_FILTER,
   monthlySummary: null,
+  recentTransactions: [],
 
   async fetchTransactions() {
     const token = useAuthStore.getState().accessToken
@@ -87,6 +90,17 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
       })
     } catch (err) {
       set({ isLoading: false, error: (err as Error).message ?? "Failed to load transactions" })
+    }
+  },
+
+  async fetchRecent(limit = 5) {
+    const token = useAuthStore.getState().accessToken
+    if (!token) return
+    try {
+      const result = await transactionApi.list({ limit }, token)
+      set({ recentTransactions: result.transactions ?? [] })
+    } catch {
+      // non-critical
     }
   },
 

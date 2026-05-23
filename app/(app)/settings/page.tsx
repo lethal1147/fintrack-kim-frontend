@@ -3,13 +3,13 @@
 import {
   IconUser,
   IconLock,
-  IconBell,
+  // IconBell,
   IconAlertTriangle,
 } from "@tabler/icons-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProfileTab } from "@/components/app/settings/profile-tab";
 import { SecurityTab } from "@/components/app/settings/security-tab";
-import { NotificationsTab } from "@/components/app/settings/notifications-tab";
+// import { NotificationsTab } from "@/components/app/settings/notifications-tab";
 import { DangerZone } from "@/components/app/settings/danger-zone";
 
 // ─── constants ────────────────────────────────────────────────────────────────
@@ -17,7 +17,7 @@ import { DangerZone } from "@/components/app/settings/danger-zone";
 const SETTINGS_TABS = [
   { value: "profile", label: "Profile", icon: IconUser },
   { value: "security", label: "Security", icon: IconLock },
-  { value: "notifications", label: "Notifications", icon: IconBell },
+  // { value: "notifications", label: "Notifications", icon: IconBell },
   // { value: "preferences", label: "Preferences", icon: IconSettings },
 ];
 
@@ -74,9 +74,7 @@ export default function SettingsPage() {
         <TabsContent value="security" className="mt-0 min-w-0">
           <SecurityTab />
         </TabsContent>
-        <TabsContent value="notifications" className="mt-0 min-w-0">
-          <NotificationsTab />
-        </TabsContent>
+        {/* <TabsContent value="notifications" className="mt-0 min-w-0"><NotificationsTab /></TabsContent> */}
         {/* <TabsContent value="preferences"   className="mt-0 min-w-0"><PreferencesTab /></TabsContent> */}
         <TabsContent value="danger" className="mt-0 min-w-0">
           <DangerZone />
