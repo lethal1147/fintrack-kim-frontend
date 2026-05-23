@@ -4,7 +4,12 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 
-export default function NotFoundPage() {
+export default function ErrorPage({
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
   const router = useRouter()
 
   return (
@@ -19,19 +24,24 @@ export default function NotFoundPage() {
 
       <div className="relative z-10 flex flex-col items-center gap-4">
         <p className="text-8xl font-bold text-muted-foreground/30 select-none leading-none">
-          404
+          500
         </p>
 
         <div className="space-y-2 max-w-sm">
-          <h1 className="text-xl font-semibold tracking-tight">Page not found</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Something went wrong</h1>
           <p className="text-sm text-muted-foreground">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
+            An unexpected error occurred. Try again or go back.
           </p>
         </div>
 
-        <Button variant="outline" onClick={() => router.back()}>
-          Go back
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => router.back()}>
+            Go back
+          </Button>
+          <Button onClick={reset}>
+            Try again
+          </Button>
+        </div>
       </div>
     </div>
   )

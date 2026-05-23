@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
 
   if (step === "code") {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <IconMailCheck className="size-6 text-primary" />
@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        <form className="space-y-5" onSubmit={handleReset}>
+        <form className="space-y-4" onSubmit={handleReset}>
           <div className="space-y-1.5">
             <Label htmlFor="otp">Verification code</Label>
             <Input
@@ -227,7 +227,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <IconLockOpen className="size-6 text-primary" />
@@ -238,7 +238,7 @@ export default function ForgotPasswordPage() {
         </p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSendCode}>
+      <form className="space-y-4" onSubmit={handleSendCode}>
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input

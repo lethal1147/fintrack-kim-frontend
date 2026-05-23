@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2 } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,8 +39,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-6">
       <div className="space-y-1.5">
         <h2 className="text-2xl font-bold tracking-tight">Create an account</h2>
         <p className="text-sm text-muted-foreground">
@@ -48,24 +47,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* Social signup */}
-      <Button variant="outline" className="w-full gap-2" size="lg" disabled>
-        <IconBrandGoogle className="size-4" />
-        Sign up with Google
-      </Button>
-
-      {/* Divider */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-background px-3 text-muted-foreground">or continue with email</span>
-        </div>
-      </div>
-
-      {/* Form */}
-      <form className="space-y-5" onSubmit={handleSubmit}>
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="name">Full name</Label>
           <Input
