@@ -98,7 +98,7 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
       <div className="text-right shrink-0 mr-2">
         <p className={cn(
           "text-sm font-semibold tabular-nums",
-          item.kind === "income" ? "text-emerald-600" : "text-foreground"
+          item.kind === "income" ? "text-emerald-600" : "text-destructive"
         )}>
           {item.kind === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(item.amount)}
         </p>
