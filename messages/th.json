@@ -580,7 +580,13 @@
       "languageLabel": "ภาษา",
       "langEnglish": "English",
       "langThai": "ภาษาไทย",
-      "saveButton": "บันทึกการตั้งค่า"
+      "saveButton": "บันทึกการตั้งค่า",
+      "themeLabel": "ธีม",
+      "theme": {
+        "light": "สว่าง",
+        "dark": "มืด",
+        "system": "ระบบ"
+      }
     }
   },
   "categories": {

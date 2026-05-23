@@ -580,7 +580,13 @@
       "languageLabel": "Language",
       "langEnglish": "English",
       "langThai": "ภาษาไทย",
-      "saveButton": "Save preferences"
+      "saveButton": "Save preferences",
+      "themeLabel": "Theme",
+      "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
     }
   },
   "categories": {
