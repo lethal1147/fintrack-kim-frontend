@@ -5,6 +5,7 @@ export type UserProfile = {
   avatar_url:   string
   provider:     string
   totp_enabled: boolean
+  locale:       string
   created_at:   string
 }
 
@@ -382,8 +383,9 @@ export const budgetApi = {
 // ── Profile types + API ───────────────────────────────────────────────────────
 
 export type UpdateProfileBody = {
-  name:  string
-  email: string
+  name:   string
+  email:  string
+  locale?: string
 }
 
 export const profileApi = {
