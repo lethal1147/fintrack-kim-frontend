@@ -1,68 +1,131 @@
+"use client"
+
+import { useState } from "react"
 import {
-  IconCurrencyDollar,
   IconTrendingDown,
   IconTrendingUp,
+  IconWallet,
   IconPigMoney,
 } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/app/dashboard/stat-card"
-import { SpendingChart } from "@/components/app/dashboard/spending-chart"
-import { BudgetOverview } from "@/components/app/dashboard/budget-overview"
 import { RecentTransactions } from "@/components/app/dashboard/recent-transactions"
-import { GoalsOverview } from "@/components/app/dashboard/goals-overview"
-import { stats } from "@/lib/mock-data"
+import { stats, monthlyTrend } from "@/lib/mock-data"
+import { stringUtil } from "@/lib/string-util"
 
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n)
+// ─── constants ────────────────────────────────────────────────────────────────
+
+type Period = "month" | "year"
+
+const YEAR_INCOME  = monthlyTrend.reduce((s, m) => s + m.income,  0)
+const YEAR_EXPENSE = monthlyTrend.reduce((s, m) => s + m.expense, 0)
+const YEAR_SAVINGS_RATE = Math.round((1 - YEAR_EXPENSE / YEAR_INCOME) * 100)
+
+// ─── helpers ──────────────────────────────────────────────────────────────────
+
+function kpiData(period: Period) {
+  if (period === "year") {
+    const net = YEAR_INCOME - YEAR_EXPENSE
+    return {
+      income:      YEAR_INCOME,
+      expense:     YEAR_EXPENSE,
+      net,
+      savingsRate: YEAR_SAVINGS_RATE,
+    }
+  }
+  const net = stats.monthlyIncome - stats.monthlySpent
+  return {
+    income:      stats.monthlyIncome,
+    expense:     stats.monthlySpent,
+    net,
+    savingsRate: stats.savingsRate,
+  }
 }
 
+// ─── page ─────────────────────────────────────────────────────────────────────
+
 export default function DashboardPage() {
+  const [period, setPeriod] = useState<Period>("month")
+  const kpi = kpiData(period)
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">Welcome back, Kim — here&apos;s your overview for March 2026.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            {period === "month" ? "March 2026 overview" : "2026 year-to-date overview"}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <Button
+            size="sm"
+            variant={period === "month" ? "default" : "outline"}
+            onClick={() => setPeriod("month")}
+          >
+            This Month
+          </Button>
+          <Button
+            size="sm"
+            variant={period === "year" ? "default" : "outline"}
+            onClick={() => setPeriod("year")}
+          >
+            This Year
+          </Button>
+        </div>
       </div>
 
-      {/* Row 1 — Stat cards */}
+      {/* Row 1 — KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Balance"
-          value={formatCurrency(stats.totalBalance)}
-          delta={stats.balanceDelta}
+          title="Total Income"
+          value={stringUtil.formatMoney(kpi.income)}
+          delta={period === "month" ? stats.incomeDelta : undefined}
           deltaLabel="vs last month"
-          icon={IconCurrencyDollar}
-        />
-        <StatCard
-          title="Monthly Income"
-          value={formatCurrency(stats.monthlyIncome)}
           icon={IconTrendingUp}
         />
         <StatCard
-          title="Monthly Spent"
-          value={formatCurrency(stats.monthlySpent)}
-          delta={stats.spentDelta}
+          title="Total Expenses"
+          value={stringUtil.formatMoney(kpi.expense)}
+          delta={period === "month" ? stats.spentDelta : undefined}
           deltaLabel="vs last month"
           icon={IconTrendingDown}
         />
         <StatCard
+          title="Net Cash Flow"
+          value={stringUtil.formatMoney(kpi.net)}
+          icon={IconWallet}
+        />
+        <StatCard
           title="Savings Rate"
-          value={`${stats.savingsRate}%`}
+          value={`${kpi.savingsRate}%`}
           deltaLabel="of income saved"
           icon={IconPigMoney}
         />
       </div>
 
-      {/* Row 2 — Chart + Budget */}
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
-        <SpendingChart />
-        <BudgetOverview />
+      {/* Row 2 — Cash Flow Chart (stub) */}
+      <div className="rounded-lg border bg-card p-4 h-64 flex items-center justify-center text-muted-foreground text-sm">
+        Cash Flow Chart — coming next
       </div>
 
-      {/* Row 3 — Transactions + Goals */}
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+      {/* Row 3 — Category Donut + Budget Performance (stubs) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
+        <div className="rounded-lg border bg-card p-4 h-72 flex items-center justify-center text-muted-foreground text-sm">
+          Spending by Category — coming next
+        </div>
+        <div className="rounded-lg border bg-card p-4 h-72 flex items-center justify-center text-muted-foreground text-sm">
+          Budget Performance — coming next
+        </div>
+      </div>
+
+      {/* Row 4 — Recurring Summary + Recent Transactions */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-4">
+        <div className="rounded-lg border bg-card p-4 h-64 flex items-center justify-center text-muted-foreground text-sm">
+          Recurring Summary — coming next
+        </div>
         <RecentTransactions />
-        <GoalsOverview />
       </div>
     </div>
   )
