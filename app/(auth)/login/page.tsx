@@ -1,13 +1,24 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { Suspense, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2, IconShieldLock } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconBrandGoogle, IconLoader2, IconShieldLock, IconCircleCheck } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/store/auth-store"
+
+function ResetSuccessBanner() {
+  const searchParams = useSearchParams()
+  if (searchParams.get("reset") !== "true") return null
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+      <IconCircleCheck className="size-4 shrink-0" />
+      Password reset successfully. Please sign in.
+    </div>
+  )
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -88,6 +99,11 @@ export default function LoginPage() {
 
   return (
     <div className="space-y-8">
+      {/* Password reset success banner */}
+      <Suspense>
+        <ResetSuccessBanner />
+      </Suspense>
+
       {/* Header */}
       <div className="space-y-1.5">
         <h2 className="text-2xl font-bold tracking-tight">Welcome back</h2>

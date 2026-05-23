@@ -35,6 +35,8 @@ const NO_AUTO_LOGOUT_PATHS = [
   "/api/auth/register",
   "/api/auth/totp-verify",
   "/api/auth/refresh",
+  "/api/auth/forgot-password/request",
+  "/api/auth/forgot-password/reset",
 ]
 
 function handleUnauthorized(path: string): void {
@@ -514,6 +516,20 @@ export const authApi = {
   me(accessToken: string): Promise<UserProfile> {
     return apiFetch("/api/auth/me", {
       headers: authHeaders(accessToken),
+    })
+  },
+
+  forgotPasswordRequest(email: string): Promise<void> {
+    return apiFetch("/api/auth/forgot-password/request", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    })
+  },
+
+  forgotPasswordReset(email: string, otp: string, newPassword: string): Promise<void> {
+    return apiFetch("/api/auth/forgot-password/reset", {
+      method: "POST",
+      body: JSON.stringify({ email, otp, new_password: newPassword }),
     })
   },
 }
