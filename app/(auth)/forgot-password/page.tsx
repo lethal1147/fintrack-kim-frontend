@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authApi } from "@/lib/api-client"
+import { useTranslations } from "next-intl"
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +32,8 @@ function maskEmail(email: string): string {
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("auth.forgotPassword")
+  const tCheck = useTranslations("auth.forgotPassword.checkEmail")
   const router = useRouter()
 
   const [step,           setStep]           = useState<Step>("email")
@@ -56,7 +59,7 @@ export default function ForgotPasswordPage() {
       setStep("code")
       startResendCooldown()
     } catch {
-      setError("Failed to send code. Please try again.")
+      setError(t("errorSendFailed"))
     } finally {
       setIsLoading(false)
     }
@@ -71,7 +74,7 @@ export default function ForgotPasswordPage() {
       await authApi.forgotPasswordReset(email, otp, newPassword)
       router.push("/login?reset=true")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Invalid or expired code."
+      const msg = err instanceof Error ? err.message : tCheck("errorInvalidCode")
       setError(msg)
     } finally {
       setIsLoading(false)
@@ -84,7 +87,7 @@ export default function ForgotPasswordPage() {
       await authApi.forgotPasswordRequest(email)
       startResendCooldown()
     } catch {
-      setError("Failed to resend code. Please try again.")
+      setError(t("errorResendFailed"))
     }
   }
 
@@ -105,17 +108,17 @@ export default function ForgotPasswordPage() {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <IconMailCheck className="size-6 text-primary" />
-            <h2 className="text-2xl font-bold tracking-tight">Check your email</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{tCheck("title")}</h2>
           </div>
           <p className="text-sm text-muted-foreground">
-            We sent a 6-digit code to{" "}
+            {tCheck("subtitle")}{" "}
             <span className="font-medium text-foreground">{maskEmail(email)}</span>
           </p>
         </div>
 
         <form className="space-y-4" onSubmit={handleReset}>
           <div className="space-y-1.5">
-            <Label htmlFor="otp">Verification code</Label>
+            <Label htmlFor="otp">{tCheck("verificationCodeLabel")}</Label>
             <Input
               id="otp"
               inputMode="numeric"
@@ -131,7 +134,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="new-password">New password</Label>
+            <Label htmlFor="new-password">{tCheck("newPasswordLabel")}</Label>
             <div className="relative">
               <Input
                 id="new-password"
@@ -157,7 +160,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="confirm-password">Confirm new password</Label>
+            <Label htmlFor="confirm-password">{tCheck("confirmNewPasswordLabel")}</Label>
             <div className="relative">
               <Input
                 id="confirm-password"
@@ -180,7 +183,7 @@ export default function ForgotPasswordPage() {
               </button>
             </div>
             {confirmPw.length > 0 && !passwordsMatch && (
-              <p className="text-xs text-destructive">Passwords don&apos;t match</p>
+              <p className="text-xs text-destructive">{tCheck("passwordsMismatch")}</p>
             )}
           </div>
 
@@ -193,9 +196,9 @@ export default function ForgotPasswordPage() {
             disabled={isLoading || !canSubmitReset}
           >
             {isLoading ? (
-              <><IconLoader2 className="size-4 animate-spin" /> Resetting…</>
+              <><IconLoader2 className="size-4 animate-spin" /> {tCheck("resettingButton")}</>
             ) : (
-              "Reset password"
+              tCheck("resetButton")
             )}
           </Button>
         </form>
@@ -207,18 +210,20 @@ export default function ForgotPasswordPage() {
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
           >
             <IconArrowLeft className="size-3.5" />
-            Change email
+            {tCheck("changeEmail")}
           </button>
 
           <span className="text-muted-foreground">
-            Didn&apos;t receive a code?{" "}
+            {tCheck("didntReceive")}{" "}
             <button
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
               className="font-medium text-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {resendCooldown > 0 ? `Resend (${resendCooldown}s)` : "Resend"}
+              {resendCooldown > 0
+                ? tCheck("resendCooldown", { seconds: resendCooldown })
+                : tCheck("resend")}
             </button>
           </span>
         </div>
@@ -231,20 +236,20 @@ export default function ForgotPasswordPage() {
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <IconLockOpen className="size-6 text-primary" />
-          <h2 className="text-2xl font-bold tracking-tight">Reset password</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          Enter your email and we&apos;ll send you a verification code.
+          {t("subtitle")}
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSendCode}>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("emailLabel")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             autoComplete="email"
             autoFocus
             value={email}
@@ -258,9 +263,9 @@ export default function ForgotPasswordPage() {
 
         <Button type="submit" className="w-full" size="lg" disabled={isLoading || !email}>
           {isLoading ? (
-            <><IconLoader2 className="size-4 animate-spin" /> Sending…</>
+            <><IconLoader2 className="size-4 animate-spin" /> {t("sendingButton")}</>
           ) : (
-            "Send code"
+            t("sendCodeButton")
           )}
         </Button>
       </form>
@@ -271,7 +276,7 @@ export default function ForgotPasswordPage() {
           className="flex items-center justify-center gap-1 hover:text-foreground transition-colors"
         >
           <IconArrowLeft className="size-3.5" />
-          Back to sign in
+          {t("backToSignIn")}
         </Link>
       </p>
     </div>

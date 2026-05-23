@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuthStore } from "@/store/auth-store"
+import { useTranslations } from "next-intl"
 
 export default function RegisterPage() {
+  const t = useTranslations("auth.register")
   const router = useRouter()
   const { register, isLoading } = useAuthStore()
 
@@ -26,7 +28,7 @@ export default function RegisterPage() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
+      setError(t("errorPasswordMismatch"))
       return
     }
 
@@ -34,26 +36,26 @@ export default function RegisterPage() {
       await register(name, email, password)
       router.push("/dashboard")
     } catch {
-      setError(useAuthStore.getState().error ?? "Something went wrong. Please try again.")
+      setError(useAuthStore.getState().error ?? t("errorFallback"))
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-bold tracking-tight">Create an account</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         <p className="text-sm text-muted-foreground">
-          Start your financial journey today — it&apos;s free
+          {t("subtitle")}
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1.5">
-          <Label htmlFor="name">Full name</Label>
+          <Label htmlFor="name">{t("fullNameLabel")}</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Your name"
+            placeholder={t("fullNamePlaceholder")}
             autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -63,11 +65,11 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("emailLabel")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -77,12 +79,12 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("passwordLabel")}</Label>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Min. 8 characters"
+              placeholder={t("passwordPlaceholder")}
               autoComplete="new-password"
               className="pr-10"
               value={password}
@@ -103,12 +105,12 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="confirm-password">Confirm password</Label>
+          <Label htmlFor="confirm-password">{t("confirmPasswordLabel")}</Label>
           <div className="relative">
             <Input
               id="confirm-password"
               type={showConfirm ? "text" : "password"}
-              placeholder="Repeat your password"
+              placeholder={t("confirmPasswordPlaceholder")}
               autoComplete="new-password"
               className="pr-10"
               value={confirmPassword}
@@ -133,32 +135,32 @@ export default function RegisterPage() {
 
         <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
           {isLoading ? (
-            <><IconLoader2 className="size-4 animate-spin" /> Creating account…</>
+            <><IconLoader2 className="size-4 animate-spin" /> {t("submittingButton")}</>
           ) : (
-            "Create account"
+            t("submitButton")
           )}
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">
-          By creating an account you agree to our{" "}
+          {t("termsText")}{" "}
           <Link href="/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
-            Terms of Service
+            {t("termsLink")}
           </Link>{" "}
-          and{" "}
+          {t("andText")}{" "}
           <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground transition-colors">
-            Privacy Policy
+            {t("privacyLink")}
           </Link>
         </p>
       </form>
 
       {/* Footer */}
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("alreadyHaveAccount")}{" "}
         <Link
           href="/login"
           className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
         >
-          Sign in
+          {t("signInLink")}
         </Link>
       </p>
     </div>

@@ -14,19 +14,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/auth-store";
+import { useTranslations } from "next-intl";
 
 function ResetSuccessBanner() {
+  const t = useTranslations("auth.login");
   const searchParams = useSearchParams();
   if (searchParams.get("reset") !== "true") return null;
   return (
     <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
       <IconCircleCheck className="size-4 shrink-0" />
-      Password reset successfully. Please sign in.
+      {t("resetSuccessBanner")}
     </div>
   );
 }
 
 export default function LoginPage() {
+  const t = useTranslations("auth.login");
+  const tTotp = useTranslations("auth.login.totp");
   const router = useRouter();
   const { login, verifyTOTP, isLoading, totpChallengeToken } = useAuthStore();
 
@@ -45,7 +49,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       }
     } catch {
-      setError(useAuthStore.getState().error ?? "Invalid email or password");
+      setError(useAuthStore.getState().error ?? t("errorFallback"));
     }
   }
 
@@ -56,7 +60,7 @@ export default function LoginPage() {
       await verifyTOTP(totpCode);
       router.push("/dashboard");
     } catch {
-      setError(useAuthStore.getState().error ?? "Invalid code");
+      setError(useAuthStore.getState().error ?? tTotp("errorFallback"));
     }
   }
 
@@ -69,21 +73,20 @@ export default function LoginPage() {
           </div>
           <div className="space-y-1.5">
             <h2 className="text-2xl font-bold tracking-tight">
-              Two-factor auth
+              {tTotp("title")}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Enter the 6-digit code from your authenticator app, or a backup
-              code.
+              {tTotp("subtitle")}
             </p>
           </div>
         </div>
 
         <form className="space-y-5" onSubmit={handleTOTPSubmit}>
           <div className="space-y-1.5">
-            <Label htmlFor="totp-code">Verification code</Label>
+            <Label htmlFor="totp-code">{tTotp("codeLabel")}</Label>
             <Input
               id="totp-code"
-              placeholder="123456 or XXXXX-XXXXX"
+              placeholder={tTotp("codePlaceholder")}
               value={totpCode}
               onChange={(e) => setTotpCode(e.target.value.trim())}
               autoFocus
@@ -103,10 +106,10 @@ export default function LoginPage() {
           >
             {isLoading ? (
               <>
-                <IconLoader2 className="size-4 animate-spin" /> Verifying…
+                <IconLoader2 className="size-4 animate-spin" /> {tTotp("submittingButton")}
               </>
             ) : (
-              "Verify"
+              tTotp("submitButton")
             )}
           </Button>
         </form>
@@ -121,19 +124,19 @@ export default function LoginPage() {
       </Suspense>
 
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         <p className="text-sm text-muted-foreground">
-          Enter your credentials to access your account.
+          {t("subtitle")}
         </p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("emailLabel")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -144,12 +147,12 @@ export default function LoginPage() {
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("passwordLabel")}</Label>
             <Link
               href="/forgot-password"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Forgot password?
+              {t("forgotPassword")}
             </Link>
           </div>
           <div className="relative">
@@ -184,21 +187,21 @@ export default function LoginPage() {
         <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
           {isLoading ? (
             <>
-              <IconLoader2 className="size-4 animate-spin" /> Signing in…
+              <IconLoader2 className="size-4 animate-spin" /> {t("submittingButton")}
             </>
           ) : (
-            "Sign in"
+            t("submitButton")
           )}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("noAccount")}{" "}
         <Link
           href="/register"
           className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
         >
-          Create one
+          {t("createOne")}
         </Link>
       </p>
     </div>
