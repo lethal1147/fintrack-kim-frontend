@@ -29,6 +29,25 @@ export class ApiError extends Error {
   }
 }
 
+// Paths where a 401 means wrong credentials, not a revoked session.
+const NO_AUTO_LOGOUT_PATHS = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/totp-verify",
+  "/api/auth/refresh",
+]
+
+function handleUnauthorized(path: string): void {
+  if (NO_AUTO_LOGOUT_PATHS.some((p) => path.startsWith(p))) return
+  // Lazy import avoids a circular dependency at module load time.
+  import("@/store/auth-store").then(({ useAuthStore }) => {
+    useAuthStore.getState().forceLogout()
+  })
+  if (typeof window !== "undefined") {
+    window.location.replace("/login")
+  }
+}
+
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(path, {
     ...init,
@@ -44,6 +63,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!res.ok) {
     const code = json?.error?.code ?? "UNKNOWN_ERROR"
     const message = json?.error?.message ?? res.statusText
+    if (res.status === 401) handleUnauthorized(path)
     throw new ApiError(code, message, res.status)
   }
 
@@ -61,6 +81,7 @@ async function apiFetchRaw<T>(path: string, init: RequestInit = {}): Promise<T> 
   if (!res.ok) {
     const code = json?.error?.code ?? "UNKNOWN_ERROR"
     const message = json?.error?.message ?? res.statusText
+    if (res.status === 401) handleUnauthorized(path)
     throw new ApiError(code, message, res.status)
   }
   return json.data as T

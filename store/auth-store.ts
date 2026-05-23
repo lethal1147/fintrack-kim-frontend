@@ -11,6 +11,7 @@ type AuthState = {
   login(email: string, password: string): Promise<void>
   register(name: string, email: string, password: string): Promise<void>
   logout(): Promise<void>
+  forceLogout(): void
   refreshAccessToken(): Promise<boolean>
   loadUser(): Promise<void>
   updateProfile(name: string, email: string): Promise<void>
@@ -65,6 +66,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } finally {
       set({ user: null, accessToken: null, isLoading: false, error: null })
     }
+  },
+
+  forceLogout() {
+    set({ user: null, accessToken: null, totpChallengeToken: null, isLoading: false, error: null })
   },
 
   async refreshAccessToken() {
