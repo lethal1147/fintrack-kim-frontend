@@ -227,3 +227,23 @@ export const recurringItems: RecurringItem[] = [
   { id: "r10", name: "Salary",         category: "Income",        amount: 4500,   frequency: "monthly", nextDue: "2026-03-31", kind: "income",  status: "active", color: "#10b981" },
   { id: "r11", name: "Freelance",      category: "Income",        amount: 750,    frequency: "monthly", nextDue: "2026-04-05", kind: "income",  status: "active", color: "#14b8a6" },
 ]
+
+// ─── Category expense stats (for dashboard donut) ─────────────────────────────
+
+export type CategoryStat = {
+  category: string
+  total:    number
+  pct:      number
+  color:    string
+}
+
+export const categoryStats: CategoryStat[] = [
+  { category: "Housing",       total: 1200.00, pct: 57.0, color: "var(--chart-1)" },
+  { category: "Food & Dining", total: 421.45,  pct: 20.0, color: "var(--chart-2)" },
+  { category: "Shopping",      total: 198.89,  pct: 9.4,  color: "var(--chart-3)" },
+  { category: "Utilities",     total: 134.19,  pct: 6.4,  color: "var(--chart-4)" },
+  { category: "Health",        total: 73.50,   pct: 3.5,  color: "var(--chart-5)" },
+  { category: "Transport",     total: 94.25,   pct: 4.5,  color: "var(--chart-1)" },
+  { category: "Education",     total: 39.00,   pct: 1.8,  color: "var(--chart-2)" },
+  { category: "Entertainment", total: 25.98,   pct: 1.2,  color: "var(--chart-3)" },
+]

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/app/dashboard/stat-card"
 import { RecentTransactions } from "@/components/app/dashboard/recent-transactions"
 import { CashFlowChart } from "@/components/app/dashboard/cash-flow-chart"
+import { CategoryDonut } from "@/components/app/dashboard/category-donut"
 import { stats, monthlyTrend } from "@/lib/mock-data"
 import { stringUtil } from "@/lib/string-util"
 
@@ -111,9 +112,7 @@ export default function DashboardPage() {
 
       {/* Row 3 — Category Donut + Budget Performance (stubs) */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
-        <div className="rounded-lg border bg-card p-4 h-72 flex items-center justify-center text-muted-foreground text-sm">
-          Spending by Category — coming next
-        </div>
+        <CategoryDonut />
         <div className="rounded-lg border bg-card p-4 h-72 flex items-center justify-center text-muted-foreground text-sm">
           Budget Performance — coming next
         </div>
