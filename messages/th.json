@@ -191,6 +191,8 @@
     },
     "editDialog": {
       "title": "แก้ไขธุรกรรม",
+      "typeExpense": "รายจ่าย",
+      "typeIncome": "รายรับ",
       "merchantLabel": "ร้านค้า",
       "sourceLabel": "แหล่งรายรับ",
       "merchantPlaceholder": "เช่น Starbucks",

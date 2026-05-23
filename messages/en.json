@@ -191,6 +191,8 @@
     },
     "editDialog": {
       "title": "Edit Transaction",
+      "typeExpense": "expense",
+      "typeIncome": "income",
       "merchantLabel": "Merchant",
       "sourceLabel": "Source",
       "merchantPlaceholder": "e.g. Starbucks",
