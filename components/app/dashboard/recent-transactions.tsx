@@ -2,10 +2,7 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { recentTransactions } from "@/lib/mock-data"
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n)
-}
+import { stringUtil } from "@/lib/string-util"
 
 const categoryColors: Record<string, string> = {
   Income:        "bg-emerald-500",
@@ -41,7 +38,7 @@ export function RecentTransactions() {
               <p className="text-xs text-muted-foreground">{tx.category} · {tx.date}</p>
             </div>
             <p className={cn("text-sm font-semibold tabular-nums shrink-0", tx.type === "income" ? "text-emerald-600" : "text-foreground")}>
-              {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+              {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
             </p>
           </div>
         ))}

@@ -25,6 +25,11 @@ const YEAR_INCOME  = monthlyTrend.reduce((s, m) => s + m.income,  0)
 const YEAR_EXPENSE = monthlyTrend.reduce((s, m) => s + m.expense, 0)
 const YEAR_SAVINGS_RATE = Math.round((1 - YEAR_EXPENSE / YEAR_INCOME) * 100)
 
+const SPARK_INCOME  = monthlyTrend.map((m) => m.income)
+const SPARK_EXPENSE = monthlyTrend.map((m) => m.expense)
+const SPARK_NET     = monthlyTrend.map((m) => m.income - m.expense)
+const SPARK_SAVINGS = monthlyTrend.map((m) => Math.round((1 - m.expense / m.income) * 100))
+
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function kpiData(period: Period) {
@@ -88,6 +93,8 @@ export default function DashboardPage() {
           delta={period === "month" ? stats.incomeDelta : undefined}
           deltaLabel="vs last month"
           icon={IconTrendingUp}
+          sparkData={SPARK_INCOME}
+          sparkColor="var(--chart-2)"
         />
         <StatCard
           title="Total Expenses"
@@ -95,17 +102,23 @@ export default function DashboardPage() {
           delta={period === "month" ? stats.spentDelta : undefined}
           deltaLabel="vs last month"
           icon={IconTrendingDown}
+          sparkData={SPARK_EXPENSE}
+          sparkColor="var(--chart-5)"
         />
         <StatCard
           title="Net Cash Flow"
           value={stringUtil.formatMoney(kpi.net)}
           icon={IconWallet}
+          sparkData={SPARK_NET}
+          sparkColor="var(--chart-1)"
         />
         <StatCard
           title="Savings Rate"
           value={`${kpi.savingsRate}%`}
           deltaLabel="of income saved"
           icon={IconPigMoney}
+          sparkData={SPARK_SAVINGS}
+          sparkColor="var(--chart-3)"
         />
       </div>
 
