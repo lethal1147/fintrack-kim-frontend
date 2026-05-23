@@ -83,7 +83,7 @@ export function TransactionTableView({ paginated, onEdit, onDelete }: Props) {
               </td>
               <td className={cn(
                 "px-4 py-3 text-right font-semibold tabular-nums",
-                tx.type === "income" ? "text-emerald-600" : "text-foreground"
+                tx.type === "income" ? "text-emerald-600" : "text-destructive"
               )}>
                 {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
               </td>

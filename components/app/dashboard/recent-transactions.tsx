@@ -58,7 +58,7 @@ export function RecentTransactions() {
                 <p className="text-sm font-medium truncate">{tx.merchant}</p>
                 <p className="text-xs text-muted-foreground">{getCategoryLabel(tx.category)} · {tx.date}</p>
               </div>
-              <p className={cn("text-sm font-semibold tabular-nums shrink-0", tx.type === "income" ? "text-emerald-600" : "text-foreground")}>
+              <p className={cn("text-sm font-semibold tabular-nums shrink-0", tx.type === "income" ? "text-emerald-600" : "text-destructive")}>
                 {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
               </p>
             </div>

@@ -79,7 +79,7 @@ export function TransactionListView({ paginated, onEdit, onDelete }: Props) {
                 </div>
                 <p className={cn(
                   "text-sm font-semibold tabular-nums shrink-0",
-                  tx.type === "income" ? "text-emerald-600" : "text-foreground"
+                  tx.type === "income" ? "text-emerald-600" : "text-destructive"
                 )}>
                   {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
                 </p>
