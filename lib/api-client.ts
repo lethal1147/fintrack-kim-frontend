@@ -404,6 +404,14 @@ export const profileApi = {
       headers: authHeaders(token), // no Content-Type — browser sets multipart boundary
     })
   },
+
+  deleteAccount(password: string, token: string): Promise<void> {
+    return apiFetch("/api/profile", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+      headers: authHeaders(token),
+    })
+  },
 }
 
 // ── Security types + API ──────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ type AuthState = {
   register(name: string, email: string, password: string): Promise<void>
   logout(): Promise<void>
   forceLogout(): void
+  deleteAccount(password: string): Promise<void>
   refreshAccessToken(): Promise<boolean>
   loadUser(): Promise<void>
   updateProfile(name: string, email: string): Promise<void>
@@ -131,6 +132,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const resp = await authApi.totpVerify(totpChallengeToken, code)
       set({ accessToken: resp.access_token, user: resp.user, totpChallengeToken: null, isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: errorMessage(err) })
+      throw err
+    }
+  },
+
+  async deleteAccount(password) {
+    const { accessToken } = get()
+    if (!accessToken) return
+    set({ isLoading: true, error: null })
+    try {
+      await profileApi.deleteAccount(password, accessToken)
+      set({ user: null, accessToken: null, totpChallengeToken: null, isLoading: false, error: null })
     } catch (err) {
       set({ isLoading: false, error: errorMessage(err) })
       throw err

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SectionHeader } from "./section-header"
+import { DeleteAccountDialog } from "./delete-account-dialog"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -13,6 +14,7 @@ const DELETE_CONFIRMATION_TEXT = "delete my account"
 
 export function DangerZone() {
   const [confirmText, setConfirmText] = useState("")
+  const [dialogOpen, setDialogOpen]   = useState(false)
 
   return (
     <div className="space-y-6">
@@ -36,10 +38,16 @@ export function DangerZone() {
           variant="destructive"
           disabled={confirmText !== DELETE_CONFIRMATION_TEXT}
           className="w-full"
+          onClick={() => setDialogOpen(true)}
         >
           Delete account permanently
         </Button>
       </div>
+
+      <DeleteAccountDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+      />
     </div>
   )
 }
