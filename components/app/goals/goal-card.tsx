@@ -1,6 +1,7 @@
 "use client"
 
 import { IconPlus, IconTarget, IconCheck, IconAlertTriangle, IconPigMoney } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { type Goal } from "@/lib/mock-data"
@@ -29,6 +30,7 @@ type Props = {
 }
 
 export function GoalCard({ goal, onAddFunds }: Props) {
+  const t = useTranslations("goals.card")
   const pct     = Math.min(Math.round((goal.current / goal.target) * 100), 100)
   const months  = dateUtil.monthsUntil(goal.targetDate)
   const status  = getStatus(goal)
@@ -53,7 +55,7 @@ export function GoalCard({ goal, onAddFunds }: Props) {
             <div>
               <p className="font-semibold text-sm leading-tight">{goal.name}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Target: {dateUtil.format(goal.targetDate, "MMM YYYY")}
+                {t("targetDate", { date: dateUtil.format(goal.targetDate, "MMM YYYY") })}
               </p>
             </div>
           </div>
@@ -61,17 +63,17 @@ export function GoalCard({ goal, onAddFunds }: Props) {
           {/* Status badge */}
           {status === "completed" && (
             <Badge className="gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shrink-0">
-              <IconCheck className="size-3" /> Done
+              <IconCheck className="size-3" /> {t("statusDone")}
             </Badge>
           )}
           {status === "on-track" && (
             <Badge className="gap-1 bg-sky-500/10 text-sky-600 border-sky-500/20 shrink-0">
-              <IconTarget className="size-3" /> On track
+              <IconTarget className="size-3" /> {t("statusOnTrack")}
             </Badge>
           )}
           {status === "behind" && (
             <Badge className="gap-1 bg-amber-500/10 text-amber-600 border-amber-500/20 shrink-0">
-              <IconAlertTriangle className="size-3" /> Behind
+              <IconAlertTriangle className="size-3" /> {t("statusBehind")}
             </Badge>
           )}
         </div>
@@ -98,15 +100,15 @@ export function GoalCard({ goal, onAddFunds }: Props) {
         {/* Meta row */}
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="rounded-lg bg-muted/50 px-3 py-2">
-            <p className="text-muted-foreground">Still needed</p>
+            <p className="text-muted-foreground">{t("stillNeededLabel")}</p>
             <p className="font-semibold mt-0.5 tabular-nums">{status === "completed" ? "—" : stringUtil.formatMoney(needed)}</p>
           </div>
           <div className="rounded-lg bg-muted/50 px-3 py-2">
             <p className="text-muted-foreground">
-              {months > 0 ? `${months} mo. left` : "Overdue"}
+              {months > 0 ? t("monthsLeft", { months }) : t("overdueLabel")}
             </p>
             <p className="font-semibold mt-0.5 tabular-nums">
-              {status === "completed" ? "Achieved!" : months > 0 ? `${stringUtil.formatMoney(neededPerMonth)}/mo needed` : "—"}
+              {status === "completed" ? t("achieved") : months > 0 ? t("neededPerMonth", { amount: stringUtil.formatMoney(neededPerMonth) }) : "—"}
             </p>
           </div>
         </div>
@@ -120,13 +122,13 @@ export function GoalCard({ goal, onAddFunds }: Props) {
             onClick={() => onAddFunds(goal)}
           >
             <IconPigMoney className="size-3.5" />
-            Add funds
+            {t("addFundsButton")}
           </Button>
         )}
         {status === "completed" && (
           <div className="flex items-center justify-center gap-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 text-sm font-medium">
             <IconCheck className="size-4" />
-            Goal achieved!
+            {t("goalAchieved")}
           </div>
         )}
       </div>

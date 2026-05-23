@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { IconPlus } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { type Goal } from "@/lib/mock-data"
 import { AddGoalDialog } from "@/components/app/goals/add-goal-dialog"
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils"
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function GoalsPage() {
+  const t = useTranslations("goals")
   const { goals, addGoal, addFunds } = useGoalsStore()
 
   // UI-only state
@@ -30,21 +32,21 @@ export default function GoalsPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Goals</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Track your savings milestones</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t("subtitle")}</p>
         </div>
         <Button className="gap-1.5" onClick={() => setAddOpen(true)}>
           <IconPlus className="size-4" />
-          New goal
+          {t("addButton")}
         </Button>
       </div>
 
       {/* ── Summary strip ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Total Saved",   value: stringUtil.formatMoney(totalSaved),   color: "text-foreground" },
-          { label: "Total Target",  value: stringUtil.formatMoney(totalTarget),  color: "text-foreground" },
-          { label: "Goals Reached", value: `${completed} / ${goals.length}`,     color: "text-emerald-600" },
+          { label: t("statTotalSaved"),   value: stringUtil.formatMoney(totalSaved),   color: "text-foreground" },
+          { label: t("statTotalTarget"),  value: stringUtil.formatMoney(totalTarget),  color: "text-foreground" },
+          { label: t("statGoalsReached"), value: `${completed} / ${goals.length}`,     color: "text-emerald-600" },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-border bg-card px-4 py-3">
             <p className="text-xs text-muted-foreground">{s.label}</p>
@@ -56,9 +58,9 @@ export default function GoalsPage() {
       {/* ── Goals grid ── */}
       {goals.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border py-16 text-center">
-          <p className="text-muted-foreground text-sm">No goals yet. Create your first one!</p>
+          <p className="text-muted-foreground text-sm">{t("emptyMessage")}</p>
           <Button className="mt-4 gap-1.5" onClick={() => setAddOpen(true)}>
-            <IconPlus className="size-4" /> New goal
+            <IconPlus className="size-4" /> {t("emptyAddButton")}
           </Button>
         </div>
       ) : (

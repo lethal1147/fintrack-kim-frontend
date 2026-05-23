@@ -11,6 +11,7 @@ import {
   IconPencil,
   IconTrash,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { type BudgetCategory, type BudgetGroup } from "@/lib/api-client"
@@ -25,12 +26,6 @@ import { cn } from "@/lib/utils"
 
 const GROUPS: BudgetGroup[] = ["Fixed", "Flexible", "Non-Monthly"]
 
-const GROUP_DESCRIPTIONS: Record<BudgetGroup, string> = {
-  Fixed:         "Same amount every month",
-  Flexible:      "Varies month to month",
-  "Non-Monthly": "Occasional or seasonal expenses",
-}
-
 // ─── sub-components ───────────────────────────────────────────────────────────
 
 function CategoryRow({
@@ -42,6 +37,7 @@ function CategoryRow({
   onEdit: (cat: BudgetCategory) => void
   onDelete: (id: string) => void
 }) {
+  const t = useTranslations("budget.categoryRow")
   const pct      = cat.budgeted === 0 ? 0 : Math.min(Math.round((cat.spent / cat.budgeted) * 100), 100)
   const over     = cat.spent > cat.budgeted
   const remaining = cat.budgeted - cat.spent
@@ -62,17 +58,17 @@ function CategoryRow({
       {/* Numbers */}
       <div className="flex gap-6 shrink-0 text-sm tabular-nums text-right">
         <div className="w-20">
-          <p className="text-xs text-muted-foreground leading-none mb-0.5">Budgeted</p>
+          <p className="text-xs text-muted-foreground leading-none mb-0.5">{t("budgetedLabel")}</p>
           <p className="font-medium">{stringUtil.formatMoney(cat.budgeted)}</p>
         </div>
         <div className="w-20">
-          <p className="text-xs text-muted-foreground leading-none mb-0.5">Spent</p>
+          <p className="text-xs text-muted-foreground leading-none mb-0.5">{t("spentLabel")}</p>
           <p className={cn("font-medium", over ? "text-destructive" : "text-foreground")}>
             {stringUtil.formatMoney(cat.spent)}
           </p>
         </div>
         <div className="w-20">
-          <p className="text-xs text-muted-foreground leading-none mb-0.5">Remaining</p>
+          <p className="text-xs text-muted-foreground leading-none mb-0.5">{t("remainingLabel")}</p>
           <p className={cn("font-medium", over ? "text-destructive" : "text-emerald-600")}>
             {over ? "-" : ""}{stringUtil.formatMoney(Math.abs(remaining))}
           </p>
@@ -109,12 +105,16 @@ function GroupSection({
   onEdit: (cat: BudgetCategory) => void
   onDelete: (id: string) => void
 }) {
+  const tg = useTranslations("budget.groups")
   const [open, setOpen] = useState(true)
 
   const totalBudgeted = categories.reduce((s, c) => s + c.budgeted, 0)
   const totalSpent    = categories.reduce((s, c) => s + c.spent, 0)
   const totalPct      = totalBudgeted === 0 ? 0 : Math.min(Math.round((totalSpent / totalBudgeted) * 100), 100)
   const over          = totalSpent > totalBudgeted
+
+  const groupLabel = group === "Fixed" ? tg("fixed") : group === "Flexible" ? tg("flexible") : tg("nonMonthly")
+  const groupDesc  = group === "Fixed" ? tg("fixedDescription") : group === "Flexible" ? tg("flexibleDescription") : tg("nonMonthlyDescription")
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -124,8 +124,8 @@ function GroupSection({
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold">{group}</span>
-            <span className="text-xs text-muted-foreground">{GROUP_DESCRIPTIONS[group]}</span>
+            <span className="text-sm font-semibold">{groupLabel}</span>
+            <span className="text-xs text-muted-foreground">{groupDesc}</span>
           </div>
         </div>
         <div className="flex items-center gap-6 text-sm tabular-nums shrink-0">
@@ -156,6 +156,7 @@ function GroupSection({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function BudgetPage() {
+  const t = useTranslations("budget")
   const currentYear = dayjs().year()
 
   const [monthIdx, setMonthIdx]   = useState(dayjs().month()) // 0-indexed
@@ -179,12 +180,12 @@ export default function BudgetPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Budget</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Plan and track your monthly spending</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t("subtitle")}</p>
         </div>
         <Button className="gap-1.5" onClick={() => setAddOpen(true)}>
           <IconPlus className="size-4" />
-          Add category
+          {t("addButton")}
         </Button>
       </div>
 
@@ -215,15 +216,15 @@ export default function BudgetPage() {
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <p className="text-xs text-muted-foreground">Total Budgeted</p>
+            <p className="text-xs text-muted-foreground">{t("totalBudgeted")}</p>
             <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalBudgeted)}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Total Spent</p>
+            <p className="text-xs text-muted-foreground">{t("totalSpent")}</p>
             <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalSpent)}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Remaining</p>
+            <p className="text-xs text-muted-foreground">{t("remaining")}</p>
             <p className={cn(
               "text-lg font-bold tabular-nums",
               totalRemaining < 0 ? "text-destructive" : "text-emerald-600"
@@ -234,7 +235,7 @@ export default function BudgetPage() {
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{overallPct}% of budget used</span>
+            <span>{t("overallUsed", { pct: overallPct })}</span>
             <span>{stringUtil.formatMoney(totalSpent)} / {stringUtil.formatMoney(totalBudgeted)}</span>
           </div>
           <Progress

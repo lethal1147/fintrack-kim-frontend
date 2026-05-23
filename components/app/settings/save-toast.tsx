@@ -1,7 +1,12 @@
+"use client"
+
 import { IconCheck } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 export function SaveToast({ visible }: { visible: boolean }) {
+  const t = useTranslations("settings.saveToast")
+
   return (
     <div
       className={cn(
@@ -10,7 +15,7 @@ export function SaveToast({ visible }: { visible: boolean }) {
       )}
     >
       <IconCheck className="size-4" />
-      Changes saved
+      {t("message")}
     </div>
   )
 }

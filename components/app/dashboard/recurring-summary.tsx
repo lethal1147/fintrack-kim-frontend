@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useTranslations } from "next-intl"
 import { useRecurringStore } from "@/store/recurring-store"
 import { stringUtil } from "@/lib/string-util"
 
@@ -13,6 +14,7 @@ const SKELETON_ROWS = 4
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function RecurringSummary() {
+  const t = useTranslations("dashboard.recurringSummary")
   const { items } = useRecurringStore()
 
   const activeMonthly = items
@@ -26,13 +28,13 @@ export function RecurringSummary() {
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex items-baseline justify-between gap-2">
-          <CardTitle className="text-base">Recurring</CardTitle>
+          <CardTitle className="text-base">{t("title")}</CardTitle>
           <span className="text-lg font-bold tabular-nums">
             {stringUtil.formatMoney(monthlyTotal)}
-            <span className="text-xs font-normal text-muted-foreground">/mo</span>
+            <span className="text-xs font-normal text-muted-foreground">{t("perMonth")}</span>
           </span>
         </div>
-        <CardDescription>Monthly committed expenses</CardDescription>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 pt-0 flex-1">
         {items.length === 0 ? (
@@ -59,7 +61,7 @@ export function RecurringSummary() {
       </CardContent>
       <div className="px-6 pb-4">
         <Link href="/recurring" className="text-xs text-primary hover:underline underline-offset-4">
-          {activeMonthly.length} active subscriptions · View all →
+          {t("activeSubscriptions", { count: activeMonthly.length })}
         </Link>
       </div>
     </Card>

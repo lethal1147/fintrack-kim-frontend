@@ -2,9 +2,11 @@
 
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useTransactionsStore } from "@/store/transactions-store"
 import { stringUtil } from "@/lib/string-util"
+import { useCategoryLabel } from "@/lib/category-util"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -21,18 +23,20 @@ const CATEGORY_COLORS: Record<string, string> = {
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function RecentTransactions() {
+  const t = useTranslations("dashboard.recentTransactions")
   const { recentTransactions } = useTransactionsStore()
+  const getCategoryLabel = useCategoryLabel()
 
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base">Recent Transactions</CardTitle>
-            <CardDescription>Last 5 entries</CardDescription>
+            <CardTitle className="text-base">{t("title")}</CardTitle>
+            <CardDescription>{t("subtitle")}</CardDescription>
           </div>
           <Link href="/transactions" className="text-xs text-primary hover:underline underline-offset-4">
-            View all →
+            {t("viewAll")}
           </Link>
         </div>
       </CardHeader>
@@ -52,7 +56,7 @@ export function RecentTransactions() {
               <div className={cn("size-2 rounded-full shrink-0", CATEGORY_COLORS[tx.category] ?? "bg-muted-foreground")} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{tx.merchant}</p>
-                <p className="text-xs text-muted-foreground">{tx.category} · {tx.date}</p>
+                <p className="text-xs text-muted-foreground">{getCategoryLabel(tx.category)} · {tx.date}</p>
               </div>
               <p className={cn("text-sm font-semibold tabular-nums shrink-0", tx.type === "income" ? "text-emerald-600" : "text-foreground")}>
                 {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}

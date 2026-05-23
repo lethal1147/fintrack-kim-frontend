@@ -1,31 +1,32 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SectionHeader } from "./section-header"
 import { DeleteAccountDialog } from "./delete-account-dialog"
 
-// ─── constants ────────────────────────────────────────────────────────────────
-
-const DELETE_CONFIRMATION_TEXT = "delete my account"
-
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function DangerZone() {
+  const t = useTranslations("settings.dangerZone")
+  const DELETE_CONFIRMATION_TEXT = t("deleteConfirmationText")
+
   const [confirmText, setConfirmText] = useState("")
   const [dialogOpen, setDialogOpen]   = useState(false)
 
   return (
     <div className="space-y-6">
-      <SectionHeader title="Danger Zone" description="Irreversible actions — proceed with caution." />
+      <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
       <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-5 space-y-4">
         <div>
-          <p className="text-sm font-semibold text-destructive">Delete account</p>
+          <p className="text-sm font-semibold text-destructive">{t("deleteAccountHeading")}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Permanently deletes your account and all associated data. This cannot be undone.
-            Type <span className="font-mono font-semibold text-foreground">{DELETE_CONFIRMATION_TEXT}</span> to confirm.
+            {t("deleteAccountDescription")}{" "}
+            <span className="font-mono font-semibold text-foreground">{DELETE_CONFIRMATION_TEXT}</span>{" "}
+            {t("deleteConfirmationInstruction")}
           </p>
         </div>
         <Input
@@ -40,7 +41,7 @@ export function DangerZone() {
           className="w-full"
           onClick={() => setDialogOpen(true)}
         >
-          Delete account permanently
+          {t("deleteButton")}
         </Button>
       </div>
 

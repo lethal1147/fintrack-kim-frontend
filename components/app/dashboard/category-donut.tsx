@@ -8,8 +8,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { useTranslations } from "next-intl"
 import { type CategoryStatWithPct } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
+import { useCategoryLabel } from "@/lib/category-util"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -25,6 +27,8 @@ const SKELETON_ROWS = 4
 type Props = { data: CategoryStatWithPct[] }
 
 export function CategoryDonut({ data }: Props) {
+  const t = useTranslations("dashboard.categoryDonut")
+  const getCategoryLabel = useCategoryLabel()
   const chartData = data
     .filter((s) => s.type === "expense")
     .map((s, i) => ({ ...s, color: CHART_COLORS[i % CHART_COLORS.length] }))
@@ -39,8 +43,8 @@ export function CategoryDonut({ data }: Props) {
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Spending by Category</CardTitle>
-        <CardDescription>Expense breakdown this month</CardDescription>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         {chartData.length === 0 ? (
@@ -72,7 +76,7 @@ export function CategoryDonut({ data }: Props) {
               </ChartContainer>
               {/* Center label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-xs text-muted-foreground">{t("centerLabel")}</p>
                 <p className="text-base font-bold tabular-nums leading-tight">
                   {stringUtil.formatMoney(totalExpense)}
                 </p>
@@ -88,7 +92,7 @@ export function CategoryDonut({ data }: Props) {
                       className="size-2.5 rounded-full shrink-0"
                       style={{ backgroundColor: c.color }}
                     />
-                    <span className="truncate text-muted-foreground">{c.category}</span>
+                    <span className="truncate text-muted-foreground">{getCategoryLabel(c.category)}</span>
                   </span>
                   <span className="tabular-nums shrink-0 font-medium">
                     {stringUtil.formatMoney(c.total)}

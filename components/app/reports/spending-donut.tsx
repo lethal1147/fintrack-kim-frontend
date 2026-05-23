@@ -1,6 +1,7 @@
 "use client"
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts"
+import { useTranslations } from "next-intl"
 import { stringUtil } from "@/lib/string-util"
 
 // ─── constants ────────────────────────────────────────────────────────────────
@@ -42,6 +43,7 @@ function DonutTooltip({ active, payload }: { active?: boolean; payload?: { name:
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function SpendingDonut({ data, tab }: Props) {
+  const t = useTranslations("reports.spendingDonut")
   const totalAmount = data.reduce((s, d) => s + d.value, 0)
   const largestItem = data[0]
 
@@ -76,7 +78,7 @@ export function SpendingDonut({ data, tab }: Props) {
 
           {/* Center label */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <p className="text-xs text-muted-foreground">{tab === "Spending" ? "Total spent" : "Total income"}</p>
+            <p className="text-xs text-muted-foreground">{tab === "Spending" ? t("centerLabelSpent") : t("centerLabelIncome")}</p>
             <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalAmount)}</p>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function SpendingDonut({ data, tab }: Props) {
         {/* Legend */}
         <div className="flex-1 min-w-48 space-y-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            {tab === "Spending" ? "By Category" : "By Source"}
+            {tab === "Spending" ? t("legendByCategory") : t("legendBySource")}
           </p>
           {data.map((item) => {
             const pct   = totalAmount === 0 ? 0 : Math.round((item.value / totalAmount) * 100)
@@ -103,7 +105,7 @@ export function SpendingDonut({ data, tab }: Props) {
           {largestItem && (
             <div className="pt-3 mt-3 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Largest: <span className="font-medium text-foreground">{largestItem.name}</span>
+                {t("largest")} <span className="font-medium text-foreground">{largestItem.name}</span>
                 {" "}— {stringUtil.formatMoneyFull(largestItem.value)}
               </p>
             </div>

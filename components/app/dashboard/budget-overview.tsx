@@ -1,17 +1,19 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import { budgetCategories } from "@/lib/mock-data"
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n)
-}
+import { stringUtil } from "@/lib/string-util"
 
 export function BudgetOverview() {
+  const t = useTranslations("budget")
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Budget</CardTitle>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
         <CardDescription>March 2026</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-0">
@@ -23,7 +25,7 @@ export function BudgetOverview() {
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{cat.name}</span>
                 <span className={cn("text-xs tabular-nums", over ? "text-destructive font-medium" : "text-muted-foreground")}>
-                  {formatCurrency(cat.spent)} / {formatCurrency(cat.budgeted)}
+                  {stringUtil.formatMoney(cat.spent)} / {stringUtil.formatMoney(cat.budgeted)}
                 </span>
               </div>
               <Progress

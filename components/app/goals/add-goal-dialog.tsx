@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { useTranslations } from "next-intl"
 import { type Goal } from "@/lib/mock-data"
 
 const COLOR_OPTIONS = [
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export function AddGoalDialog({ open, onClose, onAdd }: Props) {
+  const t = useTranslations("goals.addDialog")
   const [name, setName]                   = useState("")
   const [emoji, setEmoji]                 = useState("🎯")
   const [target, setTarget]               = useState("")
@@ -61,14 +63,14 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>New Goal</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
 
           {/* Emoji presets */}
           <div className="space-y-1.5">
-            <Label>Icon</Label>
+            <Label>{t("iconLabel")}</Label>
             <div className="flex gap-1.5 flex-wrap">
               {EMOJI_PRESETS.map((e) => (
                 <button
@@ -86,10 +88,10 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
 
           {/* Name */}
           <div className="space-y-1.5">
-            <Label htmlFor="goal-name">Goal name</Label>
+            <Label htmlFor="goal-name">{t("goalNameLabel")}</Label>
             <Input
               id="goal-name"
-              placeholder="e.g. Emergency Fund, New Car…"
+              placeholder={t("goalNamePlaceholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -99,7 +101,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
           {/* Target + Current */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="goal-target">Target amount ($)</Label>
+              <Label htmlFor="goal-target">{t("targetAmountLabel")}</Label>
               <Input
                 id="goal-target"
                 type="number" min="1" step="1" placeholder="0"
@@ -110,7 +112,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="goal-current">
-                Already saved ($) <span className="text-muted-foreground">(optional)</span>
+                {t("alreadySavedLabel")} <span className="text-muted-foreground">{t("alreadySavedOptional")}</span>
               </Label>
               <Input
                 id="goal-current"
@@ -124,7 +126,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
           {/* Target date + Monthly */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="goal-date">Target date</Label>
+              <Label htmlFor="goal-date">{t("targetDateLabel")}</Label>
               <Input
                 id="goal-date"
                 type="month"
@@ -135,7 +137,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="goal-monthly">
-                Monthly contribution ($) <span className="text-muted-foreground">(optional)</span>
+                {t("monthlyContributionLabel")} <span className="text-muted-foreground">{t("monthlyContributionOptional")}</span>
               </Label>
               <Input
                 id="goal-monthly"
@@ -148,7 +150,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
 
           {/* Color */}
           <div className="space-y-1.5">
-            <Label>Colour</Label>
+            <Label>{t("colourLabel")}</Label>
             <div className="flex gap-2">
               {COLOR_OPTIONS.map((c) => (
                 <button
@@ -164,8 +166,8 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
           </div>
 
           <DialogFooter className="gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={!valid}>Create goal</Button>
+            <Button type="button" variant="outline" onClick={onClose}>{t("cancelButton")}</Button>
+            <Button type="submit" disabled={!valid}>{t("createButton")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -8,6 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { useTranslations } from "next-intl"
 import { type CategoryStatWithPct } from "@/lib/api-client"
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -57,17 +58,6 @@ function tickFormatter(v: number): string {
   return `${v > 0 ? "+" : ""}${v}%`
 }
 
-function tooltipFormatter(
-  value: number | string | (number | string)[],
-  _: number | string,
-  entry: { payload?: CategoryGrowth },
-) {
-  const v = typeof value === "number" ? value : Number(value)
-  const isNew = entry.payload?.isNew
-  const label = isNew ? `+${v}% (new this month)` : tickFormatter(v)
-  return [label, "Change"] as [string, string]
-}
-
 // ─── component ────────────────────────────────────────────────────────────────
 
 type Props = {
@@ -76,12 +66,25 @@ type Props = {
 }
 
 export function CategoryGrowthChart({ current, previous }: Props) {
+  const t = useTranslations("dashboard.categoryGrowthChart")
+
+  function tooltipFormatter(
+    value: number | string | (number | string)[],
+    _: number | string,
+    entry: { payload?: CategoryGrowth },
+  ) {
+    const v = typeof value === "number" ? value : Number(value)
+    const isNew = entry.payload?.isNew
+    const label = isNew ? t("tooltipNewThisMonth", { value: v }) : tickFormatter(v)
+    return [label, "Change"] as [string, string]
+  }
+
   if (current.length === 0) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Category Growth</CardTitle>
-          <CardDescription>Spending change vs previous month</CardDescription>
+          <CardTitle className="text-base">{t("title")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-3">
@@ -100,11 +103,11 @@ export function CategoryGrowthChart({ current, previous }: Props) {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Category Growth</CardTitle>
-          <CardDescription>Spending change vs previous month</CardDescription>
+          <CardTitle className="text-base">{t("title")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
-          <p className="text-sm text-muted-foreground">No expense data for comparison</p>
+          <p className="text-sm text-muted-foreground">{t("emptyNoData")}</p>
         </CardContent>
       </Card>
     )
@@ -115,8 +118,8 @@ export function CategoryGrowthChart({ current, previous }: Props) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Category Growth</CardTitle>
-        <CardDescription>Spending change vs previous month</CardDescription>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         <ChartContainer config={CHART_CONFIG} style={{ height: chartHeight }} className="w-full">

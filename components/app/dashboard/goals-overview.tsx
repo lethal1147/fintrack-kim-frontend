@@ -1,17 +1,19 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { goals } from "@/lib/mock-data"
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n)
-}
+import { stringUtil } from "@/lib/string-util"
 
 export function GoalsOverview() {
+  const t = useTranslations("dashboard.goalsOverview")
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Goals</CardTitle>
-        <CardDescription>Your savings targets</CardDescription>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5 pt-0">
         {goals.map((goal) => {
@@ -27,7 +29,7 @@ export function GoalsOverview() {
               </div>
               <Progress value={pct} className="h-1.5" />
               <p className="text-xs text-muted-foreground tabular-nums">
-                {formatCurrency(goal.current)} of {formatCurrency(goal.target)}
+                {stringUtil.formatMoney(goal.current)} {t("of")} {stringUtil.formatMoney(goal.target)}
               </p>
             </div>
           )

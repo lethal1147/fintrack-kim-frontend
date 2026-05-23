@@ -7,26 +7,13 @@ import {
   IconRepeat,
   IconPencil,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { type RecurringItem } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
-
-// ─── constants ────────────────────────────────────────────────────────────────
-
-export const FREQ_LABEL: Record<string, string> = {
-  weekly: "Weekly", monthly: "Monthly", annual: "Annual",
-}
-
-// ─── helpers ─────────────────────────────────────────────────────────────────
-
-function dueBadge(days: number) {
-  if (days < 0)   return { label: `${Math.abs(days)}d overdue`, cls: "bg-destructive/10 text-destructive border-destructive/20" }
-  if (days === 0) return { label: "Due today",   cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
-  if (days <= 5)  return { label: `in ${days}d`, cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
-  return               { label: `in ${days}d`, cls: "bg-muted text-muted-foreground border-border" }
-}
+import { useCategoryLabel } from "@/lib/category-util"
 
 function monthlyEquivalent(item: RecurringItem) {
   if (item.frequency === "monthly") return item.amount
@@ -45,9 +32,23 @@ type Props = {
 }
 
 export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) {
+  const t = useTranslations("recurring.row")
+  const getCategoryLabel = useCategoryLabel()
   const days   = dateUtil.daysUntil(item.next_due)
-  const due    = dueBadge(days)
   const paused = item.status === "paused"
+
+  function dueBadge(d: number) {
+    if (d < 0)   return { label: t("overdueDays", { days: Math.abs(d) }), cls: "bg-destructive/10 text-destructive border-destructive/20" }
+    if (d === 0) return { label: t("dueToday"),   cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
+    if (d <= 5)  return { label: t("dueInDays", { days: d }), cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" }
+    return               { label: t("dueInDays", { days: d }), cls: "bg-muted text-muted-foreground border-border" }
+  }
+
+  const due = dueBadge(days)
+
+  const FREQ_LABEL: Record<string, string> = {
+    weekly: t("freqWeekly"), monthly: t("freqMonthly"), annual: t("freqAnnual"),
+  }
 
   return (
     <div className={cn(
@@ -67,7 +68,7 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
         <div className="flex items-center gap-2 flex-wrap">
           <span className={cn("text-sm font-medium", paused && "line-through")}>{item.name}</span>
           <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md font-normal">
-            {item.category}
+            {getCategoryLabel(item.category)}
           </Badge>
           <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md font-normal gap-0.5">
             <IconRepeat className="size-2.5" />
@@ -75,14 +76,14 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
           </Badge>
           {paused && (
             <Badge variant="outline" className="text-xs px-1.5 py-0 rounded-md text-muted-foreground">
-              Paused
+              {t("statusPaused")}
             </Badge>
           )}
         </div>
         {/* Next due chip */}
         {!paused && (
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="text-xs text-muted-foreground">Next:</span>
+            <span className="text-xs text-muted-foreground">{t("nextLabel")}</span>
             <span className="text-xs text-muted-foreground">
               {dateUtil.format(item.next_due, "MMM D")}
             </span>
@@ -103,7 +104,7 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
         </p>
         {item.frequency !== "monthly" && (
           <p className="text-xs text-muted-foreground">
-            ≈ {stringUtil.formatMoneyFull(monthlyEquivalent(item))}/mo
+            {t("monthlyEquivalent", { amount: stringUtil.formatMoneyFull(monthlyEquivalent(item)) })}
           </p>
         )}
       </div>
@@ -112,14 +113,14 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
         <button
           onClick={() => onEdit(item)}
-          title="Edit"
+          title={t("actionEdit")}
           className="size-7 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
           <IconPencil className="size-3.5" />
         </button>
         <button
           onClick={() => onToggleStatus(item.id)}
-          title={paused ? "Resume" : "Pause"}
+          title={paused ? t("actionResume") : t("actionPause")}
           className="size-7 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
           {paused
@@ -129,7 +130,7 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
         </button>
         <button
           onClick={() => onDelete(item.id)}
-          title="Delete"
+          title={t("actionDelete")}
           className="size-7 rounded-md hover:bg-destructive/10 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
         >
           <IconTrash className="size-3.5" />
@@ -137,4 +138,9 @@ export function RecurringRow({ item, onToggleStatus, onDelete, onEdit }: Props) 
       </div>
     </div>
   )
+}
+
+// ─── exported freq label helper (still available for external use) ────────────
+export const FREQ_LABEL: Record<string, string> = {
+  weekly: "Weekly", monthly: "Monthly", annual: "Annual",
 }

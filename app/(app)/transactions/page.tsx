@@ -9,6 +9,7 @@ import {
   IconLayoutList,
   IconTable,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -26,6 +27,7 @@ import { TransactionPagination } from "@/components/app/transactions/transaction
 import { type Transaction } from "@/lib/api-client"
 import { ALL_CATEGORIES } from "@/lib/categories"
 import { stringUtil } from "@/lib/string-util"
+import { useCategoryLabel } from "@/lib/category-util"
 import { useTransactionsStore } from "@/store/transactions-store"
 import { cn } from "@/lib/utils"
 
@@ -38,6 +40,8 @@ const VIEW_TABLE = "table" as const
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function TransactionsPage() {
+  const t = useTranslations("transactions")
+  const getCategoryLabel = useCategoryLabel()
   const {
     transactions,
     total,
@@ -71,12 +75,12 @@ export default function TransactionsPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Transactions</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{total} entries</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t("entriesCount", { count: total })}</p>
         </div>
         <Button onClick={() => setDialogOpen(true)} className="gap-1.5">
           <IconPlus className="size-4" />
-          Add transaction
+          {t("addButton")}
         </Button>
       </div>
 
@@ -87,7 +91,7 @@ export default function TransactionsPage() {
             <IconArrowDown className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Income this month</p>
+            <p className="text-xs text-muted-foreground">{t("incomeThisMonth")}</p>
             <p className="text-base font-bold text-emerald-600">{stringUtil.formatMoneyFull(totalIncome)}</p>
           </div>
         </div>
@@ -96,7 +100,7 @@ export default function TransactionsPage() {
             <IconArrowUp className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Spent this month</p>
+            <p className="text-xs text-muted-foreground">{t("spentThisMonth")}</p>
             <p className="text-base font-bold">{stringUtil.formatMoneyFull(totalExpense)}</p>
           </div>
         </div>
@@ -108,7 +112,7 @@ export default function TransactionsPage() {
         <div className="relative flex-1 min-w-48">
           <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search transactions..."
+            placeholder={t("searchPlaceholder")}
             value={filter.search}
             onChange={(e) => setFilter({ search: e.target.value })}
             className="pl-8"
@@ -117,18 +121,18 @@ export default function TransactionsPage() {
 
         {/* Type filter */}
         <div className="flex rounded-lg border border-border overflow-hidden text-sm shrink-0">
-          {TYPE_FILTERS.map((t) => (
+          {TYPE_FILTERS.map((f) => (
             <button
-              key={t}
-              onClick={() => setFilter({ type: t })}
+              key={f}
+              onClick={() => setFilter({ type: f })}
               className={cn(
                 "px-3 py-1.5 capitalize transition-colors",
-                filter.type === t
+                filter.type === f
                   ? "bg-primary text-primary-foreground"
                   : "bg-background text-muted-foreground hover:bg-muted"
               )}
             >
-              {t}
+              {f === "all" ? t("filterAll") : f === "income" ? t("filterIncome") : t("filterExpense")}
             </button>
           ))}
         </div>
@@ -139,12 +143,12 @@ export default function TransactionsPage() {
           onValueChange={(v) => setFilter({ category: v === "all" ? "" : v })}
         >
           <SelectTrigger className="w-44 shrink-0">
-            <SelectValue placeholder="All categories" />
+            <SelectValue placeholder={t("categoryAll")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">{t("categoryAll")}</SelectItem>
             {ALL_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
+              <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -156,7 +160,7 @@ export default function TransactionsPage() {
             value={filter.from}
             onChange={(e) => setFilter({ from: e.target.value })}
             className="w-36"
-            title="From date"
+            title={t("fromDateTitle")}
           />
           <span className="text-xs text-muted-foreground px-0.5">–</span>
           <Input
@@ -164,7 +168,7 @@ export default function TransactionsPage() {
             value={filter.to}
             onChange={(e) => setFilter({ to: e.target.value })}
             className="w-36"
-            title="To date"
+            title={t("toDateTitle")}
           />
         </div>
 
@@ -178,7 +182,7 @@ export default function TransactionsPage() {
                 ? "bg-primary text-primary-foreground"
                 : "bg-background text-muted-foreground hover:bg-muted"
             )}
-            title="List view"
+            title={t("viewTitleList")}
           >
             <IconLayoutList className="size-4" />
           </button>
@@ -190,7 +194,7 @@ export default function TransactionsPage() {
                 ? "bg-primary text-primary-foreground"
                 : "bg-background text-muted-foreground hover:bg-muted"
             )}
-            title="Table view"
+            title={t("viewTitleTable")}
           >
             <IconTable className="size-4" />
           </button>
@@ -199,10 +203,10 @@ export default function TransactionsPage() {
 
       {/* ── Content ── */}
       {isLoading ? (
-        <div className="py-20 text-center text-muted-foreground text-sm">Loading…</div>
+        <div className="py-20 text-center text-muted-foreground text-sm">{t("loading")}</div>
       ) : transactions.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground text-sm">
-          No transactions match your filters.
+          {t("emptyFilters")}
         </div>
       ) : view === VIEW_LIST ? (
         <TransactionListView

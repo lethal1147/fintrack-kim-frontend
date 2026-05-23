@@ -12,22 +12,24 @@ import {
   IconLogout,
   IconWallet,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { stringUtil } from "@/lib/string-util"
 import { useAuthStore } from "@/store/auth-store"
-
-const PRIMARY_NAV = [
-  { label: "Dashboard",    href: "/dashboard",    icon: IconLayoutDashboard },
-  { label: "Transactions", href: "/transactions", icon: IconArrowsExchange },
-  { label: "Budget",       href: "/budget",       icon: IconWallet },
-  { label: "Reports",      href: "/reports",      icon: IconChartBar },
-  { label: "Recurring",    href: "/recurring",    icon: IconRepeat },
-]
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuthStore()
+  const t = useTranslations("nav")
+
+  const PRIMARY_NAV = [
+    { label: t("dashboard"),    href: "/dashboard",    icon: IconLayoutDashboard },
+    { label: t("transactions"), href: "/transactions", icon: IconArrowsExchange },
+    { label: t("budget"),       href: "/budget",       icon: IconWallet },
+    { label: t("reports"),      href: "/reports",      icon: IconChartBar },
+    { label: t("recurring"),    href: "/recurring",    icon: IconRepeat },
+  ]
 
   async function handleLogout() {
     await logout()
@@ -85,7 +87,7 @@ export function Sidebar() {
           )}
         >
           <IconSettings className="size-4 shrink-0" />
-          Settings
+          {t("settings")}
         </Link>
 
         {/* User identity */}
@@ -122,7 +124,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
         >
           <IconLogout className="size-4 shrink-0" />
-          Sign out
+          {t("signOut")}
         </button>
       </div>
     </aside>

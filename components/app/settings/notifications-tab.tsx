@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { SectionHeader } from "./section-header"
@@ -17,15 +18,6 @@ type NotifPrefs = {
   newFeatures:        boolean
 }
 
-const NOTIFICATION_ITEMS: { key: keyof NotifPrefs; label: string; description: string }[] = [
-  { key: "weeklySummary",      label: "Weekly summary",      description: "Spending digest every Monday morning." },
-  { key: "budgetAlerts",       label: "Budget alerts",       description: "Notify when a category nears or exceeds budget." },
-  { key: "goalMilestones",     label: "Goal milestones",     description: "Celebrate when you hit 25%, 50%, 75%, 100% of a goal." },
-  { key: "largeTransactions",  label: "Large transactions",  description: "Alert for transactions over $200." },
-  { key: "recurringReminders", label: "Recurring reminders", description: "Remind me 3 days before a bill is due." },
-  { key: "newFeatures",        label: "Product updates",     description: "News about new features and improvements." },
-]
-
 const DEFAULT_PREFS: NotifPrefs = {
   weeklySummary:      true,
   budgetAlerts:       true,
@@ -38,8 +30,18 @@ const DEFAULT_PREFS: NotifPrefs = {
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function NotificationsTab() {
+  const t = useTranslations("settings.notifications")
   const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS)
   const [saved, setSaved] = useState(false)
+
+  const NOTIFICATION_ITEMS: { key: keyof NotifPrefs; label: string; description: string }[] = [
+    { key: "weeklySummary",      label: t("weeklySummaryLabel"),      description: t("weeklySummaryDescription") },
+    { key: "budgetAlerts",       label: t("budgetAlertsLabel"),       description: t("budgetAlertsDescription") },
+    { key: "goalMilestones",     label: t("goalMilestonesLabel"),     description: t("goalMilestonesDescription") },
+    { key: "largeTransactions",  label: t("largeTransactionsLabel"),  description: t("largeTransactionsDescription") },
+    { key: "recurringReminders", label: t("recurringRemindersLabel"), description: t("recurringRemindersDescription") },
+    { key: "newFeatures",        label: t("newFeaturesLabel"),        description: t("newFeaturesDescription") },
+  ]
 
   function toggle(key: keyof NotifPrefs) {
     setPrefs((p) => ({ ...p, [key]: !p[key] }))
@@ -47,7 +49,7 @@ export function NotificationsTab() {
 
   return (
     <div className="space-y-6">
-      <SectionHeader title="Notifications" description="Choose what you want to be notified about." />
+      <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
       <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
         {NOTIFICATION_ITEMS.map((item) => (
@@ -63,7 +65,7 @@ export function NotificationsTab() {
 
       <div className="flex justify-end">
         <Button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2500) }}>
-          Save preferences
+          {t("saveButton")}
         </Button>
       </div>
 

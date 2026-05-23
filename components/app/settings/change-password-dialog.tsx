@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { IconAlertTriangle } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export function ChangePasswordDialog({ open, onClose }: Props) {
+  const t = useTranslations("settings.changePasswordDialog")
   const { user } = useAuthStore()
   const { isLoading, requestPasswordChange, changePassword } = useSecurityStore()
 
@@ -51,7 +53,7 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
       await requestPasswordChange()
       setStep("change")
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to send code")
+      setError(err instanceof Error ? err.message : t("errorSendFailed"))
     }
   }
 
@@ -59,18 +61,18 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
     e.preventDefault()
     setError(null)
     if (newPw !== confirmPw) {
-      setError("Passwords don't match")
+      setError(t("errorPasswordMismatch"))
       return
     }
     if (newPw.length < 8) {
-      setError("Password must be at least 8 characters")
+      setError(t("errorMinLength"))
       return
     }
     try {
       await changePassword(otp, newPw)
       handleClose()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to change password")
+      setError(err instanceof Error ? err.message : t("errorChangeFailed"))
     }
   }
 
@@ -78,14 +80,13 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         {step === "request" ? (
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              We&apos;ll send a 6-digit verification code to{" "}
-              <span className="font-medium text-foreground">{user?.email}</span>.
+              {t("requestStepDescription", { email: user?.email ?? "" })}
             </p>
             {error && (
               <div className="flex items-center gap-1.5 text-sm text-destructive">
@@ -94,24 +95,23 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button variant="outline" onClick={handleClose}>{t("cancelButton")}</Button>
               <Button onClick={handleSendCode} disabled={isLoading}>
-                {isLoading ? "Sending…" : "Send verification code"}
+                {isLoading ? t("sendingButton") : t("sendCodeButton")}
               </Button>
             </DialogFooter>
           </div>
         ) : (
           <form onSubmit={handleChange} className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Enter the code sent to <span className="font-medium text-foreground">{user?.email}</span>{" "}
-              and your new password.
+              {t("changeStepDescription", { email: user?.email ?? "" })}
             </p>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label htmlFor="cp-otp">Verification code</Label>
+                <Label htmlFor="cp-otp">{t("verificationCodeLabel")}</Label>
                 <Input
                   id="cp-otp"
-                  placeholder="123456"
+                  placeholder={t("verificationCodePlaceholder")}
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
@@ -119,7 +119,7 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cp-new">New password</Label>
+                <Label htmlFor="cp-new">{t("newPasswordLabel")}</Label>
                 <Input
                   id="cp-new"
                   type="password"
@@ -129,7 +129,7 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cp-confirm">Confirm password</Label>
+                <Label htmlFor="cp-confirm">{t("confirmPasswordLabel")}</Label>
                 <Input
                   id="cp-confirm"
                   type="password"
@@ -147,10 +147,10 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
             )}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setStep("request")}>
-                Resend code
+                {t("resendCodeButton")}
               </Button>
               <Button type="submit" disabled={isLoading || !otp || !newPw || !confirmPw}>
-                {isLoading ? "Changing…" : "Change password"}
+                {isLoading ? t("changingButton") : t("changeButton")}
               </Button>
             </DialogFooter>
           </form>

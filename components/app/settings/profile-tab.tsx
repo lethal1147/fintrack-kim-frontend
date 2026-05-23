@@ -5,6 +5,7 @@ import { IconCamera, IconLoader2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useTranslations } from "next-intl"
 import { stringUtil } from "@/lib/string-util"
 import { useAuthStore } from "@/store/auth-store"
 import { SectionHeader } from "./section-header"
@@ -18,6 +19,7 @@ const MAX_AVATAR_BYTES = 5 * 1024 * 1024
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function ProfileTab() {
+  const t = useTranslations("settings.profile")
   const { user, updateProfile, uploadAvatar, isLoading } = useAuthStore()
 
   const [name, setName]         = useState(user?.name ?? "")
@@ -44,7 +46,7 @@ export function ProfileTab() {
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save profile")
+      setError(err instanceof Error ? err.message : t("errorSaveFallback"))
     }
   }
 
@@ -53,7 +55,7 @@ export function ProfileTab() {
     if (!file) return
 
     if (file.size > MAX_AVATAR_BYTES) {
-      setError("Image must be under 5 MB")
+      setError(t("errorAvatarSize"))
       return
     }
 
@@ -62,7 +64,7 @@ export function ProfileTab() {
     try {
       await uploadAvatar(file)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to upload avatar")
+      setError(err instanceof Error ? err.message : t("errorUploadAvatar"))
     } finally {
       setAvatarUploading(false)
       // Reset the input so the same file can be re-selected after an error
@@ -75,8 +77,8 @@ export function ProfileTab() {
   return (
     <form onSubmit={handleSave} className="space-y-6">
       <SectionHeader
-        title="Profile"
-        description="Your personal details shown across FinTrack."
+        title={t("sectionTitle")}
+        description={t("sectionDescription")}
       />
 
       {/* Avatar */}
@@ -128,11 +130,11 @@ export function ProfileTab() {
       {/* Fields */}
       <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
         <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
-          <Label htmlFor="p-name" className="text-sm font-medium">Full name</Label>
+          <Label htmlFor="p-name" className="text-sm font-medium">{t("fullNameLabel")}</Label>
           <Input id="p-name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
-          <Label htmlFor="p-email" className="text-sm font-medium">Email</Label>
+          <Label htmlFor="p-email" className="text-sm font-medium">{t("emailLabel")}</Label>
           <Input id="p-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
       </div>
@@ -143,7 +145,7 @@ export function ProfileTab() {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving…" : "Save profile"}
+          {isLoading ? t("savingButton") : t("saveButton")}
         </Button>
       </div>
 

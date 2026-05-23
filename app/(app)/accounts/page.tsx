@@ -11,6 +11,7 @@ import {
   IconTrendingUp,
   IconCar,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { type Account, type AccountType } from "@/lib/mock-data"
@@ -19,32 +20,10 @@ import { useAccountsStore } from "@/store/accounts-store"
 import { stringUtil } from "@/lib/string-util"
 import { cn } from "@/lib/utils"
 
-// ─── constants ────────────────────────────────────────────────────────────────
-
-const GROUP_CONFIG: {
-  label: string
-  types: AccountType[]
-  isLiability: boolean
-  icon: React.ElementType
-  color: string
-}[] = [
-  { label: "Cash",         types: ["checking", "savings"],  isLiability: false, icon: IconBuildingBank, color: "bg-emerald-500/10 text-emerald-600" },
-  { label: "Credit Cards", types: ["credit_card"],           isLiability: true,  icon: IconCreditCard,  color: "bg-rose-500/10 text-rose-600" },
-  { label: "Loans",        types: ["loan"],                  isLiability: true,  icon: IconCar,         color: "bg-orange-500/10 text-orange-600" },
-  { label: "Investments",  types: ["investment"],            isLiability: false, icon: IconTrendingUp,  color: "bg-violet-500/10 text-violet-600" },
-]
-
-const TYPE_LABEL: Record<AccountType, string> = {
-  checking:    "Checking",
-  savings:     "Savings",
-  credit_card: "Credit Card",
-  loan:        "Loan",
-  investment:  "Investment",
-}
-
 // ─── sub-components ───────────────────────────────────────────────────────────
 
 function AccountRow({ account }: { account: Account }) {
+  const t = useTranslations("accounts")
   const isLiability = account.balance < 0
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors">
@@ -60,7 +39,11 @@ function AccountRow({ account }: { account: Account }) {
             <span className="text-xs text-muted-foreground">•••• {account.lastFour}</span>
           )}
           <Badge variant="secondary" className="text-xs px-1.5 py-0 rounded-md font-normal">
-            {TYPE_LABEL[account.type]}
+            {account.type === "checking" ? t("typeChecking")
+              : account.type === "savings" ? t("typeSavings")
+              : account.type === "credit_card" ? t("typeCreditCard")
+              : account.type === "loan" ? t("typeLoan")
+              : t("typeInvestment")}
           </Badge>
         </div>
       </div>
@@ -128,8 +111,22 @@ function GroupSection({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function AccountsPage() {
+  const t = useTranslations("accounts")
   const { accounts, addAccount } = useAccountsStore()
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  const GROUP_CONFIG: {
+    label: string
+    types: AccountType[]
+    isLiability: boolean
+    icon: React.ElementType
+    color: string
+  }[] = [
+    { label: t("groupCash"),         types: ["checking", "savings"],  isLiability: false, icon: IconBuildingBank, color: "bg-emerald-500/10 text-emerald-600" },
+    { label: t("groupCreditCards"),  types: ["credit_card"],           isLiability: true,  icon: IconCreditCard,  color: "bg-rose-500/10 text-rose-600" },
+    { label: t("groupLoans"),        types: ["loan"],                  isLiability: true,  icon: IconCar,         color: "bg-orange-500/10 text-orange-600" },
+    { label: t("groupInvestments"),  types: ["investment"],            isLiability: false, icon: IconTrendingUp,  color: "bg-violet-500/10 text-violet-600" },
+  ]
 
   const totalAssets      = accounts.filter((a) => a.balance > 0).reduce((s, a) => s + a.balance, 0)
   const totalLiabilities = accounts.filter((a) => a.balance < 0).reduce((s, a) => s + Math.abs(a.balance), 0)
@@ -143,17 +140,17 @@ export default function AccountsPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Accounts</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Your connected accounts and balances</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-1.5 text-muted-foreground">
             <IconRefresh className="size-3.5" />
-            Refresh
+            {t("refreshButton")}
           </Button>
           <Button className="gap-1.5" onClick={() => setDialogOpen(true)}>
             <IconPlus className="size-4" />
-            Add account
+            {t("addButton")}
           </Button>
         </div>
       </div>
@@ -161,7 +158,7 @@ export default function AccountsPage() {
       {/* ── Net Worth Card ── */}
       <div className="rounded-xl border border-border bg-card p-5 space-y-4">
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Net Worth</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{t("netWorthLabel")}</p>
           <p className="text-3xl font-bold tabular-nums mt-1">{stringUtil.formatMoneyFull(netWorth)}</p>
         </div>
 
@@ -177,14 +174,14 @@ export default function AccountsPage() {
           <div>
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
-              <p className="text-xs text-muted-foreground">Total Assets</p>
+              <p className="text-xs text-muted-foreground">{t("totalAssetsLabel")}</p>
             </div>
             <p className="text-xl font-bold tabular-nums text-emerald-600">{stringUtil.formatMoneyFull(totalAssets)}</p>
           </div>
           <div>
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="size-2 rounded-full bg-destructive shrink-0" />
-              <p className="text-xs text-muted-foreground">Total Liabilities</p>
+              <p className="text-xs text-muted-foreground">{t("totalLiabilitiesLabel")}</p>
             </div>
             <p className="text-xl font-bold tabular-nums text-destructive">{stringUtil.formatMoneyFull(totalLiabilities)}</p>
           </div>

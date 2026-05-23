@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,18 +22,11 @@ import {
 import { type BudgetGroup, type CreateBudgetBody } from "@/lib/api-client"
 import { EXPENSE_CATEGORIES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
+import { useCategoryLabel } from "@/lib/category-util"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
 const GROUPS: BudgetGroup[] = ["Fixed", "Flexible", "Non-Monthly"]
-
-const COLOR_OPTIONS = [
-  { label: "Blue",   value: "var(--chart-1)" },
-  { label: "Green",  value: "var(--chart-2)" },
-  { label: "Violet", value: "var(--chart-3)" },
-  { label: "Orange", value: "var(--chart-4)" },
-  { label: "Pink",   value: "var(--chart-5)" },
-]
 
 // ─── component ────────────────────────────────────────────────────────────────
 
@@ -43,6 +37,17 @@ type Props = {
 }
 
 export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
+  const t = useTranslations("budget.addDialog")
+  const getCategoryLabel = useCategoryLabel()
+
+  const COLOR_OPTIONS = [
+    { label: t("colorBlue"),   value: "var(--chart-1)" },
+    { label: t("colorGreen"),  value: "var(--chart-2)" },
+    { label: t("colorViolet"), value: "var(--chart-3)" },
+    { label: t("colorOrange"), value: "var(--chart-4)" },
+    { label: t("colorPink"),   value: "var(--chart-5)" },
+  ]
+
   const [name, setName]     = useState("")
   const [group, setGroup]   = useState<BudgetGroup | "">("")
   const [amount, setAmount] = useState("")
@@ -72,21 +77,21 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Budget Category</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
 
           {/* Category name — dropdown of canonical expense categories */}
           <div className="space-y-1.5">
-            <Label>Category name</Label>
+            <Label>{t("categoryNameLabel")}</Label>
             <Select value={name} onValueChange={setName}>
               <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t("categoryPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {EXPENSE_CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -94,10 +99,10 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
 
           {/* Group */}
           <div className="space-y-1.5">
-            <Label>Group</Label>
+            <Label>{t("groupLabel")}</Label>
             <Select value={group} onValueChange={(v) => setGroup(v as BudgetGroup)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select group" />
+                <SelectValue placeholder={t("groupPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {GROUPS.map((g) => (
@@ -109,7 +114,7 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
 
           {/* Monthly budget */}
           <div className="space-y-1.5">
-            <Label htmlFor="cat-amount">Monthly budget ($)</Label>
+            <Label htmlFor="cat-amount">{t("monthlyBudgetLabel")}</Label>
             <Input
               id="cat-amount"
               type="number"
@@ -124,7 +129,7 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
 
           {/* Color */}
           <div className="space-y-1.5">
-            <Label>Color</Label>
+            <Label>{t("colorLabel")}</Label>
             <div className="flex gap-2">
               {COLOR_OPTIONS.map((c) => (
                 <button
@@ -144,10 +149,10 @@ export function AddBudgetCategoryDialog({ open, onClose, onAdd }: Props) {
 
           <DialogFooter className="gap-2 pt-1">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {t("cancelButton")}
             </Button>
             <Button type="submit" disabled={!valid}>
-              Add category
+              {t("addButton")}
             </Button>
           </DialogFooter>
         </form>

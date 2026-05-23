@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useBudgetStore } from "@/store/budget-store"
 import { stringUtil } from "@/lib/string-util"
@@ -16,6 +17,7 @@ const SKELETON_ROWS = 4
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function BudgetPerformance() {
+  const t = useTranslations("dashboard.budgetPerformance")
   const { categories } = useBudgetStore()
 
   const topCategories = [...categories]
@@ -25,8 +27,8 @@ export function BudgetPerformance() {
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Budget Performance</CardTitle>
-        <CardDescription>Top 5 categories by spend</CardDescription>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-0 flex-1">
         {categories.length === 0 ? (
@@ -66,8 +68,8 @@ export function BudgetPerformance() {
                   over ? "text-destructive" : "text-emerald-600"
                 )}>
                   {over
-                    ? `฿${Math.abs(remaining).toFixed(0)} over budget`
-                    : `฿${remaining.toFixed(0)} remaining`}
+                    ? t("overBudget", { amount: stringUtil.formatMoney(Math.abs(remaining)) })
+                    : t("remaining", { amount: stringUtil.formatMoney(remaining) })}
                 </p>
               </div>
             )
@@ -76,7 +78,7 @@ export function BudgetPerformance() {
       </CardContent>
       <div className="px-6 pb-4">
         <Link href="/budget" className="text-xs text-primary hover:underline underline-offset-4">
-          View all budgets →
+          {t("viewAll")}
         </Link>
       </div>
     </Card>

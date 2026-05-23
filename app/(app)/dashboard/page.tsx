@@ -8,6 +8,7 @@ import {
   IconWallet,
   IconPigMoney,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/app/dashboard/stat-card"
 import { RecentTransactions } from "@/components/app/dashboard/recent-transactions"
@@ -41,6 +42,7 @@ function savingsRate(income: number, expense: number): number {
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard")
   const [period, setPeriod] = useState<Period>("month")
 
   const { monthly, prevMonth, trend, isLoading, fetchDashboard } = useDashboardStore()
@@ -105,11 +107,11 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             {period === "month"
-              ? `${today.format("MMMM YYYY")} overview`
-              : `${today.format("YYYY")} year-to-date overview`}
+              ? today.format("MMMM YYYY")
+              : today.format("YYYY")}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -118,14 +120,14 @@ export default function DashboardPage() {
             variant={period === "month" ? "default" : "outline"}
             onClick={() => setPeriod("month")}
           >
-            This Month
+            {t("periodMonth")}
           </Button>
           <Button
             size="sm"
             variant={period === "year" ? "default" : "outline"}
             onClick={() => setPeriod("year")}
           >
-            This Year
+            {t("periodYear")}
           </Button>
         </div>
       </div>
@@ -133,37 +135,37 @@ export default function DashboardPage() {
       {/* Row 1 — KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Income"
+          title={t("statTotalIncome")}
           value={stringUtil.formatMoney(kpi.income)}
           delta={deltaIncome}
-          deltaLabel="vs last month"
+          deltaLabel={t("vsLastMonth")}
           icon={IconTrendingUp}
           sparkData={sparkIncome}
           sparkColor="var(--chart-2)"
         />
         <StatCard
-          title="Total Expenses"
+          title={t("statTotalExpenses")}
           value={stringUtil.formatMoney(kpi.expense)}
           delta={deltaExpense}
-          deltaLabel="vs last month"
+          deltaLabel={t("vsLastMonth")}
           icon={IconTrendingDown}
           sparkData={sparkExpense}
           sparkColor="var(--chart-5)"
         />
         <StatCard
-          title="Net Cash Flow"
+          title={t("statNetCashFlow")}
           value={stringUtil.formatMoney(kpi.net)}
           delta={deltaNet}
-          deltaLabel="vs last month"
+          deltaLabel={t("vsLastMonth")}
           icon={IconWallet}
           sparkData={sparkNet}
           sparkColor="var(--chart-1)"
         />
         <StatCard
-          title="Savings Rate"
+          title={t("statSavingsRate")}
           value={`${kpi.savingsRate}%`}
           delta={deltaSavings}
-          deltaLabel="vs last month"
+          deltaLabel={t("vsLastMonth")}
           icon={IconPigMoney}
           sparkData={sparkSavings}
           sparkColor="var(--chart-3)"

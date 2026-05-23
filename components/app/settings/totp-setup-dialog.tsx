@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { IconAlertTriangle } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export function TOTPSetupDialog({ open, onClose }: Props) {
+  const t = useTranslations("settings.totpSetupDialog")
   const { isLoading, setupTOTP, confirmTOTP } = useSecurityStore()
 
   const [step, setStep]             = useState<Step>("loading")
@@ -64,7 +66,7 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
       setBackupCodes(codes)
       setStep("backup")
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid code")
+      setError(err instanceof Error ? err.message : t("errorFallback"))
     }
   }
 
@@ -72,27 +74,26 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Enable two-factor authentication</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         {step === "loading" && (
           <div className="py-8 text-center text-sm text-muted-foreground">
-            Generating QR code…
+            {t("generatingQr")}
           </div>
         )}
 
         {step === "scan" && setup && (
           <form onSubmit={handleConfirm} className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.),
-              then enter the 6-digit code to confirm.
+              {t("scanDescription")}
             </p>
 
             {/* QR code rendered via img tag — browser-safe */}
             <div className="flex justify-center py-2">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(setup.qr_code_uri)}&size=180x180`}
-                alt="TOTP QR Code"
+                alt={t("qrAlt")}
                 className="rounded-lg border border-border"
                 width={180}
                 height={180}
@@ -101,7 +102,7 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
 
             <details className="text-xs text-muted-foreground">
               <summary className="cursor-pointer hover:text-foreground">
-                Can&apos;t scan? Enter code manually
+                {t("cantScanSummary")}
               </summary>
               <p className="mt-1 font-mono break-all select-all bg-muted rounded p-2">
                 {setup.secret}
@@ -109,10 +110,10 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
             </details>
 
             <div className="space-y-1.5">
-              <Label htmlFor="totp-code">Verification code</Label>
+              <Label htmlFor="totp-code">{t("verificationCodeLabel")}</Label>
               <Input
                 id="totp-code"
-                placeholder="123456"
+                placeholder={t("verificationCodePlaceholder")}
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
@@ -128,9 +129,9 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>{t("cancelButton")}</Button>
               <Button type="submit" disabled={isLoading || code.length !== 6}>
-                {isLoading ? "Verifying…" : "Enable 2FA"}
+                {isLoading ? t("verifyingButton") : t("enableButton")}
               </Button>
             </DialogFooter>
           </form>
@@ -139,8 +140,7 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
         {step === "backup" && (
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Save these backup codes somewhere safe. Each code can be used once
-              to log in if you lose access to your authenticator app.
+              {t("backupDescription")}
             </p>
             <div className="grid grid-cols-2 gap-2 bg-muted rounded-lg p-3">
               {backupCodes.map((c) => (
@@ -150,7 +150,7 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
               ))}
             </div>
             <DialogFooter>
-              <Button onClick={handleClose}>I&apos;ve saved my backup codes</Button>
+              <Button onClick={handleClose}>{t("savedCodesButton")}</Button>
             </DialogFooter>
           </div>
         )}

@@ -11,14 +11,8 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { useTranslations } from "next-intl"
 import { type MonthStat } from "@/lib/api-client"
-
-// ─── constants ────────────────────────────────────────────────────────────────
-
-const CHART_CONFIG = {
-  income:  { label: "Income",   color: "var(--chart-2)" },
-  expense: { label: "Expenses", color: "var(--chart-5)" },
-} satisfies ChartConfig
 
 function formatMonthLabel(yyyyMM: string): string {
   return dayjs(yyyyMM + "-01").format("MMM")
@@ -29,13 +23,20 @@ function formatMonthLabel(yyyyMM: string): string {
 type Props = { data: MonthStat[] }
 
 export function CashFlowChart({ data }: Props) {
+  const t = useTranslations("dashboard.cashFlowChart")
+
+  const CHART_CONFIG = {
+    income:  { label: t("legendIncome"),   color: "var(--chart-2)" },
+    expense: { label: t("legendExpenses"), color: "var(--chart-5)" },
+  } satisfies ChartConfig
+
   const chartData = data.map((m) => ({ ...m, month: formatMonthLabel(m.month) }))
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Cash Flow</CardTitle>
-        <CardDescription>Income vs expenses — last 6 months</CardDescription>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         <ChartContainer config={CHART_CONFIG} className="h-55 w-full">

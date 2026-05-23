@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
+import { useTranslations } from "next-intl"
 import { stringUtil } from "@/lib/string-util"
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -48,9 +49,11 @@ function BarTooltip({
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function TrendBarChart({ data }: Props) {
+  const t = useTranslations("reports.trendChart")
+
   return (
     <div className="rounded-xl border border-border bg-card p-5">
-      <p className="text-sm font-semibold mb-4">12-Month Trend</p>
+      <p className="text-sm font-semibold mb-4">{t("title")}</p>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barGap={4}>
           <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" />
@@ -68,8 +71,8 @@ export function TrendBarChart({ data }: Props) {
             width={36}
           />
           <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--muted)", opacity: 0.5 }} />
-          <Bar dataKey="income"  name="Income"  fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
-          <Bar dataKey="expense" name="Expense" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={32} />
+          <Bar dataKey="income"  name={t("legendIncome")}  fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
+          <Bar dataKey="expense" name={t("legendExpense")} fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={32} />
         </BarChart>
       </ResponsiveContainer>
 
@@ -77,11 +80,11 @@ export function TrendBarChart({ data }: Props) {
       <div className="flex items-center gap-4 mt-3 justify-center">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="size-2.5 rounded-full bg-emerald-500" />
-          Income
+          {t("legendIncome")}
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="size-2.5 rounded-full" style={{ background: "var(--chart-1)" }} />
-          Expense
+          {t("legendExpense")}
         </div>
       </div>
     </div>

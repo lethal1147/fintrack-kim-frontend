@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { IconAlertTriangle, IconLoader2 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { useAuthStore } from "@/store/auth-store"
@@ -16,6 +17,7 @@ import { TOTPDisableDialog } from "./totp-disable-dialog"
 // ─── component ────────────────────────────────────────────────────────────────
 
 export function SecurityTab() {
+  const t = useTranslations("settings.security")
   const router = useRouter()
   const { user, logout } = useAuthStore()
   const { sessions, isLoading, error, fetchSessions, revokeSession } = useSecurityStore()
@@ -56,22 +58,22 @@ export function SecurityTab() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Security"
-        description="Manage your password and account security."
+        title={t("sectionTitle")}
+        description={t("sectionDescription")}
       />
 
       {/* Password */}
       <div>
-        <p className="text-sm font-semibold mb-3">Change password</p>
+        <p className="text-sm font-semibold mb-3">{t("changePasswordHeading")}</p>
         <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium">Password</p>
+            <p className="text-sm font-medium">{t("passwordLabel")}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Use a verification code sent to your email to set a new password.
+              {t("passwordDescription")}
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => setChangePwOpen(true)}>
-            Change password
+            {t("changePasswordButton")}
           </Button>
         </div>
       </div>
@@ -79,11 +81,11 @@ export function SecurityTab() {
       {/* 2FA */}
       <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-medium">Two-factor authentication</p>
+          <p className="text-sm font-medium">{t("twoFactorLabel")}</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             {totpEnabled
-              ? "2FA is enabled — your account requires an authenticator code on login."
-              : "Add an extra layer of security with a one-time code on login."}
+              ? t("twoFactorEnabledDescription")
+              : t("twoFactorDisabledDescription")}
           </p>
         </div>
         <Switch checked={totpEnabled} onCheckedChange={handleTOTPToggle} />
@@ -91,25 +93,25 @@ export function SecurityTab() {
 
       {/* Active sessions */}
       <div>
-        <p className="text-sm font-semibold mb-3">Active sessions</p>
+        <p className="text-sm font-semibold mb-3">{t("activeSessionsHeading")}</p>
         <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
           {isLoading && sessions.length === 0 ? (
             <div className="px-4 py-6 flex justify-center">
               <IconLoader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
           ) : sessions.length === 0 ? (
-            <div className="px-4 py-4 text-sm text-muted-foreground">No active sessions.</div>
+            <div className="px-4 py-4 text-sm text-muted-foreground">{t("noActiveSessions")}</div>
           ) : (
             sessions.map((s) => (
               <div key={s.id} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium">{s.device}</p>
                   <p className="text-xs text-muted-foreground">
-                    {s.is_current ? "Current session" : `Last active ${dateUtil.fromNow(s.last_active_at)}`}
+                    {s.is_current ? t("currentSession") : t("lastActive", { time: dateUtil.fromNow(s.last_active_at) })}
                   </p>
                 </div>
                 {s.is_current ? (
-                  <span className="text-xs text-emerald-600 font-medium">This device</span>
+                  <span className="text-xs text-emerald-600 font-medium">{t("thisDevice")}</span>
                 ) : (
                   <Button
                     variant="ghost"
@@ -121,7 +123,7 @@ export function SecurityTab() {
                     {revoking === s.id ? (
                       <IconLoader2 className="size-3.5 animate-spin" />
                     ) : (
-                      "Sign out"
+                      t("sessionSignOut")
                     )}
                   </Button>
                 )}
@@ -140,7 +142,7 @@ export function SecurityTab() {
 
       <div className="flex justify-end">
         <Button variant="destructive" size="sm" onClick={handleLogoutAll}>
-          Sign out all devices
+          {t("signOutAllButton")}
         </Button>
       </div>
 

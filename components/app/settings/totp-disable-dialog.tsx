@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { IconAlertTriangle } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +23,7 @@ type Props = {
 }
 
 export function TOTPDisableDialog({ open, onClose }: Props) {
+  const t = useTranslations("settings.totpDisableDialog")
   const { isLoading, disableTOTP } = useSecurityStore()
 
   const [code, setCode]   = useState("")
@@ -40,7 +42,7 @@ export function TOTPDisableDialog({ open, onClose }: Props) {
       await disableTOTP(code)
       handleClose()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid code")
+      setError(err instanceof Error ? err.message : t("errorFallback"))
     }
   }
 
@@ -48,19 +50,19 @@ export function TOTPDisableDialog({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Disable two-factor authentication</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Enter your authenticator code or a backup code to disable 2FA.
+            {t("description")}
           </p>
 
           <div className="space-y-1.5">
-            <Label htmlFor="disable-code">Code</Label>
+            <Label htmlFor="disable-code">{t("codeLabel")}</Label>
             <Input
               id="disable-code"
-              placeholder="123456 or XXXXX-XXXXX"
+              placeholder={t("codePlaceholder")}
               value={code}
               onChange={(e) => setCode(e.target.value.trim())}
               autoFocus
@@ -75,9 +77,9 @@ export function TOTPDisableDialog({ open, onClose }: Props) {
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={handleClose}>{t("cancelButton")}</Button>
             <Button type="submit" variant="destructive" disabled={isLoading || !code}>
-              {isLoading ? "Disabling…" : "Disable 2FA"}
+              {isLoading ? t("disablingButton") : t("disableButton")}
             </Button>
           </DialogFooter>
         </form>

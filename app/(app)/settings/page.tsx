@@ -3,34 +3,35 @@
 import {
   IconUser,
   IconLock,
-  // IconBell,
+  IconSettings,
   IconAlertTriangle,
 } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProfileTab } from "@/components/app/settings/profile-tab";
 import { SecurityTab } from "@/components/app/settings/security-tab";
 // import { NotificationsTab } from "@/components/app/settings/notifications-tab";
+import { PreferencesTab } from "@/components/app/settings/preferences-tab";
 import { DangerZone } from "@/components/app/settings/danger-zone";
-
-// ─── constants ────────────────────────────────────────────────────────────────
-
-const SETTINGS_TABS = [
-  { value: "profile", label: "Profile", icon: IconUser },
-  { value: "security", label: "Security", icon: IconLock },
-  // { value: "notifications", label: "Notifications", icon: IconBell },
-  // { value: "preferences", label: "Preferences", icon: IconSettings },
-];
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const t = useTranslations("settings")
+
+  const SETTINGS_TABS = [
+    { value: "profile",     label: t("tabProfile"),     icon: IconUser     },
+    { value: "security",    label: t("tabSecurity"),    icon: IconLock     },
+    { value: "preferences", label: t("tabPreferences"), icon: IconSettings },
+  ];
+
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Manage your account and preferences
+          {t("subtitle")}
         </p>
       </div>
 
@@ -63,7 +64,7 @@ export default function SettingsPage() {
               text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-colors"
           >
             <IconAlertTriangle className="size-4 shrink-0" />
-            Danger zone
+            {t("tabDangerZone")}
           </TabsTrigger>
         </TabsList>
 
@@ -75,7 +76,7 @@ export default function SettingsPage() {
           <SecurityTab />
         </TabsContent>
         {/* <TabsContent value="notifications" className="mt-0 min-w-0"><NotificationsTab /></TabsContent> */}
-        {/* <TabsContent value="preferences"   className="mt-0 min-w-0"><PreferencesTab /></TabsContent> */}
+        <TabsContent value="preferences" className="mt-0 min-w-0"><PreferencesTab /></TabsContent>
         <TabsContent value="danger" className="mt-0 min-w-0">
           <DangerZone />
         </TabsContent>

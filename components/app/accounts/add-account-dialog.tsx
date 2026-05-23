@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,14 +21,6 @@ import {
 } from "@/components/ui/select"
 import { type Account, type AccountType } from "@/lib/mock-data"
 
-const TYPE_OPTIONS: { value: AccountType; label: string }[] = [
-  { value: "checking",    label: "Checking" },
-  { value: "savings",     label: "Savings" },
-  { value: "credit_card", label: "Credit Card" },
-  { value: "loan",        label: "Loan / Mortgage" },
-  { value: "investment",  label: "Investment" },
-]
-
 type Props = {
   open: boolean
   onClose: () => void
@@ -35,6 +28,16 @@ type Props = {
 }
 
 export function AddAccountDialog({ open, onClose, onAdd }: Props) {
+  const t = useTranslations("accounts.addDialog")
+
+  const TYPE_OPTIONS: { value: AccountType; label: string }[] = [
+    { value: "checking",    label: t("typeChecking") },
+    { value: "savings",     label: t("typeSavings") },
+    { value: "credit_card", label: t("typeCreditCard") },
+    { value: "loan",        label: t("typeLoanMortgage") },
+    { value: "investment",  label: t("typeInvestment") },
+  ]
+
   const [name, setName]           = useState("")
   const [institution, setInstitution] = useState("")
   const [type, setType]           = useState<AccountType | "">("")
@@ -67,17 +70,17 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Account</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
 
           {/* Account type */}
           <div className="space-y-1.5">
-            <Label>Account type</Label>
+            <Label>{t("accountTypeLabel")}</Label>
             <Select value={type} onValueChange={(v) => setType(v as AccountType)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder={t("accountTypePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {TYPE_OPTIONS.map((o) => (
@@ -90,20 +93,20 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
           {/* Name + Institution */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="acc-name">Account name</Label>
+              <Label htmlFor="acc-name">{t("accountNameLabel")}</Label>
               <Input
                 id="acc-name"
-                placeholder="e.g. Main Checking"
+                placeholder={t("accountNamePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="acc-inst">Institution</Label>
+              <Label htmlFor="acc-inst">{t("institutionLabel")}</Label>
               <Input
                 id="acc-inst"
-                placeholder="e.g. Chase"
+                placeholder={t("institutionPlaceholder")}
                 value={institution}
                 onChange={(e) => setInstitution(e.target.value)}
                 required
@@ -115,7 +118,7 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="acc-balance">
-                {isLiability ? "Amount owed ($)" : "Current balance ($)"}
+                {isLiability ? t("amountOwedLabel") : t("currentBalanceLabel")}
               </Label>
               <Input
                 id="acc-balance"
@@ -130,11 +133,11 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="acc-last4">
-                Last 4 digits <span className="text-muted-foreground">(optional)</span>
+                {t("last4Label")} <span className="text-muted-foreground">{t("last4Optional")}</span>
               </Label>
               <Input
                 id="acc-last4"
-                placeholder="1234"
+                placeholder={t("last4Placeholder")}
                 maxLength={4}
                 value={lastFour}
                 onChange={(e) => setLastFour(e.target.value.replace(/\D/g, ""))}
@@ -144,13 +147,13 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
 
           {isLiability && (
             <p className="text-xs text-muted-foreground">
-              Credit card and loan balances are treated as liabilities and subtracted from your net worth.
+              {t("liabilityNote")}
             </p>
           )}
 
           <DialogFooter className="gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={!valid}>Add account</Button>
+            <Button type="button" variant="outline" onClick={onClose}>{t("cancelButton")}</Button>
+            <Button type="submit" disabled={!valid}>{t("addButton")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

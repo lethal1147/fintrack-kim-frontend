@@ -1,5 +1,8 @@
 "use client"
 
+"use client"
+
+import { useTranslations } from "next-intl"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
@@ -10,26 +13,28 @@ import {
 } from "@/components/ui/chart"
 import { spendingData } from "@/lib/mock-data"
 
-const chartConfig = {
-  thisMonth: {
-    label: "This month",
-    color: "var(--chart-1)",
-  },
-  lastMonth: {
-    label: "Last month",
-    color: "var(--chart-3)",
-  },
-} satisfies ChartConfig
-
 export function SpendingChart() {
+  const t = useTranslations("dashboard.spendingChart")
+
+  const chartConfig = {
+    thisMonth: {
+      label: t("legendThisMonth"),
+      color: "var(--chart-1)",
+    },
+    lastMonth: {
+      label: t("legendLastMonth"),
+      color: "var(--chart-3)",
+    },
+  } satisfies ChartConfig
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Spending Over Time</CardTitle>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
         <CardDescription>Cumulative spend — March 2026</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <ChartContainer config={chartConfig} className="h-[220px] w-full">
+        <ChartContainer config={chartConfig} className="h-55 w-full">
           <AreaChart data={spendingData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id="thisMonthGrad" x1="0" y1="0" x2="0" y2="1">

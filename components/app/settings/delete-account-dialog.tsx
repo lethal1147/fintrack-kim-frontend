@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { IconAlertTriangle, IconEye, IconEyeOff, IconLoader2 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,6 +24,7 @@ type Props = {
 }
 
 export function DeleteAccountDialog({ open, onClose }: Props) {
+  const t = useTranslations("settings.deleteAccountDialog")
   const router = useRouter()
   const { isLoading, deleteAccount } = useAuthStore()
 
@@ -44,7 +46,7 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
       await deleteAccount(password)
       router.replace("/login")
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Incorrect password")
+      setError(err instanceof Error ? err.message : t("errorFallback"))
     }
   }
 
@@ -52,17 +54,16 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Confirm account deletion</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Enter your password to permanently delete your account and all data.
-            This cannot be undone.
+            {t("description")}
           </p>
 
           <div className="space-y-1.5">
-            <Label htmlFor="delete-password">Password</Label>
+            <Label htmlFor="delete-password">{t("passwordLabel")}</Label>
             <div className="relative">
               <Input
                 id="delete-password"
@@ -95,13 +96,13 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
-              Cancel
+              {t("cancelButton")}
             </Button>
             <Button type="submit" variant="destructive" disabled={isLoading || !password}>
               {isLoading ? (
-                <><IconLoader2 className="size-4 animate-spin" /> Deleting…</>
+                <><IconLoader2 className="size-4 animate-spin" /> {t("deletingButton")}</>
               ) : (
-                "Delete my account"
+                t("deleteButton")
               )}
             </Button>
           </DialogFooter>
