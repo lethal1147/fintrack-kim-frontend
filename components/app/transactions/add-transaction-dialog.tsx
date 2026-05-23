@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/select"
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
+import { useCategoryLabel } from "@/lib/category-util"
 
 type Props = {
   open: boolean
@@ -28,6 +30,8 @@ type Props = {
 }
 
 export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
+  const t = useTranslations("transactions.addDialog")
+  const getCategoryLabel = useCategoryLabel()
   const [type, setType] = useState<"income" | "expense">("expense")
   const [merchant, setMerchant] = useState("")
   const [amount, setAmount] = useState("")
@@ -65,25 +69,25 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Transaction</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
           {/* Type toggle */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
-            {(["expense", "income"] as const).map((t) => (
+            {(["expense", "income"] as const).map((kind) => (
               <button
-                key={t}
+                key={kind}
                 type="button"
-                onClick={() => { setType(t); setCategory("") }}
+                onClick={() => { setType(kind); setCategory("") }}
                 className={cn(
                   "py-1.5 rounded-md text-sm font-medium transition-colors capitalize",
-                  type === t
+                  type === kind
                     ? "bg-background shadow-sm text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {t}
+                {kind === "expense" ? t("typeExpense") : t("typeIncome")}
               </button>
             ))}
           </div>
@@ -91,11 +95,11 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
           {/* Merchant */}
           <div className="space-y-1.5">
             <Label htmlFor="merchant">
-              {type === "income" ? "Source" : "Merchant"}
+              {type === "income" ? t("sourceLabel") : t("merchantLabel")}
             </Label>
             <Input
               id="merchant"
-              placeholder={type === "income" ? "e.g. Salary, Freelance" : "e.g. Starbucks"}
+              placeholder={type === "income" ? t("sourcePlaceholder") : t("merchantPlaceholder")}
               value={merchant}
               onChange={(e) => setMerchant(e.target.value)}
               required
@@ -105,20 +109,20 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
           {/* Amount + Date side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="amount">Amount (฿)</Label>
+              <Label htmlFor="amount">{t("amountLabel")}</Label>
               <Input
                 id="amount"
                 type="number"
                 min="0.01"
                 step="0.01"
-                placeholder="0.00"
+                placeholder={t("amountPlaceholder")}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date">{t("dateLabel")}</Label>
               <Input
                 id="date"
                 type="date"
@@ -131,14 +135,14 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
 
           {/* Category */}
           <div className="space-y-1.5">
-            <Label>Category</Label>
+            <Label>{t("categoryLabel")}</Label>
             <Select value={category} onValueChange={setCategory} required>
               <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t("categoryPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {(type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -146,10 +150,10 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes <span className="text-muted-foreground">(optional)</span></Label>
+            <Label htmlFor="notes">{t("notesLabel")} <span className="text-muted-foreground">{t("notesOptional")}</span></Label>
             <Input
               id="notes"
-              placeholder="Any extra details..."
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
@@ -157,13 +161,13 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
 
           <DialogFooter className="gap-2 pt-1">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-              Cancel
+              {t("cancelButton")}
             </Button>
             <Button
               type="submit"
               disabled={!merchant || !amount || !category || isSubmitting}
             >
-              {isSubmitting ? "Adding…" : "Add transaction"}
+              {isSubmitting ? t("addingButton") : t("addButton")}
             </Button>
           </DialogFooter>
         </form>

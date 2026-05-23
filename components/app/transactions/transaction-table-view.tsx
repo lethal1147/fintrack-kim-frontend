@@ -2,10 +2,12 @@
 
 import { Badge } from "@/components/ui/badge"
 import { IconPencil, IconTrash } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { type Transaction } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
+import { useCategoryLabel } from "@/lib/category-util"
 
 const CATEGORY_COLORS: Record<string, string> = {
   // Income
@@ -39,16 +41,19 @@ type Props = {
 }
 
 export function TransactionTableView({ paginated, onEdit, onDelete }: Props) {
+  const t = useTranslations("transactions.tableView")
+  const getCategoryLabel = useCategoryLabel()
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/40">
-            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-32">Date</th>
-            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Merchant</th>
-            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-36">Category</th>
-            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-24">Type</th>
-            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground w-32">Amount</th>
+            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-32">{t("colDate")}</th>
+            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">{t("colMerchant")}</th>
+            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-36">{t("colCategory")}</th>
+            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-24">{t("colType")}</th>
+            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground w-32">{t("colAmount")}</th>
             <th className="w-16" />
           </tr>
         </thead>
@@ -62,7 +67,7 @@ export function TransactionTableView({ paginated, onEdit, onDelete }: Props) {
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1.5">
                   <div className={cn("size-2 rounded-full shrink-0", CATEGORY_COLORS[tx.category] ?? "bg-muted-foreground")} />
-                  <span className="text-muted-foreground">{tx.category}</span>
+                  <span className="text-muted-foreground">{getCategoryLabel(tx.category)}</span>
                 </div>
               </td>
               <td className="px-4 py-3">
@@ -87,14 +92,14 @@ export function TransactionTableView({ paginated, onEdit, onDelete }: Props) {
                   <button
                     onClick={() => onEdit(tx)}
                     className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    title="Edit"
+                    title={t("actionEdit")}
                   >
                     <IconPencil className="size-3.5" />
                   </button>
                   <button
                     onClick={() => onDelete(tx.id)}
                     className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    title="Delete"
+                    title={t("actionDelete")}
                   >
                     <IconTrash className="size-3.5" />
                   </button>

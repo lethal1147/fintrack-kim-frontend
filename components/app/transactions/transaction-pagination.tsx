@@ -1,6 +1,7 @@
 "use client"
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -14,10 +15,12 @@ type Props = {
 }
 
 export function TransactionPagination({ safePage, totalPages, filteredCount, onPageChange }: Props) {
+  const t = useTranslations("transactions.pagination")
+
   return (
     <div className="flex items-center justify-between pt-1">
       <p className="text-xs text-muted-foreground">
-        Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filteredCount)} of {filteredCount}
+        {t("showing", { from: (safePage - 1) * PAGE_SIZE + 1, to: Math.min(safePage * PAGE_SIZE, filteredCount), total: filteredCount })}
       </p>
       <div className="flex items-center gap-1">
         <Button

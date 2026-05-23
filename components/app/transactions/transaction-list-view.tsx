@@ -2,10 +2,12 @@
 
 import { Badge } from "@/components/ui/badge"
 import { IconPencil, IconTrash } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 import { type Transaction } from "@/lib/api-client"
 import { stringUtil } from "@/lib/string-util"
 import { dateUtil } from "@/lib/date-util"
 import { cn } from "@/lib/utils"
+import { useCategoryLabel } from "@/lib/category-util"
 
 const CATEGORY_COLORS: Record<string, string> = {
   // Income
@@ -48,6 +50,8 @@ type Props = {
 }
 
 export function TransactionListView({ paginated, onEdit, onDelete }: Props) {
+  const t = useTranslations("transactions.listView")
+  const getCategoryLabel = useCategoryLabel()
   const grouped = groupByDate(paginated)
 
   return (
@@ -68,7 +72,7 @@ export function TransactionListView({ paginated, onEdit, onDelete }: Props) {
                   <p className="text-sm font-medium truncate">{tx.merchant}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <Badge variant="secondary" className="text-xs px-1.5 py-0 rounded-md font-normal">
-                      {tx.category}
+                      {getCategoryLabel(tx.category)}
                     </Badge>
                     <span className="text-xs text-muted-foreground">{dateUtil.format(tx.date, "MMM D")}</span>
                   </div>
@@ -83,14 +87,14 @@ export function TransactionListView({ paginated, onEdit, onDelete }: Props) {
                   <button
                     onClick={() => onEdit(tx)}
                     className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    title="Edit"
+                    title={t("actionEdit")}
                   >
                     <IconPencil className="size-3.5" />
                   </button>
                   <button
                     onClick={() => onDelete(tx.id)}
                     className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    title="Delete"
+                    title={t("actionDelete")}
                   >
                     <IconTrash className="size-3.5" />
                   </button>
