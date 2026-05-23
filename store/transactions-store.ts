@@ -47,7 +47,7 @@ type TransactionsState = {
 
   fetchTransactions(): Promise<void>
   fetchMonthlySummary(): Promise<void>
-  fetchRecent(limit?: number): Promise<void>
+  fetchRecent(limit?: number, from?: string, to?: string): Promise<void>
   setFilter(patch: Partial<FilterState>): void
   addTransaction(body: CreateTransactionBody): Promise<void>
   updateTransaction(id: string, body: UpdateTransactionBody): Promise<void>
@@ -93,11 +93,11 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     }
   },
 
-  async fetchRecent(limit = 5) {
+  async fetchRecent(limit = 5, from?: string, to?: string) {
     const token = useAuthStore.getState().accessToken
     if (!token) return
     try {
-      const result = await transactionApi.list({ limit }, token)
+      const result = await transactionApi.list({ limit, from, to }, token)
       set({ recentTransactions: result.transactions ?? [] })
     } catch {
       // non-critical

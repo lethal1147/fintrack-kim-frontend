@@ -7,6 +7,8 @@ import {
   IconTrendingUp,
   IconWallet,
   IconPigMoney,
+  IconChevronLeft,
+  IconChevronRight,
 } from "@tabler/icons-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -23,9 +25,11 @@ import { useRecurringStore } from "@/store/recurring-store"
 import { useTransactionsStore } from "@/store/transactions-store"
 import { stringUtil } from "@/lib/string-util"
 
-// ─── types ────────────────────────────────────────────────────────────────────
+// ─── constants ────────────────────────────────────────────────────────────────
 
 type Period = "month" | "year"
+
+const MIN_MONTHS_BACK = 24
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,20 +49,25 @@ export default function DashboardPage() {
   const t = useTranslations("dashboard")
   const [period, setPeriod] = useState<Period>("month")
 
-  const { monthly, prevMonth, trend, isLoading, fetchDashboard } = useDashboardStore()
+  const { monthly, prevMonth, trend, isLoading, selectedMonth, setMonth, fetchDashboard } = useDashboardStore()
   const { fetchCategories } = useBudgetStore()
   const { fetchItems } = useRecurringStore()
   const { fetchRecent } = useTransactionsStore()
 
-  const today = dayjs()
+  const today    = dayjs().startOf("month")
+  const minMonth = today.subtract(MIN_MONTHS_BACK, "month")
 
   useEffect(() => {
+    const y    = selectedMonth.year()
+    const m    = selectedMonth.month() + 1
+    const from = selectedMonth.startOf("month").format("YYYY-MM-DD")
+    const to   = selectedMonth.endOf("month").format("YYYY-MM-DD")
     fetchDashboard()
-    fetchCategories(today.year(), today.month() + 1)
+    fetchCategories(y, m)
     fetchItems()
-    fetchRecent()
+    fetchRecent(5, from, to)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedMonth])
 
   if (isLoading && !trend) {
     return (
@@ -110,25 +119,50 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             {period === "month"
-              ? today.format("MMMM YYYY")
+              ? selectedMonth.format("MMMM YYYY")
               : today.format("YYYY")}
           </p>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <Button
-            size="sm"
-            variant={period === "month" ? "default" : "outline"}
-            onClick={() => setPeriod("month")}
-          >
-            {t("periodMonth")}
-          </Button>
-          <Button
-            size="sm"
-            variant={period === "year" ? "default" : "outline"}
-            onClick={() => setPeriod("year")}
-          >
-            {t("periodYear")}
-          </Button>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {period === "month" && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setMonth(selectedMonth.subtract(1, "month"))}
+                disabled={!selectedMonth.isAfter(minMonth)}
+              >
+                <IconChevronLeft className="size-3.5" />
+              </Button>
+              <span className="text-sm font-semibold w-28 text-center">
+                {selectedMonth.format("MMMM YYYY")}
+              </span>
+              <Button
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setMonth(selectedMonth.add(1, "month"))}
+                disabled={selectedMonth.isSame(today)}
+              >
+                <IconChevronRight className="size-3.5" />
+              </Button>
+            </div>
+          )}
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              variant={period === "month" ? "default" : "outline"}
+              onClick={() => setPeriod("month")}
+            >
+              {t("periodMonth")}
+            </Button>
+            <Button
+              size="sm"
+              variant={period === "year" ? "default" : "outline"}
+              onClick={() => setPeriod("year")}
+            >
+              {t("periodYear")}
+            </Button>
+          </div>
         </div>
       </div>
 

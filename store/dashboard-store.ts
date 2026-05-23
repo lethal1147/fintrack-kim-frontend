@@ -1,38 +1,45 @@
 import { create } from "zustand"
-import dayjs from "dayjs"
+import dayjs, { type Dayjs } from "dayjs"
 import { transactionApi, type AnalyticsData } from "@/lib/api-client"
 import { useAuthStore } from "@/store/auth-store"
 
 type DashboardState = {
-  monthly:   AnalyticsData | null
-  prevMonth: AnalyticsData | null
-  trend:     AnalyticsData | null
-  isLoading: boolean
-  error:     string | null
+  monthly:       AnalyticsData | null
+  prevMonth:     AnalyticsData | null
+  trend:         AnalyticsData | null
+  isLoading:     boolean
+  error:         string | null
+  selectedMonth: Dayjs
 
+  setMonth(m: Dayjs): void
   fetchDashboard(): Promise<void>
 }
 
-export const useDashboardStore = create<DashboardState>((set) => ({
-  monthly:   null,
-  prevMonth: null,
-  trend:     null,
-  isLoading: false,
-  error:     null,
+export const useDashboardStore = create<DashboardState>((set, get) => ({
+  monthly:       null,
+  prevMonth:     null,
+  trend:         null,
+  isLoading:     false,
+  error:         null,
+  selectedMonth: dayjs().startOf("month"),
+
+  setMonth(m: Dayjs) {
+    set({ selectedMonth: m })
+  },
 
   async fetchDashboard() {
     const token = useAuthStore.getState().accessToken
     if (!token) return
 
+    const month = get().selectedMonth
     set({ isLoading: true, error: null })
     try {
-      const today        = dayjs()
-      const monthFrom    = today.startOf("month").format("YYYY-MM-DD")
-      const monthTo      = today.endOf("month").format("YYYY-MM-DD")
-      const trendFrom    = today.subtract(5, "month").startOf("month").format("YYYY-MM-DD")
-      const trendTo      = today.format("YYYY-MM-DD")
-      const prevMonthFrom = today.subtract(1, "month").startOf("month").format("YYYY-MM-DD")
-      const prevMonthTo   = today.subtract(1, "month").endOf("month").format("YYYY-MM-DD")
+      const monthFrom     = month.startOf("month").format("YYYY-MM-DD")
+      const monthTo       = month.endOf("month").format("YYYY-MM-DD")
+      const prevMonthFrom = month.subtract(1, "month").startOf("month").format("YYYY-MM-DD")
+      const prevMonthTo   = month.subtract(1, "month").endOf("month").format("YYYY-MM-DD")
+      const trendFrom     = month.subtract(5, "month").startOf("month").format("YYYY-MM-DD")
+      const trendTo       = month.endOf("month").format("YYYY-MM-DD")
 
       const [monthly, trend, prevMonth] = await Promise.all([
         transactionApi.analytics({ from: monthFrom, to: monthTo }, token),
