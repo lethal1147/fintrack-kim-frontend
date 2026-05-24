@@ -40,7 +40,7 @@ const NO_AUTO_LOGOUT_PATHS = [
   "/api/auth/forgot-password/reset",
 ]
 
-function handleUnauthorized(path: string): void {
+function forceLogout(path: string): void {
   if (NO_AUTO_LOGOUT_PATHS.some((p) => path.startsWith(p))) return
   // Lazy import avoids a circular dependency at module load time.
   import("@/store/auth-store").then(({ useAuthStore }) => {
@@ -51,22 +51,53 @@ function handleUnauthorized(path: string): void {
   }
 }
 
-async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(path, {
-    ...init,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...init.headers,
-    },
-  })
+// One refresh at a time — concurrent 401s share the same in-flight promise.
+let refreshPromise: Promise<boolean> | null = null
 
-  const json = await res.json().catch(() => ({}))
+function silentRefresh(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = import("@/store/auth-store")
+      .then(({ useAuthStore }) => useAuthStore.getState().refreshAccessToken())
+      .finally(() => { refreshPromise = null })
+  }
+  return refreshPromise
+}
+
+async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const doFetch = (overrides: Record<string, string> = {}) =>
+    fetch(path, {
+      ...init,
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...init.headers, ...overrides },
+    })
+
+  let res = await doFetch()
+  let json = await res.json().catch(() => ({}))
+
+  if (res.status === 401 && !NO_AUTO_LOGOUT_PATHS.some((p) => path.startsWith(p))) {
+    const refreshed = await silentRefresh()
+    if (refreshed) {
+      const { useAuthStore } = await import("@/store/auth-store")
+      const newToken = useAuthStore.getState().accessToken
+      const overrides: Record<string, string> = {}
+      if (newToken && (init.headers as Record<string, string>)?.Authorization) {
+        overrides.Authorization = `Bearer ${newToken}`
+      }
+      res = await doFetch(overrides)
+      json = await res.json().catch(() => ({}))
+      if (res.ok) return json.data as T
+    }
+    forceLogout(path)
+    throw new ApiError(
+      json?.error?.code ?? "UNAUTHORIZED",
+      json?.error?.message ?? "Session expired",
+      401,
+    )
+  }
 
   if (!res.ok) {
     const code = json?.error?.code ?? "UNKNOWN_ERROR"
     const message = json?.error?.message ?? res.statusText
-    if (res.status === 401) handleUnauthorized(path)
     throw new ApiError(code, message, res.status)
   }
 
@@ -79,12 +110,36 @@ function authHeaders(accessToken: string): Record<string, string> {
 
 // apiFetchRaw is like apiFetch but does NOT inject Content-Type (needed for FormData uploads).
 async function apiFetchRaw<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(path, { ...init, credentials: "include" })
-  const json = await res.json().catch(() => ({}))
+  const doFetch = (overrides: Record<string, string> = {}) =>
+    fetch(path, { ...init, credentials: "include", headers: { ...init.headers, ...overrides } })
+
+  let res = await doFetch()
+  let json = await res.json().catch(() => ({}))
+
+  if (res.status === 401 && !NO_AUTO_LOGOUT_PATHS.some((p) => path.startsWith(p))) {
+    const refreshed = await silentRefresh()
+    if (refreshed) {
+      const { useAuthStore } = await import("@/store/auth-store")
+      const newToken = useAuthStore.getState().accessToken
+      const overrides: Record<string, string> = {}
+      if (newToken && (init.headers as Record<string, string>)?.Authorization) {
+        overrides.Authorization = `Bearer ${newToken}`
+      }
+      res = await doFetch(overrides)
+      json = await res.json().catch(() => ({}))
+      if (res.ok) return json.data as T
+    }
+    forceLogout(path)
+    throw new ApiError(
+      json?.error?.code ?? "UNAUTHORIZED",
+      json?.error?.message ?? "Session expired",
+      401,
+    )
+  }
+
   if (!res.ok) {
     const code = json?.error?.code ?? "UNKNOWN_ERROR"
     const message = json?.error?.message ?? res.statusText
-    if (res.status === 401) handleUnauthorized(path)
     throw new ApiError(code, message, res.status)
   }
   return json.data as T
