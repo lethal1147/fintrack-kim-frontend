@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils"
 // ─── constants ───────────────────────────────────────────────────────────────
 
 const TYPE_FILTERS = ["all", "income", "expense"] as const
-const VIEW_LIST  = "list" as const
+const VIEW_LIST = "list" as const
 const VIEW_TABLE = "table" as const
 
 // ─── page ─────────────────────────────────────────────────────────────────────
@@ -57,26 +57,27 @@ export default function TransactionsPage() {
     deleteTransaction,
   } = useTransactionsStore()
 
-  const [view, setView]               = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
-  const [dialogOpen, setDialogOpen]   = useState(false)
-  const [editTarget, setEditTarget]   = useState<Transaction | null>(null)
+  const [view, setView] = useState<typeof VIEW_LIST | typeof VIEW_TABLE>(VIEW_LIST)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Transaction | null>(null)
 
   useEffect(() => {
     fetchTransactions()
     fetchMonthlySummary()
   }, [fetchTransactions, fetchMonthlySummary])
 
-  const totalIncome  = monthlySummary?.totalIncome  ?? 0
+  const totalIncome = monthlySummary?.totalIncome ?? 0
   const totalExpense = monthlySummary?.totalExpense ?? 0
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{t("entriesCount", { count: total })}</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {t("entriesCount", { count: total })}
+          </p>
         </div>
         <Button onClick={() => setDialogOpen(true)} className="gap-1.5">
           <IconPlus className="size-4" />
@@ -86,21 +87,23 @@ export default function TransactionsPage() {
 
       {/* ── Summary strip ── */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3">
-          <div className="flex items-center justify-center size-8 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
+        <div className="border-border bg-card flex items-center gap-2.5 rounded-xl border px-4 py-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
             <IconArrowDown className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">{t("incomeThisMonth")}</p>
-            <p className="text-base font-bold text-emerald-600">{stringUtil.formatMoneyFull(totalIncome)}</p>
+            <p className="text-muted-foreground text-xs">{t("incomeThisMonth")}</p>
+            <p className="text-base font-bold text-emerald-600">
+              {stringUtil.formatMoneyFull(totalIncome)}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3">
-          <div className="flex items-center justify-center size-8 rounded-lg bg-destructive/10 text-destructive shrink-0">
+        <div className="border-border bg-card flex items-center gap-2.5 rounded-xl border px-4 py-3">
+          <div className="bg-destructive/10 text-destructive flex size-8 shrink-0 items-center justify-center rounded-lg">
             <IconArrowUp className="size-4" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">{t("spentThisMonth")}</p>
+            <p className="text-muted-foreground text-xs">{t("spentThisMonth")}</p>
             <p className="text-base font-bold">{stringUtil.formatMoneyFull(totalExpense)}</p>
           </div>
         </div>
@@ -109,8 +112,8 @@ export default function TransactionsPage() {
       {/* ── Filter bar + view toggle ── */}
       <div className="flex flex-wrap gap-2">
         {/* Search */}
-        <div className="relative flex-1 min-w-48">
-          <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+        <div className="relative min-w-48 flex-1">
+          <IconSearch className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
           <Input
             placeholder={t("searchPlaceholder")}
             value={filter.search}
@@ -120,7 +123,7 @@ export default function TransactionsPage() {
         </div>
 
         {/* Type filter */}
-        <div className="flex rounded-lg border border-border overflow-hidden text-sm shrink-0">
+        <div className="border-border flex shrink-0 overflow-hidden rounded-lg border text-sm">
           {TYPE_FILTERS.map((f) => (
             <button
               key={f}
@@ -132,7 +135,11 @@ export default function TransactionsPage() {
                   : "bg-background text-muted-foreground hover:bg-muted"
               )}
             >
-              {f === "all" ? t("filterAll") : f === "income" ? t("filterIncome") : t("filterExpense")}
+              {f === "all"
+                ? t("filterAll")
+                : f === "income"
+                  ? t("filterIncome")
+                  : t("filterExpense")}
             </button>
           ))}
         </div>
@@ -148,13 +155,15 @@ export default function TransactionsPage() {
           <SelectContent>
             <SelectItem value="all">{t("categoryAll")}</SelectItem>
             {ALL_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
+              <SelectItem key={c} value={c}>
+                {getCategoryLabel(c)}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         {/* Date range */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 items-center gap-1">
           <Input
             type="date"
             value={filter.from}
@@ -162,7 +171,7 @@ export default function TransactionsPage() {
             className="w-36"
             title={t("fromDateTitle")}
           />
-          <span className="text-xs text-muted-foreground px-0.5">–</span>
+          <span className="text-muted-foreground px-0.5 text-xs">–</span>
           <Input
             type="date"
             value={filter.to}
@@ -173,7 +182,7 @@ export default function TransactionsPage() {
         </div>
 
         {/* View toggle */}
-        <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
+        <div className="border-border flex shrink-0 overflow-hidden rounded-lg border">
           <button
             onClick={() => setView(VIEW_LIST)}
             className={cn(
@@ -203,11 +212,9 @@ export default function TransactionsPage() {
 
       {/* ── Content ── */}
       {isLoading ? (
-        <div className="py-20 text-center text-muted-foreground text-sm">{t("loading")}</div>
+        <div className="text-muted-foreground py-20 text-center text-sm">{t("loading")}</div>
       ) : transactions.length === 0 ? (
-        <div className="py-20 text-center text-muted-foreground text-sm">
-          {t("emptyFilters")}
-        </div>
+        <div className="text-muted-foreground py-20 text-center text-sm">{t("emptyFilters")}</div>
       ) : view === VIEW_LIST ? (
         <TransactionListView
           paginated={transactions}

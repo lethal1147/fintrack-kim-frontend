@@ -22,7 +22,7 @@ export function SecurityTab() {
   const { user, logout } = useAuthStore()
   const { sessions, isLoading, error, fetchSessions, revokeSession } = useSecurityStore()
 
-  const [changePwOpen, setChangePwOpen]   = useState(false)
+  const [changePwOpen, setChangePwOpen] = useState(false)
   const [totpSetupOpen, setTotpSetupOpen] = useState(false)
   const [totpDisableOpen, setTotpDisableOpen] = useState(false)
   const [revoking, setRevoking] = useState<string | null>(null)
@@ -57,20 +57,15 @@ export function SecurityTab() {
 
   return (
     <div className="space-y-6">
-      <SectionHeader
-        title={t("sectionTitle")}
-        description={t("sectionDescription")}
-      />
+      <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
       {/* Password */}
       <div>
-        <p className="text-sm font-semibold mb-3">{t("changePasswordHeading")}</p>
-        <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+        <p className="mb-3 text-sm font-semibold">{t("changePasswordHeading")}</p>
+        <div className="border-border bg-card flex items-center justify-between gap-4 rounded-xl border p-4">
           <div>
             <p className="text-sm font-medium">{t("passwordLabel")}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {t("passwordDescription")}
-            </p>
+            <p className="text-muted-foreground mt-0.5 text-xs">{t("passwordDescription")}</p>
           </div>
           <Button variant="outline" size="sm" onClick={() => setChangePwOpen(true)}>
             {t("changePasswordButton")}
@@ -79,13 +74,11 @@ export function SecurityTab() {
       </div>
 
       {/* 2FA */}
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+      <div className="border-border bg-card flex items-center justify-between gap-4 rounded-xl border p-4">
         <div>
           <p className="text-sm font-medium">{t("twoFactorLabel")}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {totpEnabled
-              ? t("twoFactorEnabledDescription")
-              : t("twoFactorDisabledDescription")}
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            {totpEnabled ? t("twoFactorEnabledDescription") : t("twoFactorDisabledDescription")}
           </p>
         </div>
         <Switch checked={totpEnabled} onCheckedChange={handleTOTPToggle} />
@@ -93,32 +86,34 @@ export function SecurityTab() {
 
       {/* Active sessions */}
       <div>
-        <p className="text-sm font-semibold mb-3">{t("activeSessionsHeading")}</p>
-        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+        <p className="mb-3 text-sm font-semibold">{t("activeSessionsHeading")}</p>
+        <div className="border-border bg-card divide-border divide-y overflow-hidden rounded-xl border">
           {isLoading && sessions.length === 0 ? (
-            <div className="px-4 py-6 flex justify-center">
-              <IconLoader2 className="size-5 animate-spin text-muted-foreground" />
+            <div className="flex justify-center px-4 py-6">
+              <IconLoader2 className="text-muted-foreground size-5 animate-spin" />
             </div>
           ) : sessions.length === 0 ? (
-            <div className="px-4 py-4 text-sm text-muted-foreground">{t("noActiveSessions")}</div>
+            <div className="text-muted-foreground px-4 py-4 text-sm">{t("noActiveSessions")}</div>
           ) : (
             sessions.map((s) => (
-              <div key={s.id} className="px-4 py-3 flex items-center justify-between gap-3">
+              <div key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div>
                   <p className="text-sm font-medium">{s.device}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {s.is_current ? t("currentSession") : t("lastActive", { time: dateUtil.fromNow(s.last_active_at) })}
+                  <p className="text-muted-foreground text-xs">
+                    {s.is_current
+                      ? t("currentSession")
+                      : t("lastActive", { time: dateUtil.fromNow(s.last_active_at) })}
                   </p>
                 </div>
                 {s.is_current ? (
-                  <span className="text-xs text-emerald-600 font-medium">{t("thisDevice")}</span>
+                  <span className="text-xs font-medium text-emerald-600">{t("thisDevice")}</span>
                 ) : (
                   <Button
                     variant="ghost"
                     size="sm"
                     disabled={revoking === s.id}
                     onClick={() => handleRevoke(s.id)}
-                    className="text-xs text-destructive hover:text-destructive h-7 px-2"
+                    className="text-destructive hover:text-destructive h-7 px-2 text-xs"
                   >
                     {revoking === s.id ? (
                       <IconLoader2 className="size-3.5 animate-spin" />
@@ -133,7 +128,7 @@ export function SecurityTab() {
         </div>
 
         {error && (
-          <div className="flex items-center gap-1.5 mt-2 text-sm text-destructive">
+          <div className="text-destructive mt-2 flex items-center gap-1.5 text-sm">
             <IconAlertTriangle className="size-3.5" />
             {error}
           </div>

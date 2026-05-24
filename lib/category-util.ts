@@ -11,7 +11,7 @@ import { INCOME_CATEGORIES } from "@/lib/categories"
 export function useCategoryLabel() {
   // next-intl types are strict; `as never` lets us pass any valid category string
   // without duplicating the key union — safe because the keys match CATEGORIES exactly.
-  const tIncome  = useTranslations("categories.income")
+  const tIncome = useTranslations("categories.income")
   const tExpense = useTranslations("categories.expense")
 
   return function getLabel(category: string): string {

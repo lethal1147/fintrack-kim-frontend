@@ -13,14 +13,14 @@ export default function ErrorPage({ reset }: Props) {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 p-6 text-center">
-      <div className="flex items-center justify-center size-16 rounded-full bg-destructive/10">
-        <IconAlertTriangle className="size-8 text-destructive" />
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 p-6 text-center">
+      <div className="bg-destructive/10 flex size-16 items-center justify-center rounded-full">
+        <IconAlertTriangle className="text-destructive size-8" />
       </div>
 
-      <div className="space-y-2 max-w-sm">
+      <div className="max-w-sm space-y-2">
         <h1 className="text-xl font-semibold tracking-tight">Something went wrong</h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           An unexpected error occurred. You can try again or go back to the previous page.
         </p>
       </div>
@@ -29,9 +29,7 @@ export default function ErrorPage({ reset }: Props) {
         <Button variant="outline" onClick={() => router.back()}>
           Go back
         </Button>
-        <Button onClick={reset}>
-          Try again
-        </Button>
+        <Button onClick={reset}>Try again</Button>
       </div>
     </div>
   )

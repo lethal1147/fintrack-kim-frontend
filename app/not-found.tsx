@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   const router = useRouter()
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen gap-4 p-6 text-center">
+    <div className="relative flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
       <Image
         src="/fintrack-login-background.png"
         alt=""
@@ -18,13 +18,11 @@ export default function NotFoundPage() {
       />
 
       <div className="relative z-10 flex flex-col items-center gap-4">
-        <p className="text-8xl font-bold text-muted-foreground/30 select-none leading-none">
-          404
-        </p>
+        <p className="text-muted-foreground/30 text-8xl leading-none font-bold select-none">404</p>
 
-        <div className="space-y-2 max-w-sm">
+        <div className="max-w-sm space-y-2">
           <h1 className="text-xl font-semibold tracking-tight">Page not found</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
         </div>

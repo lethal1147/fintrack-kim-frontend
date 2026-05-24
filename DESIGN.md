@@ -9,6 +9,7 @@ Typography uses two families with a clear contract: **DM Sans** handles every UI
 The app has exactly one canvas polarity — no marketing/dark alternation. Light mode is the primary authoring surface; dark mode inverts the neutral scale while preserving the violet brand. No surface ever blends the two modes on a single page. Every component is designed data-first: KPI cards surface a single number clearly, charts use the violet ramp from faint to deep to encode magnitude, progress bars stay on-brand with violet fills.
 
 **Key Characteristics:**
+
 - Single-page-application dashboard shell: persistent sidebar, scrollable main content area, no full-page navigations.
 - Violet-ramp brand palette that doubles as the data visualization scale — brand and data ink are the same ink.
 - Numeric values always in `{typography.mono}` (Geist Mono) for tabular-figure alignment; labels and copy always in `{typography.sans}` (DM Sans).
@@ -67,13 +68,13 @@ The violet ramp is the single brand accent family. It serves two roles simultane
 
 Used in order for multi-series charts. Never assign red (`{colors.destructive}`) or green (`{colors.success}`) to a chart series — those are semantic only.
 
-| Series | Token | Approx Hex |
-|---|---|---|
-| 1 (lightest) | `var(--chart-1)` | `#C4A8EF` |
-| 2 | `var(--chart-2)` | `#9555E2` |
-| 3 | `var(--chart-3)` | `#7C3AED` |
-| 4 | `var(--chart-4)` | `#6D28D9` |
-| 5 (deepest) | `var(--chart-5)` | `#5B21B6` |
+| Series       | Token            | Approx Hex |
+| ------------ | ---------------- | ---------- |
+| 1 (lightest) | `var(--chart-1)` | `#C4A8EF`  |
+| 2            | `var(--chart-2)` | `#9555E2`  |
+| 3            | `var(--chart-3)` | `#7C3AED`  |
+| 4            | `var(--chart-4)` | `#6D28D9`  |
+| 5 (deepest)  | `var(--chart-5)` | `#5B21B6`  |
 
 ---
 
@@ -87,21 +88,21 @@ Used in order for multi-series charts. Never assign red (`{colors.destructive}`)
 
 ### Hierarchy
 
-| Token | Family | Size | Weight | Line Height | Letter Spacing | Use |
-|---|---|---|---|---|---|---|
-| `{typography.page-title}` | DM Sans | 24px / 1.5rem | 700 | 1.2 | 0 | Page-level `<h1>` in page headers |
-| `{typography.section-heading}` | DM Sans | 18px / 1.125rem | 600 | 1.25 | 0 | Section headings inside pages, dialog titles |
-| `{typography.card-title}` | DM Sans | 14px / 0.875rem | 600 | 1.25 | 0 | Card header labels, widget titles |
-| `{typography.body-md}` | DM Sans | 14px / 0.875rem | 400 | 1.5 | 0 | Default UI body, table cells, descriptions |
-| `{typography.body-sm}` | DM Sans | 12px / 0.75rem | 400 | 1.5 | 0 | Captions, helper text, timestamps |
-| `{typography.label}` | DM Sans | 12px / 0.75rem | 500 | 1.4 | 0.01em | Form labels, column headers |
-| `{typography.button}` | DM Sans | 14px / 0.875rem | 500 | 1 | 0 | Button labels (sentence case) |
-| `{typography.badge}` | DM Sans | 11px / 0.6875rem | 500 | 1.4 | 0.02em | Badge text, pill labels |
-| `{typography.stat-value}` | Geist Mono | 28px / 1.75rem | 700 | 1 | -0.02em | KPI stat card primary number |
-| `{typography.stat-value-sm}` | Geist Mono | 20px / 1.25rem | 600 | 1 | -0.01em | Smaller stat number, chart center label |
-| `{typography.amount}` | Geist Mono | 14px / 0.875rem | 500 | 1.5 | 0 | Transaction amounts in table rows |
-| `{typography.amount-lg}` | Geist Mono | 16px / 1rem | 600 | 1.5 | 0 | Subtotals, dialog totals |
-| `{typography.code}` | Geist Mono | 13px / 0.8125rem | 400 | 1.5 | 0 | Code snippets, API keys, OTP inputs |
+| Token                          | Family     | Size             | Weight | Line Height | Letter Spacing | Use                                          |
+| ------------------------------ | ---------- | ---------------- | ------ | ----------- | -------------- | -------------------------------------------- |
+| `{typography.page-title}`      | DM Sans    | 24px / 1.5rem    | 700    | 1.2         | 0              | Page-level `<h1>` in page headers            |
+| `{typography.section-heading}` | DM Sans    | 18px / 1.125rem  | 600    | 1.25        | 0              | Section headings inside pages, dialog titles |
+| `{typography.card-title}`      | DM Sans    | 14px / 0.875rem  | 600    | 1.25        | 0              | Card header labels, widget titles            |
+| `{typography.body-md}`         | DM Sans    | 14px / 0.875rem  | 400    | 1.5         | 0              | Default UI body, table cells, descriptions   |
+| `{typography.body-sm}`         | DM Sans    | 12px / 0.75rem   | 400    | 1.5         | 0              | Captions, helper text, timestamps            |
+| `{typography.label}`           | DM Sans    | 12px / 0.75rem   | 500    | 1.4         | 0.01em         | Form labels, column headers                  |
+| `{typography.button}`          | DM Sans    | 14px / 0.875rem  | 500    | 1           | 0              | Button labels (sentence case)                |
+| `{typography.badge}`           | DM Sans    | 11px / 0.6875rem | 500    | 1.4         | 0.02em         | Badge text, pill labels                      |
+| `{typography.stat-value}`      | Geist Mono | 28px / 1.75rem   | 700    | 1           | -0.02em        | KPI stat card primary number                 |
+| `{typography.stat-value-sm}`   | Geist Mono | 20px / 1.25rem   | 600    | 1           | -0.01em        | Smaller stat number, chart center label      |
+| `{typography.amount}`          | Geist Mono | 14px / 0.875rem  | 500    | 1.5         | 0              | Transaction amounts in table rows            |
+| `{typography.amount-lg}`       | Geist Mono | 16px / 1rem      | 600    | 1.5         | 0              | Subtotals, dialog totals                     |
+| `{typography.code}`            | Geist Mono | 13px / 0.8125rem | 400    | 1.5         | 0              | Code snippets, API keys, OTP inputs          |
 
 ### Principles
 
@@ -119,29 +120,29 @@ Used in order for multi-series charts. Never assign red (`{colors.destructive}`)
 - **Base unit**: 4px
 - **Tokens**: `{spacing.1}` 4px · `{spacing.2}` 8px · `{spacing.3}` 12px · `{spacing.4}` 16px · `{spacing.5}` 20px · `{spacing.6}` 24px · `{spacing.8}` 32px · `{spacing.10}` 40px · `{spacing.12}` 48px · `{spacing.16}` 64px
 
-| Role | Token | Value |
-|---|---|---|
-| Card internal padding | `{spacing.6}` | 24px |
-| Page padding (desktop) | `{spacing.6}` – `{spacing.8}` | 24px – 32px |
-| Page padding (mobile) | `{spacing.4}` | 16px |
-| Grid gap (card grid) | `{spacing.6}` | 24px |
-| Form field gap | `{spacing.4}` | 16px |
-| Button padding (default) | `{spacing.3}` / `{spacing.4}` | 12px / 16px |
-| Sidebar width | fixed | 256px (w-64) |
-| Stat card inner gap | `{spacing.3}` | 12px |
-| Table row height | min `{spacing.10}` | 40px |
+| Role                     | Token                         | Value        |
+| ------------------------ | ----------------------------- | ------------ |
+| Card internal padding    | `{spacing.6}`                 | 24px         |
+| Page padding (desktop)   | `{spacing.6}` – `{spacing.8}` | 24px – 32px  |
+| Page padding (mobile)    | `{spacing.4}`                 | 16px         |
+| Grid gap (card grid)     | `{spacing.6}`                 | 24px         |
+| Form field gap           | `{spacing.4}`                 | 16px         |
+| Button padding (default) | `{spacing.3}` / `{spacing.4}` | 12px / 16px  |
+| Sidebar width            | fixed                         | 256px (w-64) |
+| Stat card inner gap      | `{spacing.3}`                 | 12px         |
+| Table row height         | min `{spacing.10}`            | 40px         |
 
 ### Grid
 
 The app shell uses a fixed sidebar + fluid main content model — not a CSS grid at the page level. Within the main content area, card grids use CSS grid with `gap-6` and `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` for KPI rows.
 
-| Region | Pattern |
-|---|---|
-| KPI stat row (dashboard) | 4-up at lg, 2-up at sm, 1-up at base |
-| Chart row | 2-up at lg (60/40 or 50/50 split), 1-up at base |
-| Budget / goal list | single-column, full-width cards |
-| Settings tabs | single-column form within max-w container |
-| Dialogs | max-w-lg, centered in viewport |
+| Region                   | Pattern                                         |
+| ------------------------ | ----------------------------------------------- |
+| KPI stat row (dashboard) | 4-up at lg, 2-up at sm, 1-up at base            |
+| Chart row                | 2-up at lg (60/40 or 50/50 split), 1-up at base |
+| Budget / goal list       | single-column, full-width cards                 |
+| Settings tabs            | single-column form within max-w container       |
+| Dialogs                  | max-w-lg, centered in viewport                  |
 
 ### Whitespace Philosophy
 
@@ -151,12 +152,12 @@ Whitespace in FinTrack is dense by default — this is a scanning surface, not a
 
 ## Elevation & Depth
 
-| Level | Treatment | Use |
-|---|---|---|
-| 0 | No shadow, `{colors.border}` hairline | Cards, inputs, sidebar — all flat on canvas |
-| 1 | `box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)` | Not used in the current app shell |
-| 2 | `box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05)` | Dropdown menus, command palette, select popover |
-| 3 | `box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05)` | Modal dialogs and sheets |
+| Level | Treatment                                                                        | Use                                             |
+| ----- | -------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 0     | No shadow, `{colors.border}` hairline                                            | Cards, inputs, sidebar — all flat on canvas     |
+| 1     | `box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)`             | Not used in the current app shell               |
+| 2     | `box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05)`   | Dropdown menus, command palette, select popover |
+| 3     | `box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05)` | Modal dialogs and sheets                        |
 
 FinTrack's depth model is almost entirely **flat**. Cards do not elevate above canvas — they are distinguished by the `{colors.border}` hairline only. This is intentional: on a dashboard where 8–12 cards are visible simultaneously, any drop shadow creates visual noise that competes with data. Elevation appears only where an element is genuinely floating above the page (dropdowns, modals).
 
@@ -168,14 +169,14 @@ FinTrack's depth model is almost entirely **flat**. Cards do not elevate above c
 
 All radii derive from `--radius: 0.625rem` (10px) in `globals.css`.
 
-| Token | Value | Use |
-|---|---|---|
-| `{rounded.sm}` | 6px (`calc(--radius * 0.6)`) | Tags inside cells, micro-badges |
-| `{rounded.md}` | 8px (`calc(--radius * 0.8)`) | Buttons, form inputs, select triggers, code blocks |
-| `{rounded.lg}` | 10px (`--radius`) | Cards, panels, dialogs, dropdowns |
-| `{rounded.xl}` | 14px (`calc(--radius * 1.4)`) | Large modals, full-panel containers |
-| `{rounded.2xl}` | 18px (`calc(--radius * 1.8)`) | Avatar containers, onboarding panels |
-| `{rounded.full}` | 9999px | Avatars, progress bar fills, status dot indicators |
+| Token            | Value                         | Use                                                |
+| ---------------- | ----------------------------- | -------------------------------------------------- |
+| `{rounded.sm}`   | 6px (`calc(--radius * 0.6)`)  | Tags inside cells, micro-badges                    |
+| `{rounded.md}`   | 8px (`calc(--radius * 0.8)`)  | Buttons, form inputs, select triggers, code blocks |
+| `{rounded.lg}`   | 10px (`--radius`)             | Cards, panels, dialogs, dropdowns                  |
+| `{rounded.xl}`   | 14px (`calc(--radius * 1.4)`) | Large modals, full-panel containers                |
+| `{rounded.2xl}`  | 18px (`calc(--radius * 1.8)`) | Avatar containers, onboarding panels               |
+| `{rounded.full}` | 9999px                        | Avatars, progress bar fills, status dot indicators |
 
 The `{rounded.lg}` (10px) radius on cards is deliberately generous — slightly rounder than shadcn's default (8px) to give FinTrack a warmer, less corporate edge. Never increase this; the friendliness comes from the round corner plus the restrained palette, not from either alone.
 
@@ -188,19 +189,24 @@ The `{rounded.lg}` (10px) radius on cards is deliberately generous — slightly 
 ### Buttons
 
 **`button-primary`** — the main CTA.
+
 - Background `{colors.violet}`, text `{colors.primary-foreground}`, type `{typography.button}`, padding `{spacing.3}` / `{spacing.4}` (12px 16px), height 36px, rounded `{rounded.md}`.
 - Hover: background lightens ~5% lightness in OKLCH. Focus: `{colors.ring}` 2px solid, offset 2px. Disabled: opacity 50%.
 
 **`button-secondary`** — neutral secondary action (e.g., "Cancel", filter toggles).
+
 - Background `{colors.muted}`, text `{colors.foreground}`, same shape as primary.
 
 **`button-outline`** — de-emphasized action alongside a primary CTA.
+
 - Background transparent, border 1px `{colors.border}`, text `{colors.foreground}`.
 
 **`button-ghost`** — inline icon-buttons, sidebar actions, row actions.
+
 - Background transparent, no border, text `{colors.muted-foreground}`. Hover: background `{colors.muted}`.
 
 **`button-destructive`** — delete / remove actions inside dialogs.
+
 - Background `{colors.destructive}`, text white. Only appears inside a confirmation dialog, never as an ambient page action.
 
 ### Stat Cards (KPI)
@@ -245,15 +251,19 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 ### Badges and Pills
 
 **`badge-income`** — transaction type indicator.
+
 - Background `green-100` (light) / `green-900/40` (dark), text `green-700` (light) / `green-400` (dark), `{rounded.sm}`, `{spacing.1}` / `{spacing.2}` padding.
 
 **`badge-expense`**
+
 - Background `red-100` / `red-900/40`, text `red-700` / `red-400`. Same shape.
 
 **`badge-category`** — transaction category chip (Food, Transport, etc.).
+
 - Background `{colors.muted}`, text `{colors.muted-foreground}`, `{rounded.sm}`. Neutral — never colored by category.
 
 **`badge-status`** — recurring item status (active / paused).
+
 - Active: `{colors.violet-faint}` background, `{colors.violet}` text.
 - Paused: `{colors.muted}` background, `{colors.muted-foreground}` text.
 
@@ -270,6 +280,7 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 ### Forms and Inputs
 
 **`text-input`** — standard form field.
+
 - Background `{colors.background}` (transparent inside a white card), border 1px `{colors.input}`, rounded `{rounded.md}`, height 36px, padding `{spacing.2}` / `{spacing.3}`.
 - Focus: ring `{colors.ring}` 2px, offset 2px.
 - Placeholder: `{colors.muted-foreground}`.
@@ -277,6 +288,7 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 **`select`** — dropdown select trigger — same shape as `text-input`. Popover uses `{rounded.lg}`, elevation level 2.
 
 **`label`** — form field label above input.
+
 - Type `{typography.label}`, color `{colors.foreground}`, `{spacing.1}` gap above input.
 
 ### Dialogs and Sheets
@@ -292,6 +304,7 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 ## Do's and Don'ts
 
 ### Do
+
 - Always render currency amounts and numeric stats in Geist Mono — the tabular figures are the reason the font is in the stack.
 - Use the five-step violet ramp exclusively for chart series and data fills. Respect the order (chart-1 → chart-5 = faint → deep).
 - Reserve `{colors.destructive}` for error states, delete actions, and expense-type semantic coloring — never for a chart series or decorative accent.
@@ -302,6 +315,7 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 - Use `{colors.muted}` as the progress bar track and `{colors.violet}` as the fill. Switch fill to `{colors.destructive}` only when the metric is over limit.
 
 ### Don't
+
 - Don't introduce teal, orange, pink, or any non-violet, non-semantic color. The violet ramp is the only data ink.
 - Don't apply drop shadows to cards — on a 12-card dashboard layout they create visual noise that competes with data.
 - Don't use green or red for chart series. Income/expense color encoding belongs only on badges and delta indicators, not on chart bars or pie slices.
@@ -319,15 +333,16 @@ The primary data surface on the dashboard. Each card surfaces one metric.
 
 FinTrack uses Tailwind's default breakpoints:
 
-| Name | Min Width | Key Changes |
-|---|---|---|
-| `sm` | 640px | 2-column KPI grid; single-column at base |
-| `md` | 768px | Sidebar always visible; mobile: sidebar hidden, top nav |
-| `lg` | 1024px | 4-column KPI grid; 2-column chart row |
-| `xl` | 1280px | Wider page padding `{spacing.8}` replaces `{spacing.6}` |
-| `2xl` | 1536px | Max content width 1280px centered |
+| Name  | Min Width | Key Changes                                             |
+| ----- | --------- | ------------------------------------------------------- |
+| `sm`  | 640px     | 2-column KPI grid; single-column at base                |
+| `md`  | 768px     | Sidebar always visible; mobile: sidebar hidden, top nav |
+| `lg`  | 1024px    | 4-column KPI grid; 2-column chart row                   |
+| `xl`  | 1280px    | Wider page padding `{spacing.8}` replaces `{spacing.6}` |
+| `2xl` | 1536px    | Max content width 1280px centered                       |
 
 ### Touch Targets
+
 - All interactive elements (buttons, nav items, table row actions) minimum 36px height × 36px width on desktop.
 - On mobile (< md): minimum 44px height to meet WCAG touch-target guidelines.
 - Table row action icons use `button-ghost` with `p-2` to ensure 36px hit area despite 20px icon.

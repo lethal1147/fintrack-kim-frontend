@@ -26,7 +26,14 @@ import { useCategoryLabel } from "@/lib/category-util"
 type Props = {
   open: boolean
   onClose: () => void
-  onAdd: (tx: { merchant: string; category: string; note: string; date: string; amount: number; type: "income" | "expense" }) => Promise<void>
+  onAdd: (tx: {
+    merchant: string
+    category: string
+    note: string
+    date: string
+    amount: number
+    type: "income" | "expense"
+  }) => Promise<void>
 }
 
 export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
@@ -74,16 +81,19 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
           {/* Type toggle */}
-          <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
+          <div className="bg-muted grid grid-cols-2 gap-2 rounded-lg p-1">
             {(["expense", "income"] as const).map((kind) => (
               <button
                 key={kind}
                 type="button"
-                onClick={() => { setType(kind); setCategory("") }}
+                onClick={() => {
+                  setType(kind)
+                  setCategory("")
+                }}
                 className={cn(
-                  "py-1.5 rounded-md text-sm font-medium transition-colors capitalize",
+                  "rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
                   type === kind
-                    ? "bg-background shadow-sm text-foreground"
+                    ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -142,7 +152,9 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
               </SelectTrigger>
               <SelectContent>
                 {(type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
-                  <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {getCategoryLabel(c)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -150,7 +162,9 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <Label htmlFor="notes">{t("notesLabel")} <span className="text-muted-foreground">{t("notesOptional")}</span></Label>
+            <Label htmlFor="notes">
+              {t("notesLabel")} <span className="text-muted-foreground">{t("notesOptional")}</span>
+            </Label>
             <Input
               id="notes"
               placeholder={t("notesPlaceholder")}
@@ -163,10 +177,7 @@ export function AddTransactionDialog({ open, onClose, onAdd }: Props) {
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               {t("cancelButton")}
             </Button>
-            <Button
-              type="submit"
-              disabled={!merchant || !amount || !category || isSubmitting}
-            >
+            <Button type="submit" disabled={!merchant || !amount || !category || isSubmitting}>
               {isSubmitting ? t("addingButton") : t("addButton")}
             </Button>
           </DialogFooter>

@@ -14,17 +14,17 @@ import { type CategoryStatWithPct } from "@/lib/api-client"
 // ─── types ────────────────────────────────────────────────────────────────────
 
 type CategoryGrowth = {
-  category:  string
-  current:   number
-  previous:  number
+  category: string
+  current: number
+  previous: number
   pctChange: number
-  isNew:     boolean
+  isNew: boolean
 }
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
 const MAX_CATEGORIES = 8
-const SKELETON_ROWS  = 5
+const SKELETON_ROWS = 5
 
 const CHART_CONFIG = {
   pctChange: { label: "Change" },
@@ -33,11 +33,11 @@ const CHART_CONFIG = {
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function computeGrowth(
-  current:  CategoryStatWithPct[],
-  previous: CategoryStatWithPct[],
+  current: CategoryStatWithPct[],
+  previous: CategoryStatWithPct[]
 ): CategoryGrowth[] {
   const prevMap = new Map(
-    previous.filter((s) => s.type === "expense").map((s) => [s.category, s.total]),
+    previous.filter((s) => s.type === "expense").map((s) => [s.category, s.total])
   )
 
   return current
@@ -45,9 +45,7 @@ function computeGrowth(
     .map((s) => {
       const prev = prevMap.get(s.category) ?? 0
       const isNew = prev === 0
-      const pctChange = isNew
-        ? 100
-        : Math.round(((s.total - prev) / prev) * 1000) / 10
+      const pctChange = isNew ? 100 : Math.round(((s.total - prev) / prev) * 1000) / 10
       return { category: s.category, current: s.total, previous: prev, pctChange, isNew }
     })
     .sort((a, b) => b.pctChange - a.pctChange)
@@ -61,7 +59,7 @@ function tickFormatter(v: number): string {
 // ─── component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  current:  CategoryStatWithPct[]
+  current: CategoryStatWithPct[]
   previous: CategoryStatWithPct[]
 }
 
@@ -71,7 +69,7 @@ export function CategoryGrowthChart({ current, previous }: Props) {
   function tooltipFormatter(
     value: number | string | (number | string)[],
     _: number | string,
-    entry: { payload?: CategoryGrowth },
+    entry: { payload?: CategoryGrowth }
   ) {
     const v = typeof value === "number" ? value : Number(value)
     const isNew = entry.payload?.isNew
@@ -89,7 +87,7 @@ export function CategoryGrowthChart({ current, previous }: Props) {
         <CardContent className="pt-0">
           <div className="space-y-3">
             {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-              <div key={i} className="h-6 rounded bg-muted animate-pulse" />
+              <div key={i} className="bg-muted h-6 animate-pulse rounded" />
             ))}
           </div>
         </CardContent>
@@ -107,7 +105,7 @@ export function CategoryGrowthChart({ current, previous }: Props) {
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
-          <p className="text-sm text-muted-foreground">{t("emptyNoData")}</p>
+          <p className="text-muted-foreground text-sm">{t("emptyNoData")}</p>
         </CardContent>
       </Card>
     )
@@ -147,13 +145,7 @@ export function CategoryGrowthChart({ current, previous }: Props) {
               width={100}
             />
             <ReferenceLine x={0} stroke="var(--border)" strokeWidth={1.5} />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  formatter={tooltipFormatter}
-                />
-              }
-            />
+            <ChartTooltip content={<ChartTooltipContent formatter={tooltipFormatter} />} />
             <Bar dataKey="pctChange" radius={3}>
               {data.map((entry) => (
                 <Cell

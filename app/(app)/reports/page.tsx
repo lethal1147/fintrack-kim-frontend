@@ -30,11 +30,11 @@ export default function ReportsPage() {
     fetchAnalytics()
   }, [fetchAnalytics])
 
-  const totalIncome  = analytics?.total_income  ?? 0
+  const totalIncome = analytics?.total_income ?? 0
   const totalExpense = analytics?.total_expense ?? 0
-  const net          = analytics?.net           ?? 0
-  const savingsRate  = analytics?.savings_rate  ?? 0
-  const txCount      = analytics?.tx_count      ?? 0
+  const net = analytics?.net ?? 0
+  const savingsRate = analytics?.savings_rate ?? 0
+  const txCount = analytics?.tx_count ?? 0
 
   const expenseCategories = (analytics?.by_category ?? [])
     .filter((c) => c.type === "expense")
@@ -53,12 +53,11 @@ export default function ReportsPage() {
   }))
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* ── Header ── */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">{t("subtitle")}</p>
+        <p className="text-muted-foreground mt-0.5 text-sm">{t("subtitle")}</p>
       </div>
 
       {/* ── Year selector ── */}
@@ -71,7 +70,7 @@ export default function ReportsPage() {
         >
           <IconChevronLeft className="size-3.5" />
         </Button>
-        <span className="text-sm font-semibold w-16 text-center">{year}</span>
+        <span className="w-16 text-center text-sm font-semibold">{year}</span>
         <Button
           variant="outline"
           size="icon-sm"
@@ -84,37 +83,53 @@ export default function ReportsPage() {
 
       {/* ── Loading / empty ── */}
       {isLoading ? (
-        <div className="py-20 text-center text-muted-foreground text-sm">{t("loading")}</div>
+        <div className="text-muted-foreground py-20 text-center text-sm">{t("loading")}</div>
       ) : !analytics ? null : (
         <>
           {/* ── KPI strip ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-border bg-card px-4 py-3">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <IconArrowDown className="size-3.5 text-emerald-600 shrink-0" />
-                <p className="text-xs text-muted-foreground">{t("statTotalIncome")}</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="border-border bg-card rounded-xl border px-4 py-3">
+              <div className="mb-0.5 flex items-center gap-1.5">
+                <IconArrowDown className="size-3.5 shrink-0 text-emerald-600" />
+                <p className="text-muted-foreground text-xs">{t("statTotalIncome")}</p>
               </div>
-              <p className="text-lg font-bold tabular-nums text-emerald-600">{stringUtil.formatMoney(totalIncome)}</p>
+              <p className="text-lg font-bold text-emerald-600 tabular-nums">
+                {stringUtil.formatMoney(totalIncome)}
+              </p>
             </div>
-            <div className="rounded-xl border border-border bg-card px-4 py-3">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <IconArrowUp className="size-3.5 text-destructive shrink-0" />
-                <p className="text-xs text-muted-foreground">{t("statTotalSpent")}</p>
+            <div className="border-border bg-card rounded-xl border px-4 py-3">
+              <div className="mb-0.5 flex items-center gap-1.5">
+                <IconArrowUp className="text-destructive size-3.5 shrink-0" />
+                <p className="text-muted-foreground text-xs">{t("statTotalSpent")}</p>
               </div>
-              <p className="text-lg font-bold tabular-nums">{stringUtil.formatMoney(totalExpense)}</p>
+              <p className="text-lg font-bold tabular-nums">
+                {stringUtil.formatMoney(totalExpense)}
+              </p>
             </div>
-            <div className="rounded-xl border border-border bg-card px-4 py-3">
-              <p className="text-xs text-muted-foreground mb-0.5">{t("statNetCashFlow")}</p>
-              <p className={cn("text-lg font-bold tabular-nums", net >= 0 ? "text-emerald-600" : "text-destructive")}>
+            <div className="border-border bg-card rounded-xl border px-4 py-3">
+              <p className="text-muted-foreground mb-0.5 text-xs">{t("statNetCashFlow")}</p>
+              <p
+                className={cn(
+                  "text-lg font-bold tabular-nums",
+                  net >= 0 ? "text-emerald-600" : "text-destructive"
+                )}
+              >
                 {stringUtil.formatMoney(net)}
               </p>
             </div>
-            <div className="rounded-xl border border-border bg-card px-4 py-3">
-              <p className="text-xs text-muted-foreground mb-0.5">{t("statSavingsRate")}</p>
-              <p className={cn("text-lg font-bold tabular-nums", savingsRate >= 0 ? "text-emerald-600" : "text-destructive")}>
+            <div className="border-border bg-card rounded-xl border px-4 py-3">
+              <p className="text-muted-foreground mb-0.5 text-xs">{t("statSavingsRate")}</p>
+              <p
+                className={cn(
+                  "text-lg font-bold tabular-nums",
+                  savingsRate >= 0 ? "text-emerald-600" : "text-destructive"
+                )}
+              >
                 {savingsRate.toFixed(1)}%
               </p>
-              <p className="text-xs text-muted-foreground">{t("statTransactions", { count: txCount })}</p>
+              <p className="text-muted-foreground text-xs">
+                {t("statTransactions", { count: txCount })}
+              </p>
             </div>
           </div>
 
@@ -122,14 +137,16 @@ export default function ReportsPage() {
           <TrendBarChart data={trendData} />
 
           {/* ── Tabs ── */}
-          <div className="flex rounded-lg border border-border overflow-hidden text-sm w-fit">
+          <div className="border-border flex w-fit overflow-hidden rounded-lg border text-sm">
             {TABS.map((tabItem) => (
               <button
                 key={tabItem}
                 onClick={() => setTab(tabItem)}
                 className={cn(
                   "px-4 py-1.5 transition-colors",
-                  tab === tabItem ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"
+                  tab === tabItem
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:bg-muted"
                 )}
               >
                 {tabItem === "Spending" ? t("tabSpending") : t("tabIncome")}
@@ -141,16 +158,13 @@ export default function ReportsPage() {
           {activeData.length > 0 ? (
             <SpendingDonut data={activeData} tab={tab} />
           ) : (
-            <div className="rounded-xl border border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+            <div className="border-border bg-card text-muted-foreground rounded-xl border px-5 py-10 text-center text-sm">
               {tab === "Spending" ? t("noExpenseData", { year }) : t("noIncomeData", { year })}
             </div>
           )}
 
           {/* ── Top merchants ── */}
-          <TopMerchantsCard
-            merchants={analytics.top_merchants ?? []}
-            expenseTotal={totalExpense}
-          />
+          <TopMerchantsCard merchants={analytics.top_merchants ?? []} expenseTotal={totalExpense} />
         </>
       )}
     </div>

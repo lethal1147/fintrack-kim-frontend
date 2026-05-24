@@ -22,11 +22,11 @@ export function ProfileTab() {
   const t = useTranslations("settings.profile")
   const { user, updateProfile, uploadAvatar, isLoading } = useAuthStore()
 
-  const [name, setName]         = useState(user?.name ?? "")
-  const [email, setEmail]       = useState(user?.email ?? "")
-  const [saved, setSaved]       = useState(false)
+  const [name, setName] = useState(user?.name ?? "")
+  const [email, setEmail] = useState(user?.email ?? "")
+  const [saved, setSaved] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
-  const [error, setError]       = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -76,10 +76,7 @@ export function ProfileTab() {
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
-      <SectionHeader
-        title={t("sectionTitle")}
-        description={t("sectionDescription")}
-      />
+      <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
       {/* Avatar */}
       <div className="flex items-center gap-4">
@@ -91,15 +88,15 @@ export function ProfileTab() {
               className="size-20 rounded-full object-cover"
             />
           ) : (
-            <div className="size-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
+            <div className="bg-primary text-primary-foreground flex size-20 items-center justify-center rounded-full text-2xl font-bold">
               {stringUtil.initials(displayName)}
             </div>
           )}
 
           {/* Upload overlay during upload */}
           {avatarUploading && (
-            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
-              <IconLoader2 className="size-5 text-white animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+              <IconLoader2 className="size-5 animate-spin text-white" />
             </div>
           )}
 
@@ -108,9 +105,9 @@ export function ProfileTab() {
             type="button"
             disabled={avatarUploading}
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 size-7 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-50"
+            className="bg-card border-border hover:bg-muted absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-full border transition-colors disabled:opacity-50"
           >
-            <IconCamera className="size-3.5 text-muted-foreground" />
+            <IconCamera className="text-muted-foreground size-3.5" />
           </button>
 
           <input
@@ -123,25 +120,32 @@ export function ProfileTab() {
         </div>
         <div>
           <p className="text-sm font-medium">{displayName}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{user?.email ?? email}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">{user?.email ?? email}</p>
         </div>
       </div>
 
       {/* Fields */}
-      <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-        <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
-          <Label htmlFor="p-name" className="text-sm font-medium">{t("fullNameLabel")}</Label>
+      <div className="border-border bg-card divide-border divide-y overflow-hidden rounded-xl border">
+        <div className="grid grid-cols-[120px_1fr] items-center gap-4 p-4">
+          <Label htmlFor="p-name" className="text-sm font-medium">
+            {t("fullNameLabel")}
+          </Label>
           <Input id="p-name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <div className="p-4 grid grid-cols-[120px_1fr] gap-4 items-center">
-          <Label htmlFor="p-email" className="text-sm font-medium">{t("emailLabel")}</Label>
-          <Input id="p-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <div className="grid grid-cols-[120px_1fr] items-center gap-4 p-4">
+          <Label htmlFor="p-email" className="text-sm font-medium">
+            {t("emailLabel")}
+          </Label>
+          <Input
+            id="p-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
       </div>
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-destructive text-sm">{error}</p>}
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>

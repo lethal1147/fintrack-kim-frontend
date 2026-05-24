@@ -24,11 +24,11 @@ export function Sidebar() {
   const t = useTranslations("nav")
 
   const PRIMARY_NAV = [
-    { label: t("dashboard"),    href: "/dashboard",    icon: IconLayoutDashboard },
+    { label: t("dashboard"), href: "/dashboard", icon: IconLayoutDashboard },
     { label: t("transactions"), href: "/transactions", icon: IconArrowsExchange },
-    { label: t("budget"),       href: "/budget",       icon: IconWallet },
-    { label: t("reports"),      href: "/reports",      icon: IconChartBar },
-    { label: t("recurring"),    href: "/recurring",    icon: IconRepeat },
+    { label: t("budget"), href: "/budget", icon: IconWallet },
+    { label: t("reports"), href: "/reports", icon: IconChartBar },
+    { label: t("recurring"), href: "/recurring", icon: IconRepeat },
   ]
 
   async function handleLogout() {
@@ -39,9 +39,9 @@ export function Sidebar() {
   const initials = user?.name ? stringUtil.initials(user.name) : "?"
 
   return (
-    <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-sidebar-border bg-sidebar h-screen sticky top-0">
+    <aside className="border-sidebar-border bg-sidebar sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r lg:flex">
       {/* Logo */}
-      <div className="flex items-center px-4 h-14 border-b border-sidebar-border">
+      <div className="border-sidebar-border flex h-14 items-center border-b px-4">
         <Image
           src="/fintrack-brand-logo.png"
           alt="FinTrack"
@@ -54,7 +54,7 @@ export function Sidebar() {
       </div>
 
       {/* Primary nav */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
         {PRIMARY_NAV.map(({ label, href, icon: Icon }) => {
           const active = pathname === href
           return (
@@ -62,7 +62,7 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors",
+                "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
                 active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                   : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -76,11 +76,11 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 pb-3 space-y-0.5 border-t border-sidebar-border pt-3">
+      <div className="border-sidebar-border space-y-0.5 border-t px-2 pt-3 pb-3">
         <Link
           href="/settings"
           className={cn(
-            "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors",
+            "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
             pathname === "/settings"
               ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
               : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -91,8 +91,8 @@ export function Sidebar() {
         </Link>
 
         {/* User identity */}
-        <div className="flex items-center gap-2.5 px-2.5 py-2 mt-1">
-          <div className="size-7 rounded-full shrink-0 overflow-hidden">
+        <div className="mt-1 flex items-center gap-2.5 px-2.5 py-2">
+          <div className="size-7 shrink-0 overflow-hidden rounded-full">
             {user?.avatar_url ? (
               <Image
                 src={user.avatar_url}
@@ -103,25 +103,23 @@ export function Sidebar() {
                 unoptimized
               />
             ) : (
-              <div className="flex items-center justify-center size-7 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+              <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-full text-xs font-semibold">
                 {initials}
               </div>
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-sidebar-foreground truncate">
+            <p className="text-sidebar-foreground truncate text-xs font-medium">
               {user?.name ?? "—"}
             </p>
-            <p className="text-xs text-sidebar-foreground/50 truncate">
-              {user?.email ?? "—"}
-            </p>
+            <p className="text-sidebar-foreground/50 truncate text-xs">{user?.email ?? "—"}</p>
           </div>
         </div>
 
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+          className="text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors"
         >
           <IconLogout className="size-4 shrink-0" />
           {t("signOut")}

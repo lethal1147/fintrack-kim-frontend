@@ -1,5 +1,10 @@
 import { create } from "zustand"
-import { transactionApi, type Transaction, type CreateTransactionBody, type UpdateTransactionBody } from "@/lib/api-client"
+import {
+  transactionApi,
+  type Transaction,
+  type CreateTransactionBody,
+  type UpdateTransactionBody,
+} from "@/lib/api-client"
 import { useAuthStore } from "@/store/auth-store"
 
 export type FilterState = {
@@ -80,7 +85,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
           page: f.page,
           limit: f.limit,
         },
-        token,
+        token
       )
       set({
         transactions: result.transactions ?? [],
@@ -109,7 +114,9 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     if (!token) return
     try {
       const result = await transactionApi.summary(currentMonthRange(), token)
-      set({ monthlySummary: { totalIncome: result.total_income, totalExpense: result.total_expense } })
+      set({
+        monthlySummary: { totalIncome: result.total_income, totalExpense: result.total_expense },
+      })
     } catch {
       // non-critical — leave previous value in place
     }

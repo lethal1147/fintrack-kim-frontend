@@ -2,17 +2,17 @@
 
 ## Tech Stack
 
-| Layer | Library / Tool |
-|---|---|
-| Framework | Next.js 16, App Router |
-| Styling | Tailwind CSS v4, OKLCH color tokens |
-| UI Components | shadcn/ui (`radix-nova` style) |
-| Icons | `@tabler/icons-react` (Tabler Icons) |
-| Charts | shadcn `chart` (Recharts wrapper) |
-| State | Zustand (`store/` directory) |
-| Date formatting | dayjs via `lib/date-util.ts` |
-| Number/currency | numeral via `lib/string-util.ts` |
-| Design research | Refero MCP |
+| Layer           | Library / Tool                       |
+| --------------- | ------------------------------------ |
+| Framework       | Next.js 16, App Router               |
+| Styling         | Tailwind CSS v4, OKLCH color tokens  |
+| UI Components   | shadcn/ui (`radix-nova` style)       |
+| Icons           | `@tabler/icons-react` (Tabler Icons) |
+| Charts          | shadcn `chart` (Recharts wrapper)    |
+| State           | Zustand (`store/` directory)         |
+| Date formatting | dayjs via `lib/date-util.ts`         |
+| Number/currency | numeral via `lib/string-util.ts`     |
+| Design research | Refero MCP                           |
 
 ## File Naming
 
@@ -53,10 +53,10 @@ or manual date arithmetic inline.
 ```ts
 import { dateUtil } from "@/lib/date-util"
 
-dateUtil.format(date, "MMM D, YYYY")   // "Mar 11, 2026"
-dateUtil.formatMonth(date)              // "March 2026"
-dateUtil.daysUntil(isoString)           // number (negative = past)
-dateUtil.monthsUntil(isoString)         // number
+dateUtil.format(date, "MMM D, YYYY") // "Mar 11, 2026"
+dateUtil.formatMonth(date) // "March 2026"
+dateUtil.daysUntil(isoString) // number (negative = past)
+dateUtil.monthsUntil(isoString) // number
 ```
 
 ## Currency / String Formatting
@@ -67,9 +67,9 @@ Always use `lib/string-util.ts` (powered by numeral). Never write inline
 ```ts
 import { stringUtil } from "@/lib/string-util"
 
-stringUtil.formatMoney(1234.5)       // "$1,235"
-stringUtil.formatMoneyFull(1234.56)  // "$1,234.56"
-stringUtil.initials("John Doe")      // "JD"
+stringUtil.formatMoney(1234.5) // "$1,235"
+stringUtil.formatMoneyFull(1234.56) // "$1,234.56"
+stringUtil.initials("John Doe") // "JD"
 ```
 
 ## State Management

@@ -14,18 +14,20 @@ export function DangerZone() {
   const DELETE_CONFIRMATION_TEXT = t("deleteConfirmationText")
 
   const [confirmText, setConfirmText] = useState("")
-  const [dialogOpen, setDialogOpen]   = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
     <div className="space-y-6">
       <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
-      <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-5 space-y-4">
+      <div className="border-destructive/40 bg-destructive/5 space-y-4 rounded-xl border p-5">
         <div>
-          <p className="text-sm font-semibold text-destructive">{t("deleteAccountHeading")}</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-destructive text-sm font-semibold">{t("deleteAccountHeading")}</p>
+          <p className="text-muted-foreground mt-1 text-xs">
             {t("deleteAccountDescription")}{" "}
-            <span className="font-mono font-semibold text-foreground">{DELETE_CONFIRMATION_TEXT}</span>{" "}
+            <span className="text-foreground font-mono font-semibold">
+              {DELETE_CONFIRMATION_TEXT}
+            </span>{" "}
             {t("deleteConfirmationInstruction")}
           </p>
         </div>
@@ -45,10 +47,7 @@ export function DangerZone() {
         </Button>
       </div>
 
-      <DeleteAccountDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-      />
+      <DeleteAccountDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </div>
   )
 }

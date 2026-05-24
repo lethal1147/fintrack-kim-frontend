@@ -23,7 +23,7 @@ type Step = "loading" | "scan" | "backup"
 // ─── component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  open:    boolean
+  open: boolean
   onClose: () => void
 }
 
@@ -31,11 +31,11 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
   const t = useTranslations("settings.totpSetupDialog")
   const { isLoading, setupTOTP, confirmTOTP } = useSecurityStore()
 
-  const [step, setStep]             = useState<Step>("loading")
-  const [setup, setSetup]           = useState<TOTPSetupResult | null>(null)
-  const [code, setCode]             = useState("")
+  const [step, setStep] = useState<Step>("loading")
+  const [setup, setSetup] = useState<TOTPSetupResult | null>(null)
+  const [code, setCode] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
-  const [error, setError]           = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -78,33 +78,29 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
         </DialogHeader>
 
         {step === "loading" && (
-          <div className="py-8 text-center text-sm text-muted-foreground">
-            {t("generatingQr")}
-          </div>
+          <div className="text-muted-foreground py-8 text-center text-sm">{t("generatingQr")}</div>
         )}
 
         {step === "scan" && setup && (
           <form onSubmit={handleConfirm} className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
-              {t("scanDescription")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("scanDescription")}</p>
 
             {/* QR code rendered via img tag — browser-safe */}
             <div className="flex justify-center py-2">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(setup.qr_code_uri)}&size=180x180`}
                 alt={t("qrAlt")}
-                className="rounded-lg border border-border"
+                className="border-border rounded-lg border"
                 width={180}
                 height={180}
               />
             </div>
 
-            <details className="text-xs text-muted-foreground">
-              <summary className="cursor-pointer hover:text-foreground">
+            <details className="text-muted-foreground text-xs">
+              <summary className="hover:text-foreground cursor-pointer">
                 {t("cantScanSummary")}
               </summary>
-              <p className="mt-1 font-mono break-all select-all bg-muted rounded p-2">
+              <p className="bg-muted mt-1 rounded p-2 font-mono break-all select-all">
                 {setup.secret}
               </p>
             </details>
@@ -122,14 +118,16 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
             </div>
 
             {error && (
-              <div className="flex items-center gap-1.5 text-sm text-destructive">
+              <div className="text-destructive flex items-center gap-1.5 text-sm">
                 <IconAlertTriangle className="size-3.5 shrink-0" />
                 {error}
               </div>
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>{t("cancelButton")}</Button>
+              <Button type="button" variant="outline" onClick={handleClose}>
+                {t("cancelButton")}
+              </Button>
               <Button type="submit" disabled={isLoading || code.length !== 6}>
                 {isLoading ? t("verifyingButton") : t("enableButton")}
               </Button>
@@ -139,12 +137,10 @@ export function TOTPSetupDialog({ open, onClose }: Props) {
 
         {step === "backup" && (
           <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
-              {t("backupDescription")}
-            </p>
-            <div className="grid grid-cols-2 gap-2 bg-muted rounded-lg p-3">
+            <p className="text-muted-foreground text-sm">{t("backupDescription")}</p>
+            <div className="bg-muted grid grid-cols-2 gap-2 rounded-lg p-3">
               {backupCodes.map((c) => (
-                <code key={c} className="text-xs font-mono text-center py-0.5">
+                <code key={c} className="py-0.5 text-center font-mono text-xs">
                   {c}
                 </code>
               ))}

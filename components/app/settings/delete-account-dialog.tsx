@@ -19,7 +19,7 @@ import { useAuthStore } from "@/store/auth-store"
 // ─── component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  open:    boolean
+  open: boolean
   onClose: () => void
 }
 
@@ -28,9 +28,9 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
   const router = useRouter()
   const { isLoading, deleteAccount } = useAuthStore()
 
-  const [password, setPassword]       = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError]             = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   function handleClose() {
     setPassword("")
@@ -58,9 +58,7 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <p className="text-sm text-muted-foreground">
-            {t("description")}
-          </p>
+          <p className="text-muted-foreground text-sm">{t("description")}</p>
 
           <div className="space-y-1.5">
             <Label htmlFor="delete-password">{t("passwordLabel")}</Label>
@@ -79,7 +77,7 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
                 tabIndex={-1}
               >
                 {showPassword ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
@@ -88,7 +86,7 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
           </div>
 
           {error && (
-            <div className="flex items-center gap-1.5 text-sm text-destructive">
+            <div className="text-destructive flex items-center gap-1.5 text-sm">
               <IconAlertTriangle className="size-3.5 shrink-0" />
               {error}
             </div>
@@ -100,7 +98,9 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
             </Button>
             <Button type="submit" variant="destructive" disabled={isLoading || !password}>
               {isLoading ? (
-                <><IconLoader2 className="size-4 animate-spin" /> {t("deletingButton")}</>
+                <>
+                  <IconLoader2 className="size-4 animate-spin" /> {t("deletingButton")}
+                </>
               ) : (
                 t("deleteButton")
               )}

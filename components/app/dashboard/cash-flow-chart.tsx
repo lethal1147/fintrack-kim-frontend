@@ -20,12 +20,12 @@ function buildYearSpine(year: number, data: MonthStat[]) {
   const dataMap = new Map(data.map((d) => [d.month, d]))
   return Array.from({ length: 12 }, (_, i) => {
     const key = `${year}-${String(i + 1).padStart(2, "0")}`
-    const d   = dataMap.get(key)
+    const d = dataMap.get(key)
     return {
-      month:   dayjs(key + "-01").format("MMM"),
-      income:  d?.income  ?? 0,
+      month: dayjs(key + "-01").format("MMM"),
+      income: d?.income ?? 0,
       expense: d?.expense ?? 0,
-      net:     d?.net     ?? 0,
+      net: d?.net ?? 0,
     }
   })
 }
@@ -38,7 +38,7 @@ export function CashFlowChart({ data, year }: Props) {
   const t = useTranslations("dashboard.cashFlowChart")
 
   const CHART_CONFIG = {
-    income:  { label: t("legendIncome"),   color: "var(--chart-2)" },
+    income: { label: t("legendIncome"), color: "var(--chart-2)" },
     expense: { label: t("legendExpenses"), color: "var(--chart-5)" },
   } satisfies ChartConfig
 
@@ -69,7 +69,7 @@ export function CashFlowChart({ data, year }: Props) {
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="income"  fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={36} />
+            <Bar dataKey="income" fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={36} />
             <Bar dataKey="expense" fill="var(--chart-5)" radius={[3, 3, 0, 0]} maxBarSize={36} />
           </BarChart>
         </ChartContainer>

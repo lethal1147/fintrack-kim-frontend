@@ -13,22 +13,23 @@ const MESSAGES: Record<Locale, Messages> = {
 }
 
 interface PreferencesState {
-  locale:   Locale
+  locale: Locale
   messages: Messages
   isLoading: boolean
-  setLocale:   (locale: Locale) => Promise<void>
-  initLocale:  (backendLocale?: string | null) => void
+  setLocale: (locale: Locale) => Promise<void>
+  initLocale: (backendLocale?: string | null) => void
 }
 
 export const usePreferencesStore = create<PreferencesState>((set, get) => ({
-  locale:    DEFAULT_LOCALE,
-  messages:  MESSAGES[DEFAULT_LOCALE],
+  locale: DEFAULT_LOCALE,
+  messages: MESSAGES[DEFAULT_LOCALE],
   isLoading: false,
 
   initLocale(backendLocale) {
-    const resolved = (backendLocale && (SUPPORTED_LOCALES as readonly string[]).includes(backendLocale))
-      ? (backendLocale as Locale)
-      : detectLocale()
+    const resolved =
+      backendLocale && (SUPPORTED_LOCALES as readonly string[]).includes(backendLocale)
+        ? (backendLocale as Locale)
+        : detectLocale()
 
     if (resolved !== get().locale) {
       set({ locale: resolved, messages: MESSAGES[resolved] })

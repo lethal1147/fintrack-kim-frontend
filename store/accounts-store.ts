@@ -9,6 +9,5 @@ type AccountsState = {
 export const useAccountsStore = create<AccountsState>((set) => ({
   accounts,
 
-  addAccount: (account) =>
-    set((s) => ({ accounts: [...s.accounts, account] })),
+  addAccount: (account) => set((s) => ({ accounts: [...s.accounts, account] })),
 }))

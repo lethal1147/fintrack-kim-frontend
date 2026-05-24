@@ -50,30 +50,31 @@ export default function DashboardPage() {
   const t = useTranslations("dashboard")
   const [period, setPeriod] = useState<Period>("month")
 
-  const { monthly, prevMonth, trend, isLoading, selectedMonth, setMonth, fetchDashboard } = useDashboardStore()
+  const { monthly, prevMonth, trend, isLoading, selectedMonth, setMonth, fetchDashboard } =
+    useDashboardStore()
   const { fetchCategories } = useBudgetStore()
   const { fetchItems } = useRecurringStore()
   const { fetchRecent } = useTransactionsStore()
 
-  const today    = dayjs().startOf("month")
+  const today = dayjs().startOf("month")
   const minMonth = today.subtract(MIN_MONTHS_BACK, "month")
 
   useEffect(() => {
-    const y    = selectedMonth.year()
-    const m    = selectedMonth.month() + 1
+    const y = selectedMonth.year()
+    const m = selectedMonth.month() + 1
     const from = selectedMonth.startOf("month").format("YYYY-MM-DD")
-    const to   = selectedMonth.endOf("month").format("YYYY-MM-DD")
+    const to = selectedMonth.endOf("month").format("YYYY-MM-DD")
     fetchDashboard()
     fetchCategories(y, m)
     fetchItems()
     fetchRecent(5, from, to)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMonth])
 
   if (isLoading && !trend) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="border-primary size-8 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     )
   }
@@ -85,46 +86,44 @@ export default function DashboardPage() {
   const currSavings = savingsRate(curr.income, curr.expense)
   const prevSavings = savingsRate(prev.income, prev.expense)
 
-  const yearIncome  = byMonth.reduce((s, m) => s + m.income, 0)
+  const yearIncome = byMonth.reduce((s, m) => s + m.income, 0)
   const yearExpense = byMonth.reduce((s, m) => s + m.expense, 0)
 
   const monthKpi = {
-    income:      monthly?.total_income ?? 0,
-    expense:     monthly?.total_expense ?? 0,
-    net:         monthly?.net ?? 0,
+    income: monthly?.total_income ?? 0,
+    expense: monthly?.total_expense ?? 0,
+    net: monthly?.net ?? 0,
     savingsRate: Math.round(monthly?.savings_rate ?? currSavings),
   }
   const yearKpi = {
-    income:      yearIncome,
-    expense:     yearExpense,
-    net:         yearIncome - yearExpense,
+    income: yearIncome,
+    expense: yearExpense,
+    net: yearIncome - yearExpense,
     savingsRate: savingsRate(yearIncome, yearExpense),
   }
   const kpi = period === "year" ? yearKpi : monthKpi
 
-  const sparkIncome  = byMonth.map((m) => m.income)
+  const sparkIncome = byMonth.map((m) => m.income)
   const sparkExpense = byMonth.map((m) => m.expense)
-  const sparkNet     = byMonth.map((m) => m.net)
+  const sparkNet = byMonth.map((m) => m.net)
   const sparkSavings = byMonth.map((m) => savingsRate(m.income, m.expense))
 
-  const deltaIncome  = pctChange(curr.income,  prev.income)
+  const deltaIncome = pctChange(curr.income, prev.income)
   const deltaExpense = pctChange(curr.expense, prev.expense)
-  const deltaNet     = pctChange(curr.net,     prev.net)
-  const deltaSavings = pctChange(currSavings,  prevSavings)
+  const deltaNet = pctChange(curr.net, prev.net)
+  const deltaSavings = pctChange(currSavings, prevSavings)
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            {period === "month"
-              ? selectedMonth.format("MMMM YYYY")
-              : today.format("YYYY")}
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {period === "month" ? selectedMonth.format("MMMM YYYY") : today.format("YYYY")}
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           {period === "month" && (
             <div className="flex items-center gap-1">
               <Button
@@ -135,7 +134,7 @@ export default function DashboardPage() {
               >
                 <IconChevronLeft className="size-3.5" />
               </Button>
-              <span className="text-sm font-semibold w-28 text-center">
+              <span className="w-28 text-center text-sm font-semibold">
                 {selectedMonth.format("MMMM YYYY")}
               </span>
               <Button
@@ -168,7 +167,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Row 1 — KPI cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           title={t("statTotalIncome")}
           value={stringUtil.formatMoney(kpi.income)}
@@ -217,13 +216,13 @@ export default function DashboardPage() {
       />
 
       {/* Row 3 — Category Donut + Budget Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
         <CategoryDonut data={monthly?.by_category ?? []} />
         <BudgetPerformance />
       </div>
 
       {/* Row 4 — Recurring Summary + Top Transactions + Recent Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <RecurringSummary />
         <TopTransactions />
         <RecentTransactions />

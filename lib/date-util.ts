@@ -29,7 +29,9 @@ const SHORT_MONTH_TEMPLATE: Record<Locale, string> = {
 export const dateUtil = {
   /** "Mar 11, 2026" / "11 มี.ค. 2569" */
   format(date: string | Date, template?: string, locale: Locale = "en"): string {
-    return dayjs(date).locale(locale).format(template ?? DATE_TEMPLATE[locale])
+    return dayjs(date)
+      .locale(locale)
+      .format(template ?? DATE_TEMPLATE[locale])
   },
 
   /** "March 2026" / "มีนาคม 2569" */

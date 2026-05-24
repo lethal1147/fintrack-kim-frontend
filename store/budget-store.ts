@@ -1,5 +1,10 @@
 import { create } from "zustand"
-import { budgetApi, type BudgetCategory, type CreateBudgetBody, type UpdateBudgetBody } from "@/lib/api-client"
+import {
+  budgetApi,
+  type BudgetCategory,
+  type CreateBudgetBody,
+  type UpdateBudgetBody,
+} from "@/lib/api-client"
 import { useAuthStore } from "@/store/auth-store"
 
 type BudgetState = {

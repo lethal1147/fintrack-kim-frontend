@@ -7,26 +7,26 @@ const TOP_TX_LIMIT = 100
 const TOP_TX_COUNT = 5
 
 type DashboardState = {
-  monthly:         AnalyticsData | null
-  prevMonth:       AnalyticsData | null
-  trend:           AnalyticsData | null
+  monthly: AnalyticsData | null
+  prevMonth: AnalyticsData | null
+  trend: AnalyticsData | null
   topTransactions: Transaction[]
-  isLoading:       boolean
-  error:           string | null
-  selectedMonth:   Dayjs
+  isLoading: boolean
+  error: string | null
+  selectedMonth: Dayjs
 
   setMonth(m: Dayjs): void
   fetchDashboard(): Promise<void>
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
-  monthly:         null,
-  prevMonth:       null,
-  trend:           null,
+  monthly: null,
+  prevMonth: null,
+  trend: null,
   topTransactions: [],
-  isLoading:       false,
-  error:           null,
-  selectedMonth:   dayjs().startOf("month"),
+  isLoading: false,
+  error: null,
+  selectedMonth: dayjs().startOf("month"),
 
   setMonth(m: Dayjs) {
     set({ selectedMonth: m })
@@ -39,13 +39,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const month = get().selectedMonth
     set({ isLoading: true, error: null })
     try {
-      const monthFrom     = month.startOf("month").format("YYYY-MM-DD")
-      const monthTo       = month.endOf("month").format("YYYY-MM-DD")
+      const monthFrom = month.startOf("month").format("YYYY-MM-DD")
+      const monthTo = month.endOf("month").format("YYYY-MM-DD")
       const prevMonthFrom = month.subtract(1, "month").startOf("month").format("YYYY-MM-DD")
-      const prevMonthTo   = month.subtract(1, "month").endOf("month").format("YYYY-MM-DD")
+      const prevMonthTo = month.subtract(1, "month").endOf("month").format("YYYY-MM-DD")
       // Full year trend so the chart always has a 12-month spine
-      const trendFrom     = month.startOf("year").format("YYYY-MM-DD")
-      const trendTo       = month.endOf("month").format("YYYY-MM-DD")
+      const trendFrom = month.startOf("year").format("YYYY-MM-DD")
+      const trendTo = month.endOf("month").format("YYYY-MM-DD")
 
       const [monthly, trend, prevMonth, txResult] = await Promise.all([
         transactionApi.analytics({ from: monthFrom, to: monthTo }, token),

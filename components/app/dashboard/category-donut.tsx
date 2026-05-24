@@ -16,8 +16,11 @@ import { useCategoryLabel } from "@/lib/category-util"
 // ─── constants ────────────────────────────────────────────────────────────────
 
 const CHART_COLORS = [
-  "var(--chart-1)", "var(--chart-2)", "var(--chart-3)",
-  "var(--chart-4)", "var(--chart-5)",
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
 ]
 
 const SKELETON_ROWS = 4
@@ -50,11 +53,11 @@ export function CategoryDonut({ data }: Props) {
         {chartData.length === 0 ? (
           <div className="space-y-3">
             {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-              <div key={i} className="h-5 rounded bg-muted animate-pulse" />
+              <div key={i} className="bg-muted h-5 animate-pulse rounded" />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col sm:flex-row items-center gap-6">
+          <div className="flex flex-col items-center gap-6 sm:flex-row">
             {/* Donut */}
             <div className="relative shrink-0">
               <ChartContainer config={chartConfig} className="size-45">
@@ -75,28 +78,30 @@ export function CategoryDonut({ data }: Props) {
                 </PieChart>
               </ChartContainer>
               {/* Center label */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-xs text-muted-foreground">{t("centerLabel")}</p>
-                <p className="text-base font-bold tabular-nums leading-tight">
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-muted-foreground text-xs">{t("centerLabel")}</p>
+                <p className="text-base leading-tight font-bold tabular-nums">
                   {stringUtil.formatMoney(totalExpense)}
                 </p>
               </div>
             </div>
 
             {/* Legend */}
-            <ul className="flex-1 space-y-2 min-w-0">
+            <ul className="min-w-0 flex-1 space-y-2">
               {chartData.map((c) => (
                 <li key={c.category} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="flex items-center gap-2 min-w-0">
+                  <span className="flex min-w-0 items-center gap-2">
                     <span
-                      className="size-2.5 rounded-full shrink-0"
+                      className="size-2.5 shrink-0 rounded-full"
                       style={{ backgroundColor: c.color }}
                     />
-                    <span className="truncate text-muted-foreground">{getCategoryLabel(c.category)}</span>
+                    <span className="text-muted-foreground truncate">
+                      {getCategoryLabel(c.category)}
+                    </span>
                   </span>
-                  <span className="tabular-nums shrink-0 font-medium">
+                  <span className="shrink-0 font-medium tabular-nums">
                     {stringUtil.formatMoney(c.total)}
-                    <span className="text-xs text-muted-foreground font-normal ml-1">
+                    <span className="text-muted-foreground ml-1 text-xs font-normal">
                       {c.pct.toFixed(2)}%
                     </span>
                   </span>

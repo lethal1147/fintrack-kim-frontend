@@ -25,11 +25,12 @@ export function GoalsOverview() {
                   <span>{goal.emoji}</span>
                   {goal.name}
                 </span>
-                <span className="text-xs text-muted-foreground tabular-nums">{pct}%</span>
+                <span className="text-muted-foreground text-xs tabular-nums">{pct}%</span>
               </div>
               <Progress value={pct} className="h-1.5" />
-              <p className="text-xs text-muted-foreground tabular-nums">
-                {stringUtil.formatMoney(goal.current)} {t("of")} {stringUtil.formatMoney(goal.target)}
+              <p className="text-muted-foreground text-xs tabular-nums">
+                {stringUtil.formatMoney(goal.current)} {t("of")}{" "}
+                {stringUtil.formatMoney(goal.target)}
               </p>
             </div>
           )

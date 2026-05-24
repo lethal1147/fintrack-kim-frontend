@@ -14,13 +14,22 @@ type Props = {
   onPageChange: (page: number) => void
 }
 
-export function TransactionPagination({ safePage, totalPages, filteredCount, onPageChange }: Props) {
+export function TransactionPagination({
+  safePage,
+  totalPages,
+  filteredCount,
+  onPageChange,
+}: Props) {
   const t = useTranslations("transactions.pagination")
 
   return (
     <div className="flex items-center justify-between pt-1">
-      <p className="text-xs text-muted-foreground">
-        {t("showing", { from: (safePage - 1) * PAGE_SIZE + 1, to: Math.min(safePage * PAGE_SIZE, filteredCount), total: filteredCount })}
+      <p className="text-muted-foreground text-xs">
+        {t("showing", {
+          from: (safePage - 1) * PAGE_SIZE + 1,
+          to: Math.min(safePage * PAGE_SIZE, filteredCount),
+          total: filteredCount,
+        })}
       </p>
       <div className="flex items-center gap-1">
         <Button
@@ -41,7 +50,9 @@ export function TransactionPagination({ safePage, totalPages, filteredCount, onP
           }, [])
           .map((p, i) =>
             p === "…" ? (
-              <span key={`ellipsis-${i}`} className="w-7 text-center text-xs text-muted-foreground">…</span>
+              <span key={`ellipsis-${i}`} className="text-muted-foreground w-7 text-center text-xs">
+                …
+              </span>
             ) : (
               <button
                 key={p}

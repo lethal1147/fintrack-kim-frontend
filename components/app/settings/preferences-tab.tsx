@@ -19,8 +19,8 @@ import type { Locale } from "@/lib/i18n-config"
 import { useState } from "react"
 
 const THEME_ICONS: Record<Theme, React.ElementType> = {
-  light:  IconSun,
-  dark:   IconMoon,
+  light: IconSun,
+  dark: IconMoon,
   system: IconDeviceDesktop,
 }
 
@@ -42,8 +42,8 @@ export function PreferencesTab() {
     <div className="space-y-6">
       <SectionHeader title={t("sectionTitle")} description={t("sectionDescription")} />
 
-      <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-        <div className="p-4 grid grid-cols-[160px_1fr] gap-4 items-center">
+      <div className="border-border bg-card divide-border divide-y overflow-hidden rounded-xl border">
+        <div className="grid grid-cols-[160px_1fr] items-center gap-4 p-4">
           <Label className="text-sm font-medium">{t("languageLabel")}</Label>
           <Select value={locale} onValueChange={(v) => setLocale(v as Locale)}>
             <SelectTrigger>
@@ -56,7 +56,7 @@ export function PreferencesTab() {
           </Select>
         </div>
 
-        <div className="p-4 grid grid-cols-[160px_1fr] gap-4 items-center">
+        <div className="grid grid-cols-[160px_1fr] items-center gap-4 p-4">
           <Label className="text-sm font-medium">{t("themeLabel")}</Label>
           <div className="flex gap-2">
             {THEME_OPTIONS.map((opt) => {

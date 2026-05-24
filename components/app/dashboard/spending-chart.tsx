@@ -38,11 +38,11 @@ export function SpendingChart() {
           <AreaChart data={spendingData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id="thisMonthGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="var(--chart-1)" stopOpacity={0.3} />
+                <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="lastMonthGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="var(--chart-3)" stopOpacity={0.15} />
+                <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.15} />
                 <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0} />
               </linearGradient>
             </defs>

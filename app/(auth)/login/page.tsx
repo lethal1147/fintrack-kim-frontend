@@ -1,66 +1,66 @@
-"use client";
+"use client"
 
-import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { Suspense, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import {
   IconEye,
   IconEyeOff,
   IconLoader2,
   IconShieldLock,
   IconCircleCheck,
-} from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/store/auth-store";
-import { useTranslations } from "next-intl";
+} from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useAuthStore } from "@/store/auth-store"
+import { useTranslations } from "next-intl"
 
 function ResetSuccessBanner() {
-  const t = useTranslations("auth.login");
-  const searchParams = useSearchParams();
-  if (searchParams.get("reset") !== "true") return null;
+  const t = useTranslations("auth.login")
+  const searchParams = useSearchParams()
+  if (searchParams.get("reset") !== "true") return null
   return (
     <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
       <IconCircleCheck className="size-4 shrink-0" />
       {t("resetSuccessBanner")}
     </div>
-  );
+  )
 }
 
 export default function LoginPage() {
-  const t = useTranslations("auth.login");
-  const tTotp = useTranslations("auth.login.totp");
-  const router = useRouter();
-  const { login, verifyTOTP, isLoading, totpChallengeToken } = useAuthStore();
+  const t = useTranslations("auth.login")
+  const tTotp = useTranslations("auth.login.totp")
+  const router = useRouter()
+  const { login, verifyTOTP, isLoading, totpChallengeToken } = useAuthStore()
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [totpCode, setTotpCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [totpCode, setTotpCode] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+    e.preventDefault()
+    setError(null)
     try {
-      await login(email, password);
+      await login(email, password)
       if (!useAuthStore.getState().totpChallengeToken) {
-        router.push("/dashboard");
+        router.push("/dashboard")
       }
     } catch {
-      setError(useAuthStore.getState().error ?? t("errorFallback"));
+      setError(useAuthStore.getState().error ?? t("errorFallback"))
     }
   }
 
   async function handleTOTPSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+    e.preventDefault()
+    setError(null)
     try {
-      await verifyTOTP(totpCode);
-      router.push("/dashboard");
+      await verifyTOTP(totpCode)
+      router.push("/dashboard")
     } catch {
-      setError(useAuthStore.getState().error ?? tTotp("errorFallback"));
+      setError(useAuthStore.getState().error ?? tTotp("errorFallback"))
     }
   }
 
@@ -68,16 +68,12 @@ export default function LoginPage() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex items-center justify-center size-14 rounded-2xl bg-primary/10">
-            <IconShieldLock className="size-7 text-primary" />
+          <div className="bg-primary/10 flex size-14 items-center justify-center rounded-2xl">
+            <IconShieldLock className="text-primary size-7" />
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-2xl font-bold tracking-tight">
-              {tTotp("title")}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {tTotp("subtitle")}
-            </p>
+            <h2 className="text-2xl font-bold tracking-tight">{tTotp("title")}</h2>
+            <p className="text-muted-foreground text-sm">{tTotp("subtitle")}</p>
           </div>
         </div>
 
@@ -96,14 +92,9 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            disabled={isLoading || !totpCode}
-          >
+          <Button type="submit" className="w-full" size="lg" disabled={isLoading || !totpCode}>
             {isLoading ? (
               <>
                 <IconLoader2 className="size-4 animate-spin" /> {tTotp("submittingButton")}
@@ -114,7 +105,7 @@ export default function LoginPage() {
           </Button>
         </form>
       </div>
-    );
+    )
   }
 
   return (
@@ -125,9 +116,7 @@ export default function LoginPage() {
 
       <div className="space-y-1.5">
         <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
-        <p className="text-sm text-muted-foreground">
-          {t("subtitle")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
@@ -150,7 +139,7 @@ export default function LoginPage() {
             <Label htmlFor="password">{t("passwordLabel")}</Label>
             <Link
               href="/forgot-password"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground text-xs transition-colors"
             >
               {t("forgotPassword")}
             </Link>
@@ -170,19 +159,15 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
               tabIndex={-1}
             >
-              {showPassword ? (
-                <IconEyeOff className="size-4" />
-              ) : (
-                <IconEye className="size-4" />
-              )}
+              {showPassword ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
             </button>
           </div>
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
         <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
           {isLoading ? (
@@ -195,15 +180,15 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-center text-sm">
         {t("noAccount")}{" "}
         <Link
           href="/register"
-          className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
+          className="text-foreground hover:text-primary font-medium underline underline-offset-4 transition-colors"
         >
           {t("createOne")}
         </Link>
       </p>
     </div>
-  );
+  )
 }

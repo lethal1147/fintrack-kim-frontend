@@ -42,17 +42,17 @@ export function EditBudgetCategoryDialog({ open, item, onClose, onEdit }: Props)
   const getCategoryLabel = useCategoryLabel()
 
   const COLOR_OPTIONS = [
-    { label: t("colorBlue"),   value: "var(--chart-1)" },
-    { label: t("colorGreen"),  value: "var(--chart-2)" },
+    { label: t("colorBlue"), value: "var(--chart-1)" },
+    { label: t("colorGreen"), value: "var(--chart-2)" },
     { label: t("colorViolet"), value: "var(--chart-3)" },
     { label: t("colorOrange"), value: "var(--chart-4)" },
-    { label: t("colorPink"),   value: "var(--chart-5)" },
+    { label: t("colorPink"), value: "var(--chart-5)" },
   ]
 
-  const [name, setName]     = useState("")
-  const [group, setGroup]   = useState<BudgetGroup | "">("")
+  const [name, setName] = useState("")
+  const [group, setGroup] = useState<BudgetGroup | "">("")
   const [amount, setAmount] = useState("")
-  const [color, setColor]   = useState(COLOR_OPTIONS[0].value)
+  const [color, setColor] = useState(COLOR_OPTIONS[0].value)
 
   useEffect(() => {
     if (item) {
@@ -85,7 +85,6 @@ export function EditBudgetCategoryDialog({ open, item, onClose, onEdit }: Props)
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-1">
-
           {/* Category name */}
           <div className="space-y-1.5">
             <Label>{t("categoryNameLabel")}</Label>
@@ -95,7 +94,9 @@ export function EditBudgetCategoryDialog({ open, item, onClose, onEdit }: Props)
               </SelectTrigger>
               <SelectContent>
                 {EXPENSE_CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>{getCategoryLabel(c)}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {getCategoryLabel(c)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -110,7 +111,9 @@ export function EditBudgetCategoryDialog({ open, item, onClose, onEdit }: Props)
               </SelectTrigger>
               <SelectContent>
                 {GROUPS.map((g) => (
-                  <SelectItem key={g} value={g}>{g}</SelectItem>
+                  <SelectItem key={g} value={g}>
+                    {g}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

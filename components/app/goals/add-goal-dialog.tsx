@@ -15,8 +15,14 @@ import { useTranslations } from "next-intl"
 import { type Goal } from "@/lib/mock-data"
 
 const COLOR_OPTIONS = [
-  "#0ea5e9", "#8b5cf6", "#f97316", "#10b981",
-  "#ec4899", "#f59e0b", "#3b82f6", "#14b8a6",
+  "#0ea5e9",
+  "#8b5cf6",
+  "#f97316",
+  "#10b981",
+  "#ec4899",
+  "#f59e0b",
+  "#3b82f6",
+  "#14b8a6",
 ]
 
 const EMOJI_PRESETS = ["🏠", "✈️", "🎓", "🚗", "💍", "💻", "🛡️", "🎯", "📱", "🎸"]
@@ -29,31 +35,36 @@ type Props = {
 
 export function AddGoalDialog({ open, onClose, onAdd }: Props) {
   const t = useTranslations("goals.addDialog")
-  const [name, setName]                   = useState("")
-  const [emoji, setEmoji]                 = useState("🎯")
-  const [target, setTarget]               = useState("")
-  const [current, setCurrent]             = useState("")
-  const [targetDate, setTargetDate]       = useState("")
-  const [monthly, setMonthly]             = useState("")
-  const [color, setColor]                 = useState(COLOR_OPTIONS[0])
+  const [name, setName] = useState("")
+  const [emoji, setEmoji] = useState("🎯")
+  const [target, setTarget] = useState("")
+  const [current, setCurrent] = useState("")
+  const [targetDate, setTargetDate] = useState("")
+  const [monthly, setMonthly] = useState("")
+  const [color, setColor] = useState(COLOR_OPTIONS[0])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name || !target || !targetDate) return
 
     onAdd({
-      id:                  Date.now().toString(),
+      id: Date.now().toString(),
       name,
       emoji,
-      target:              parseFloat(target),
-      current:             parseFloat(current || "0"),
-      targetDate:          targetDate + "-01",
+      target: parseFloat(target),
+      current: parseFloat(current || "0"),
+      targetDate: targetDate + "-01",
       monthlyContribution: parseFloat(monthly || "0"),
       color,
     })
 
-    setName(""); setEmoji("🎯"); setTarget(""); setCurrent("")
-    setTargetDate(""); setMonthly(""); setColor(COLOR_OPTIONS[0])
+    setName("")
+    setEmoji("🎯")
+    setTarget("")
+    setCurrent("")
+    setTargetDate("")
+    setMonthly("")
+    setColor(COLOR_OPTIONS[0])
     onClose()
   }
 
@@ -67,18 +78,16 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-
           {/* Emoji presets */}
           <div className="space-y-1.5">
             <Label>{t("iconLabel")}</Label>
-            <div className="flex gap-1.5 flex-wrap">
+            <div className="flex flex-wrap gap-1.5">
               {EMOJI_PRESETS.map((e) => (
                 <button
                   key={e}
                   type="button"
                   onClick={() => setEmoji(e)}
-                  className={`size-9 text-xl rounded-lg border-2 transition-colors flex items-center justify-center
-                    ${emoji === e ? "border-primary bg-primary/5" : "border-border hover:bg-muted"}`}
+                  className={`flex size-9 items-center justify-center rounded-lg border-2 text-xl transition-colors ${emoji === e ? "border-primary bg-primary/5" : "border-border hover:bg-muted"}`}
                 >
                   {e}
                 </button>
@@ -104,7 +113,10 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
               <Label htmlFor="goal-target">{t("targetAmountLabel")}</Label>
               <Input
                 id="goal-target"
-                type="number" min="1" step="1" placeholder="0"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="0"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 required
@@ -112,11 +124,15 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="goal-current">
-                {t("alreadySavedLabel")} <span className="text-muted-foreground">{t("alreadySavedOptional")}</span>
+                {t("alreadySavedLabel")}{" "}
+                <span className="text-muted-foreground">{t("alreadySavedOptional")}</span>
               </Label>
               <Input
                 id="goal-current"
-                type="number" min="0" step="1" placeholder="0"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="0"
                 value={current}
                 onChange={(e) => setCurrent(e.target.value)}
               />
@@ -137,11 +153,15 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="goal-monthly">
-                {t("monthlyContributionLabel")} <span className="text-muted-foreground">{t("monthlyContributionOptional")}</span>
+                {t("monthlyContributionLabel")}{" "}
+                <span className="text-muted-foreground">{t("monthlyContributionOptional")}</span>
               </Label>
               <Input
                 id="goal-monthly"
-                type="number" min="0" step="1" placeholder="0"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="0"
                 value={monthly}
                 onChange={(e) => setMonthly(e.target.value)}
               />
@@ -157,8 +177,7 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className={`size-7 rounded-full border-2 transition-transform
-                    ${color === c ? "border-foreground scale-110" : "border-transparent"}`}
+                  className={`size-7 rounded-full border-2 transition-transform ${color === c ? "border-foreground scale-110" : "border-transparent"}`}
                   style={{ background: c }}
                 />
               ))}
@@ -166,8 +185,12 @@ export function AddGoalDialog({ open, onClose, onAdd }: Props) {
           </div>
 
           <DialogFooter className="gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={onClose}>{t("cancelButton")}</Button>
-            <Button type="submit" disabled={!valid}>{t("createButton")}</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t("cancelButton")}
+            </Button>
+            <Button type="submit" disabled={!valid}>
+              {t("createButton")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

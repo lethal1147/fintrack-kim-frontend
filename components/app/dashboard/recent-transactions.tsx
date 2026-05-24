@@ -13,11 +13,11 @@ import { useCategoryLabel } from "@/lib/category-util"
 const SKELETON_ROWS = 5
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Income:        "bg-emerald-500",
+  Income: "bg-emerald-500",
   Entertainment: "bg-violet-500",
-  Food:          "bg-orange-500",
-  Transport:     "bg-blue-500",
-  Health:        "bg-pink-500",
+  Food: "bg-orange-500",
+  Transport: "bg-blue-500",
+  Health: "bg-pink-500",
 }
 
 // ─── component ────────────────────────────────────────────────────────────────
@@ -35,7 +35,10 @@ export function RecentTransactions() {
             <CardTitle className="text-base">{t("title")}</CardTitle>
             <CardDescription>{t("subtitle")}</CardDescription>
           </div>
-          <Link href="/transactions" className="text-xs text-primary hover:underline underline-offset-4">
+          <Link
+            href="/transactions"
+            className="text-primary text-xs underline-offset-4 hover:underline"
+          >
             {t("viewAll")}
           </Link>
         </div>
@@ -44,22 +47,35 @@ export function RecentTransactions() {
         {recentTransactions.length === 0 ? (
           <div className="space-y-3">
             {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-              <div key={i} className="h-5 rounded bg-muted animate-pulse" />
+              <div key={i} className="bg-muted h-5 animate-pulse rounded" />
             ))}
           </div>
         ) : (
           recentTransactions.map((tx) => (
             <div
               key={tx.id}
-              className="flex items-center gap-3 px-1 py-2.5 rounded-lg hover:bg-muted/50 transition-colors"
+              className="hover:bg-muted/50 flex items-center gap-3 rounded-lg px-1 py-2.5 transition-colors"
             >
-              <div className={cn("size-2 rounded-full shrink-0", CATEGORY_COLORS[tx.category] ?? "bg-muted-foreground")} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{tx.merchant}</p>
-                <p className="text-xs text-muted-foreground">{getCategoryLabel(tx.category)} · {tx.date}</p>
+              <div
+                className={cn(
+                  "size-2 shrink-0 rounded-full",
+                  CATEGORY_COLORS[tx.category] ?? "bg-muted-foreground"
+                )}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{tx.merchant}</p>
+                <p className="text-muted-foreground text-xs">
+                  {getCategoryLabel(tx.category)} · {tx.date}
+                </p>
               </div>
-              <p className={cn("text-sm font-semibold tabular-nums shrink-0", tx.type === "income" ? "text-emerald-600" : "text-destructive")}>
-                {tx.type === "income" ? "+" : "-"}{stringUtil.formatMoneyFull(tx.amount)}
+              <p
+                className={cn(
+                  "shrink-0 text-sm font-semibold tabular-nums",
+                  tx.type === "income" ? "text-emerald-600" : "text-destructive"
+                )}
+              >
+                {tx.type === "income" ? "+" : "-"}
+                {stringUtil.formatMoneyFull(tx.amount)}
               </p>
             </div>
           ))

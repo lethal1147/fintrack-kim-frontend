@@ -1,16 +1,16 @@
 export type UserProfile = {
-  id:           string
-  email:        string
-  name:         string
-  avatar_url:   string
-  provider:     string
+  id: string
+  email: string
+  name: string
+  avatar_url: string
+  provider: string
   totp_enabled: boolean
-  locale:       string
-  created_at:   string
+  locale: string
+  created_at: string
 }
 
 export type TOTPChallenge = {
-  totp_required:   true
+  totp_required: true
   challenge_token: string
 }
 
@@ -23,7 +23,7 @@ export class ApiError extends Error {
   constructor(
     public readonly code: string,
     message: string,
-    public readonly status: number,
+    public readonly status: number
   ) {
     super(message)
     this.name = "ApiError"
@@ -58,7 +58,9 @@ function silentRefresh(): Promise<boolean> {
   if (!refreshPromise) {
     refreshPromise = import("@/store/auth-store")
       .then(({ useAuthStore }) => useAuthStore.getState().refreshAccessToken())
-      .finally(() => { refreshPromise = null })
+      .finally(() => {
+        refreshPromise = null
+      })
   }
   return refreshPromise
 }
@@ -91,7 +93,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     throw new ApiError(
       json?.error?.code ?? "UNAUTHORIZED",
       json?.error?.message ?? "Session expired",
-      401,
+      401
     )
   }
 
@@ -133,7 +135,7 @@ async function apiFetchRaw<T>(path: string, init: RequestInit = {}): Promise<T> 
     throw new ApiError(
       json?.error?.code ?? "UNAUTHORIZED",
       json?.error?.message ?? "Session expired",
-      401,
+      401
     )
   }
 
@@ -152,7 +154,7 @@ export type Transaction = {
   merchant: string
   category: string
   note: string
-  date: string        // "YYYY-MM-DD"
+  date: string // "YYYY-MM-DD"
   amount: number
   type: "income" | "expense"
   created_at: string
@@ -176,7 +178,7 @@ export type CategoryStat = {
 }
 
 export type MonthStat = {
-  month: string  // "YYYY-MM"
+  month: string // "YYYY-MM"
   income: number
   expense: number
   net: number
@@ -227,13 +229,13 @@ export type MerchantStat = {
 }
 
 export type AnalyticsData = {
-  total_income:  number
+  total_income: number
   total_expense: number
-  net:           number
-  tx_count:      number
-  savings_rate:  number
-  by_category:   CategoryStatWithPct[]
-  by_month:      MonthStat[]
+  net: number
+  tx_count: number
+  savings_rate: number
+  by_category: CategoryStatWithPct[]
+  by_month: MonthStat[]
   top_merchants: MerchantStat[]
 }
 
@@ -247,13 +249,13 @@ export type AnalyticsParams = {
 export const transactionApi = {
   list(params: TransactionListParams, token: string): Promise<TransactionListResponse> {
     const q = new URLSearchParams()
-    if (params.type)     q.set("type", params.type)
+    if (params.type) q.set("type", params.type)
     if (params.category) q.set("category", params.category)
-    if (params.search)   q.set("search", params.search)
-    if (params.from)     q.set("from", params.from)
-    if (params.to)       q.set("to", params.to)
-    if (params.page)     q.set("page", String(params.page))
-    if (params.limit)    q.set("limit", String(params.limit))
+    if (params.search) q.set("search", params.search)
+    if (params.from) q.set("from", params.from)
+    if (params.to) q.set("to", params.to)
+    if (params.page) q.set("page", String(params.page))
+    if (params.limit) q.set("limit", String(params.limit))
     const qs = q.toString() ? "?" + q.toString() : ""
     return apiFetch(`/api/transactions${qs}`, { headers: authHeaders(token) })
   },
@@ -288,7 +290,7 @@ export const transactionApi = {
   summary(params: SummaryParams, token: string): Promise<TransactionSummary> {
     const q = new URLSearchParams()
     if (params.from) q.set("from", params.from)
-    if (params.to)   q.set("to", params.to)
+    if (params.to) q.set("to", params.to)
     const qs = q.toString() ? "?" + q.toString() : ""
     return apiFetch(`/api/transactions/summary${qs}`, { headers: authHeaders(token) })
   },
@@ -296,7 +298,7 @@ export const transactionApi = {
   analytics(params: AnalyticsParams, token: string): Promise<AnalyticsData> {
     const q = new URLSearchParams()
     if (params.from) q.set("from", params.from)
-    if (params.to)   q.set("to", params.to)
+    if (params.to) q.set("to", params.to)
     const qs = q.toString() ? "?" + q.toString() : ""
     return apiFetch(`/api/transactions/analytics${qs}`, { headers: authHeaders(token) })
   },
@@ -305,31 +307,31 @@ export const transactionApi = {
 // ── Recurring types ───────────────────────────────────────────────────────
 
 export type RecurringFrequency = "weekly" | "monthly" | "annual"
-export type RecurringKind      = "expense" | "income"
-export type RecurringStatus    = "active" | "paused"
+export type RecurringKind = "expense" | "income"
+export type RecurringStatus = "active" | "paused"
 
 export type RecurringItem = {
-  id:         string
-  name:       string
-  category:   string
-  amount:     number
-  frequency:  RecurringFrequency
-  kind:       RecurringKind
-  status:     RecurringStatus
-  next_due:   string   // "YYYY-MM-DD"
-  color:      string
+  id: string
+  name: string
+  category: string
+  amount: number
+  frequency: RecurringFrequency
+  kind: RecurringKind
+  status: RecurringStatus
+  next_due: string // "YYYY-MM-DD"
+  color: string
   created_at: string
   updated_at: string
 }
 
 export type CreateRecurringBody = {
-  name:      string
-  category:  string
-  amount:    number
+  name: string
+  category: string
+  amount: number
   frequency: RecurringFrequency
-  kind:      RecurringKind
-  next_due:  string
-  color:     string
+  kind: RecurringKind
+  next_due: string
+  color: string
 }
 
 export type UpdateRecurringBody = CreateRecurringBody
@@ -384,21 +386,21 @@ export const recurringApi = {
 export type BudgetGroup = "Fixed" | "Flexible" | "Non-Monthly"
 
 export type BudgetCategory = {
-  id:         string
-  name:       string
-  group:      BudgetGroup
-  budgeted:   number
-  spent:      number   // computed by backend for requested month
-  color:      string
+  id: string
+  name: string
+  group: BudgetGroup
+  budgeted: number
+  spent: number // computed by backend for requested month
+  color: string
   created_at: string
   updated_at: string
 }
 
 export type CreateBudgetBody = {
-  name:     string
-  group:    BudgetGroup
+  name: string
+  group: BudgetGroup
   budgeted: number
-  color:    string
+  color: string
 }
 
 export type UpdateBudgetBody = CreateBudgetBody
@@ -438,8 +440,8 @@ export const budgetApi = {
 // ── Profile types + API ───────────────────────────────────────────────────────
 
 export type UpdateProfileBody = {
-  name:   string
-  email:  string
+  name: string
+  email: string
   locale?: string
 }
 
@@ -474,15 +476,15 @@ export const profileApi = {
 // ── Security types + API ──────────────────────────────────────────────────────
 
 export type SessionInfo = {
-  id:             string
-  device:         string
+  id: string
+  device: string
   last_active_at: string
-  is_current:     boolean
+  is_current: boolean
 }
 
 export type TOTPSetupResult = {
-  secret:       string
-  qr_code_uri:  string
+  secret: string
+  qr_code_uri: string
   backup_codes: string[]
 }
 

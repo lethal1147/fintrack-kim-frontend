@@ -36,19 +36,20 @@ export default function ForgotPasswordPage() {
   const tCheck = useTranslations("auth.forgotPassword.checkEmail")
   const router = useRouter()
 
-  const [step,           setStep]           = useState<Step>("email")
-  const [email,          setEmail]          = useState("")
-  const [otp,            setOtp]            = useState("")
-  const [newPassword,    setNewPassword]    = useState("")
-  const [confirmPw,      setConfirmPw]      = useState("")
-  const [showPw,         setShowPw]         = useState(false)
-  const [showConfirmPw,  setShowConfirmPw]  = useState(false)
-  const [isLoading,      setIsLoading]      = useState(false)
-  const [error,          setError]          = useState<string | null>(null)
+  const [step, setStep] = useState<Step>("email")
+  const [email, setEmail] = useState("")
+  const [otp, setOtp] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPw, setConfirmPw] = useState("")
+  const [showPw, setShowPw] = useState(false)
+  const [showConfirmPw, setShowConfirmPw] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [resendCooldown, setResendCooldown] = useState(0)
 
   const passwordsMatch = newPassword === confirmPw
-  const canSubmitReset = otp.length > 0 && newPassword.length >= 8 && confirmPw.length > 0 && passwordsMatch
+  const canSubmitReset =
+    otp.length > 0 && newPassword.length >= 8 && confirmPw.length > 0 && passwordsMatch
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault()
@@ -96,7 +97,10 @@ export default function ForgotPasswordPage() {
     setResendCooldown(COOLDOWN_SECONDS)
     const interval = setInterval(() => {
       setResendCooldown((prev) => {
-        if (prev <= 1) { clearInterval(interval); return 0 }
+        if (prev <= 1) {
+          clearInterval(interval)
+          return 0
+        }
         return prev - 1
       })
     }, 1000)
@@ -107,12 +111,12 @@ export default function ForgotPasswordPage() {
       <div className="space-y-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <IconMailCheck className="size-6 text-primary" />
+            <IconMailCheck className="text-primary size-6" />
             <h2 className="text-2xl font-bold tracking-tight">{tCheck("title")}</h2>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {tCheck("subtitle")}{" "}
-            <span className="font-medium text-foreground">{maskEmail(email)}</span>
+            <span className="text-foreground font-medium">{maskEmail(email)}</span>
           </p>
         </div>
 
@@ -151,7 +155,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="button"
                 onClick={() => setShowPw((v) => !v)}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
                 tabIndex={-1}
               >
                 {showPw ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
@@ -176,18 +180,18 @@ export default function ForgotPasswordPage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPw((v) => !v)}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
                 tabIndex={-1}
               >
                 {showConfirmPw ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
               </button>
             </div>
             {confirmPw.length > 0 && !passwordsMatch && (
-              <p className="text-xs text-destructive">{tCheck("passwordsMismatch")}</p>
+              <p className="text-destructive text-xs">{tCheck("passwordsMismatch")}</p>
             )}
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <Button
             type="submit"
@@ -196,7 +200,9 @@ export default function ForgotPasswordPage() {
             disabled={isLoading || !canSubmitReset}
           >
             {isLoading ? (
-              <><IconLoader2 className="size-4 animate-spin" /> {tCheck("resettingButton")}</>
+              <>
+                <IconLoader2 className="size-4 animate-spin" /> {tCheck("resettingButton")}
+              </>
             ) : (
               tCheck("resetButton")
             )}
@@ -206,8 +212,14 @@ export default function ForgotPasswordPage() {
         <div className="flex items-center justify-between text-sm">
           <button
             type="button"
-            onClick={() => { setStep("email"); setOtp(""); setNewPassword(""); setConfirmPw(""); setError(null) }}
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => {
+              setStep("email")
+              setOtp("")
+              setNewPassword("")
+              setConfirmPw("")
+              setError(null)
+            }}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
           >
             <IconArrowLeft className="size-3.5" />
             {tCheck("changeEmail")}
@@ -219,7 +231,7 @@ export default function ForgotPasswordPage() {
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
-              className="font-medium text-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-foreground hover:text-primary font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {resendCooldown > 0
                 ? tCheck("resendCooldown", { seconds: resendCooldown })
@@ -235,12 +247,10 @@ export default function ForgotPasswordPage() {
     <div className="space-y-6">
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
-          <IconLockOpen className="size-6 text-primary" />
+          <IconLockOpen className="text-primary size-6" />
           <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t("subtitle")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSendCode}>
@@ -259,21 +269,23 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
         <Button type="submit" className="w-full" size="lg" disabled={isLoading || !email}>
           {isLoading ? (
-            <><IconLoader2 className="size-4 animate-spin" /> {t("sendingButton")}</>
+            <>
+              <IconLoader2 className="size-4 animate-spin" /> {t("sendingButton")}
+            </>
           ) : (
             t("sendCodeButton")
           )}
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-center text-sm">
         <Link
           href="/login"
-          className="flex items-center justify-center gap-1 hover:text-foreground transition-colors"
+          className="hover:text-foreground flex items-center justify-center gap-1 transition-colors"
         >
           <IconArrowLeft className="size-3.5" />
           {t("backToSignIn")}

@@ -27,9 +27,7 @@ export const useReportsStore = create<ReportsState>((set, get) => ({
     const y = year ?? get().year
     const now = new Date()
     const from = `${y}-01-01`
-    const to = y === now.getFullYear()
-      ? now.toISOString().slice(0, 10)
-      : `${y}-12-31`
+    const to = y === now.getFullYear() ? now.toISOString().slice(0, 10) : `${y}-12-31`
 
     set({ isLoading: true, error: null })
     try {

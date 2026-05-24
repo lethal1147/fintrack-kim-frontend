@@ -31,18 +31,18 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
   const t = useTranslations("accounts.addDialog")
 
   const TYPE_OPTIONS: { value: AccountType; label: string }[] = [
-    { value: "checking",    label: t("typeChecking") },
-    { value: "savings",     label: t("typeSavings") },
+    { value: "checking", label: t("typeChecking") },
+    { value: "savings", label: t("typeSavings") },
     { value: "credit_card", label: t("typeCreditCard") },
-    { value: "loan",        label: t("typeLoanMortgage") },
-    { value: "investment",  label: t("typeInvestment") },
+    { value: "loan", label: t("typeLoanMortgage") },
+    { value: "investment", label: t("typeInvestment") },
   ]
 
-  const [name, setName]           = useState("")
+  const [name, setName] = useState("")
   const [institution, setInstitution] = useState("")
-  const [type, setType]           = useState<AccountType | "">("")
-  const [balance, setBalance]     = useState("")
-  const [lastFour, setLastFour]   = useState("")
+  const [type, setType] = useState<AccountType | "">("")
+  const [balance, setBalance] = useState("")
+  const [lastFour, setLastFour] = useState("")
 
   const isLiability = type === "credit_card" || type === "loan"
 
@@ -52,15 +52,19 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
 
     const raw = parseFloat(balance)
     onAdd({
-      id:          Date.now().toString(),
+      id: Date.now().toString(),
       name,
       institution,
-      type:        type as AccountType,
-      balance:     isLiability ? -Math.abs(raw) : Math.abs(raw),
-      lastFour:    lastFour || undefined,
+      type: type as AccountType,
+      balance: isLiability ? -Math.abs(raw) : Math.abs(raw),
+      lastFour: lastFour || undefined,
     })
 
-    setName(""); setInstitution(""); setType(""); setBalance(""); setLastFour("")
+    setName("")
+    setInstitution("")
+    setType("")
+    setBalance("")
+    setLastFour("")
     onClose()
   }
 
@@ -74,7 +78,6 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-
           {/* Account type */}
           <div className="space-y-1.5">
             <Label>{t("accountTypeLabel")}</Label>
@@ -84,7 +87,9 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
               </SelectTrigger>
               <SelectContent>
                 {TYPE_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -133,7 +138,8 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="acc-last4">
-                {t("last4Label")} <span className="text-muted-foreground">{t("last4Optional")}</span>
+                {t("last4Label")}{" "}
+                <span className="text-muted-foreground">{t("last4Optional")}</span>
               </Label>
               <Input
                 id="acc-last4"
@@ -145,15 +151,15 @@ export function AddAccountDialog({ open, onClose, onAdd }: Props) {
             </div>
           </div>
 
-          {isLiability && (
-            <p className="text-xs text-muted-foreground">
-              {t("liabilityNote")}
-            </p>
-          )}
+          {isLiability && <p className="text-muted-foreground text-xs">{t("liabilityNote")}</p>}
 
           <DialogFooter className="gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={onClose}>{t("cancelButton")}</Button>
-            <Button type="submit" disabled={!valid}>{t("addButton")}</Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t("cancelButton")}
+            </Button>
+            <Button type="submit" disabled={!valid}>
+              {t("addButton")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

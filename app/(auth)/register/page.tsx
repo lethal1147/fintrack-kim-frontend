@@ -44,9 +44,7 @@ export default function RegisterPage() {
     <div className="space-y-6">
       <div className="space-y-1.5">
         <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
-        <p className="text-sm text-muted-foreground">
-          {t("subtitle")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
@@ -96,7 +94,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
               tabIndex={-1}
             >
               {showPassword ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
@@ -121,7 +119,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
               tabIndex={-1}
             >
               {showConfirm ? <IconEyeOff className="size-4" /> : <IconEye className="size-4" />}
@@ -129,36 +127,42 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
         <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
           {isLoading ? (
-            <><IconLoader2 className="size-4 animate-spin" /> {t("submittingButton")}</>
+            <>
+              <IconLoader2 className="size-4 animate-spin" /> {t("submittingButton")}
+            </>
           ) : (
             t("submitButton")
           )}
         </Button>
 
-        <p className="text-xs text-center text-muted-foreground">
+        <p className="text-muted-foreground text-center text-xs">
           {t("termsText")}{" "}
-          <Link href="/terms" className="underline underline-offset-4 hover:text-foreground transition-colors">
+          <Link
+            href="/terms"
+            className="hover:text-foreground underline underline-offset-4 transition-colors"
+          >
             {t("termsLink")}
           </Link>{" "}
           {t("andText")}{" "}
-          <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground transition-colors">
+          <Link
+            href="/privacy"
+            className="hover:text-foreground underline underline-offset-4 transition-colors"
+          >
             {t("privacyLink")}
           </Link>
         </p>
       </form>
 
       {/* Footer */}
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-center text-sm">
         {t("alreadyHaveAccount")}{" "}
         <Link
           href="/login"
-          className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
+          className="text-foreground hover:text-primary font-medium underline underline-offset-4 transition-colors"
         >
           {t("signInLink")}
         </Link>

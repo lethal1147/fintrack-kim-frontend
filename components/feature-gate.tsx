@@ -18,13 +18,11 @@ export function FeatureGate({ feature, children }: Props) {
   return (
     <div className="relative">
       {/* Render children but make them inert */}
-      <div className="pointer-events-none select-none opacity-40 blur-[1.5px]">
-        {children}
-      </div>
+      <div className="pointer-events-none opacity-40 blur-[1.5px] select-none">{children}</div>
 
       {/* Overlay */}
       <div className="absolute inset-0 flex items-center justify-center rounded-xl">
-        <div className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+        <div className="border-border bg-card text-muted-foreground flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm">
           <IconLock className="size-3" />
           Coming soon
         </div>

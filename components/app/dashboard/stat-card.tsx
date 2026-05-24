@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils"
 // ─── types ────────────────────────────────────────────────────────────────────
 
 type StatCardProps = {
-  title:       string
-  value:       string
-  delta?:      number
+  title: string
+  value: string
+  delta?: number
   deltaLabel?: string
-  icon:        React.ComponentType<{ className?: string }>
-  sparkData?:  number[]
+  icon: React.ComponentType<{ className?: string }>
+  sparkData?: number[]
   sparkColor?: string
 }
 
@@ -33,17 +33,22 @@ export function StatCard({
     <Card>
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
-          <div className="space-y-3 flex-1 min-w-0">
-            <p className="text-sm text-muted-foreground">{title}</p>
+          <div className="min-w-0 flex-1 space-y-3">
+            <p className="text-muted-foreground text-sm">{title}</p>
             <p className="text-2xl font-bold tracking-tight">{value}</p>
             {delta !== undefined && (
-              <p className={cn("text-xs font-medium", positive ? "text-emerald-600" : "text-destructive")}>
-                {positive ? "+" : ""}{delta}%{" "}
-                <span className="text-muted-foreground font-normal">{deltaLabel}</span>
+              <p
+                className={cn(
+                  "text-xs font-medium",
+                  positive ? "text-emerald-600" : "text-destructive"
+                )}
+              >
+                {positive ? "+" : ""}
+                {delta}% <span className="text-muted-foreground font-normal">{deltaLabel}</span>
               </p>
             )}
           </div>
-          <div className="flex items-center justify-center size-9 rounded-lg bg-primary/10 text-primary shrink-0 ml-3">
+          <div className="bg-primary/10 text-primary ml-3 flex size-9 shrink-0 items-center justify-center rounded-lg">
             <Icon className="size-4.5" />
           </div>
         </div>
@@ -52,7 +57,10 @@ export function StatCard({
         {sparkData && sparkData.length > 1 && (
           <div className="mt-3 h-10 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparkData.map((v, i) => ({ v, i }))} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
+              <LineChart
+                data={sparkData.map((v, i) => ({ v, i }))}
+                margin={{ top: 2, right: 0, bottom: 2, left: 0 }}
+              >
                 <Line
                   dataKey="v"
                   type="monotone"

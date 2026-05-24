@@ -5,23 +5,23 @@ import { securityApi, type SessionInfo, type TOTPSetupResult } from "@/lib/api-c
 import { useAuthStore } from "@/store/auth-store"
 
 type SecurityState = {
-  sessions:    SessionInfo[]
-  isLoading:   boolean
-  error:       string | null
+  sessions: SessionInfo[]
+  isLoading: boolean
+  error: string | null
 
-  fetchSessions():                                       Promise<void>
-  revokeSession(id: string):                             Promise<void>
-  requestPasswordChange():                               Promise<void>
-  changePassword(otp: string, newPassword: string):      Promise<void>
-  setupTOTP():                                           Promise<TOTPSetupResult | null>
-  confirmTOTP(code: string):                             Promise<string[]>
-  disableTOTP(code: string):                             Promise<void>
+  fetchSessions(): Promise<void>
+  revokeSession(id: string): Promise<void>
+  requestPasswordChange(): Promise<void>
+  changePassword(otp: string, newPassword: string): Promise<void>
+  setupTOTP(): Promise<TOTPSetupResult | null>
+  confirmTOTP(code: string): Promise<string[]>
+  disableTOTP(code: string): Promise<void>
 }
 
 export const useSecurityStore = create<SecurityState>((set) => ({
-  sessions:  [],
+  sessions: [],
   isLoading: false,
-  error:     null,
+  error: null,
 
   async fetchSessions() {
     const token = useAuthStore.getState().accessToken

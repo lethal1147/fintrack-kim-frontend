@@ -23,7 +23,7 @@ type Step = "request" | "change"
 // ─── component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  open:    boolean
+  open: boolean
   onClose: () => void
 }
 
@@ -32,11 +32,11 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
   const { user } = useAuthStore()
   const { isLoading, requestPasswordChange, changePassword } = useSecurityStore()
 
-  const [step, setStep]           = useState<Step>("request")
-  const [otp, setOtp]             = useState("")
-  const [newPw, setNewPw]         = useState("")
+  const [step, setStep] = useState<Step>("request")
+  const [otp, setOtp] = useState("")
+  const [newPw, setNewPw] = useState("")
   const [confirmPw, setConfirmPw] = useState("")
-  const [error, setError]         = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   function handleClose() {
     setStep("request")
@@ -85,17 +85,19 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
 
         {step === "request" ? (
           <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t("requestStepDescription", { email: user?.email ?? "" })}
             </p>
             {error && (
-              <div className="flex items-center gap-1.5 text-sm text-destructive">
+              <div className="text-destructive flex items-center gap-1.5 text-sm">
                 <IconAlertTriangle className="size-3.5 shrink-0" />
                 {error}
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>{t("cancelButton")}</Button>
+              <Button variant="outline" onClick={handleClose}>
+                {t("cancelButton")}
+              </Button>
               <Button onClick={handleSendCode} disabled={isLoading}>
                 {isLoading ? t("sendingButton") : t("sendCodeButton")}
               </Button>
@@ -103,7 +105,7 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
           </div>
         ) : (
           <form onSubmit={handleChange} className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t("changeStepDescription", { email: user?.email ?? "" })}
             </p>
             <div className="space-y-3">
@@ -140,7 +142,7 @@ export function ChangePasswordDialog({ open, onClose }: Props) {
               </div>
             </div>
             {error && (
-              <div className="flex items-center gap-1.5 text-sm text-destructive">
+              <div className="text-destructive flex items-center gap-1.5 text-sm">
                 <IconAlertTriangle className="size-3.5 shrink-0" />
                 {error}
               </div>

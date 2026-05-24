@@ -1,12 +1,8 @@
-import Image from "next/image";
+import Image from "next/image"
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center py-12 px-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <Image
         src="/fintrack-login-background.png"
         alt=""
@@ -14,7 +10,7 @@ export default function AuthLayout({
         className="object-cover object-center"
         priority
       />
-      <div className="relative z-10 w-full max-w-100 flex flex-col items-center gap-6">
+      <div className="relative z-10 flex w-full max-w-100 flex-col items-center gap-6">
         <Image
           src="/fintrack-brand-logo.png"
           alt="FinTrack"
@@ -24,10 +20,10 @@ export default function AuthLayout({
           priority
           unoptimized
         />
-        <div className="w-full bg-background/95 backdrop-blur-sm rounded-2xl border border-border shadow-sm p-8">
+        <div className="bg-background/95 border-border w-full rounded-2xl border p-8 shadow-sm backdrop-blur-sm">
           {children}
         </div>
       </div>
     </div>
-  );
+  )
 }
