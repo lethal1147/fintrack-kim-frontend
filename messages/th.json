@@ -92,7 +92,7 @@
     "vsLastMonth": "เทียบเดือนก่อน",
     "cashFlowChart": {
       "title": "กระแสเงินสด",
-      "subtitle": "รายรับ vs รายจ่าย — 6 เดือนที่ผ่านมา",
+      "subtitle": "รายรับ vs รายจ่าย · {year}",
       "legendIncome": "รายรับ",
       "legendExpenses": "รายจ่าย"
     },
@@ -118,6 +118,11 @@
       "title": "ธุรกรรมล่าสุด",
       "subtitle": "5 รายการล่าสุด",
       "viewAll": "ดูทั้งหมด →"
+    },
+    "topTransactions": {
+      "title": "ธุรกรรมสูงสุด",
+      "subtitle": "ธุรกรรมที่มีมูลค่าสูงสุดเดือนนี้",
+      "empty": "ไม่มีธุรกรรมในเดือนนี้"
     },
     "recurringSummary": {
       "title": "รายการประจำ",

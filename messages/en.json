@@ -92,7 +92,7 @@
     "vsLastMonth": "vs last month",
     "cashFlowChart": {
       "title": "Cash Flow",
-      "subtitle": "Income vs expenses — last 6 months",
+      "subtitle": "Income vs expenses · {year}",
       "legendIncome": "Income",
       "legendExpenses": "Expenses"
     },
@@ -118,6 +118,11 @@
       "title": "Recent Transactions",
       "subtitle": "Last 5 entries",
       "viewAll": "View all →"
+    },
+    "topTransactions": {
+      "title": "Top Transactions",
+      "subtitle": "Biggest transactions this month",
+      "empty": "No transactions this month"
     },
     "recurringSummary": {
       "title": "Recurring",

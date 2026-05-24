@@ -14,15 +14,27 @@ import {
 import { useTranslations } from "next-intl"
 import { type MonthStat } from "@/lib/api-client"
 
-function formatMonthLabel(yyyyMM: string): string {
-  return dayjs(yyyyMM + "-01").format("MMM")
+// ─── helpers ──────────────────────────────────────────────────────────────────
+
+function buildYearSpine(year: number, data: MonthStat[]) {
+  const dataMap = new Map(data.map((d) => [d.month, d]))
+  return Array.from({ length: 12 }, (_, i) => {
+    const key = `${year}-${String(i + 1).padStart(2, "0")}`
+    const d   = dataMap.get(key)
+    return {
+      month:   dayjs(key + "-01").format("MMM"),
+      income:  d?.income  ?? 0,
+      expense: d?.expense ?? 0,
+      net:     d?.net     ?? 0,
+    }
+  })
 }
 
 // ─── component ────────────────────────────────────────────────────────────────
 
-type Props = { data: MonthStat[] }
+type Props = { data: MonthStat[]; year: number }
 
-export function CashFlowChart({ data }: Props) {
+export function CashFlowChart({ data, year }: Props) {
   const t = useTranslations("dashboard.cashFlowChart")
 
   const CHART_CONFIG = {
@@ -30,13 +42,13 @@ export function CashFlowChart({ data }: Props) {
     expense: { label: t("legendExpenses"), color: "var(--chart-5)" },
   } satisfies ChartConfig
 
-  const chartData = data.map((m) => ({ ...m, month: formatMonthLabel(m.month) }))
+  const chartData = buildYearSpine(year, data)
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
+        <CardDescription>{t("subtitle", { year })}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         <ChartContainer config={CHART_CONFIG} className="h-55 w-full">

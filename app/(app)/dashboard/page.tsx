@@ -19,6 +19,7 @@ import { CategoryDonut } from "@/components/app/dashboard/category-donut"
 import { BudgetPerformance } from "@/components/app/dashboard/budget-performance"
 import { RecurringSummary } from "@/components/app/dashboard/recurring-summary"
 import { CategoryGrowthChart } from "@/components/app/dashboard/category-growth-chart"
+import { TopTransactions } from "@/components/app/dashboard/top-transactions"
 import { useDashboardStore } from "@/store/dashboard-store"
 import { useBudgetStore } from "@/store/budget-store"
 import { useRecurringStore } from "@/store/recurring-store"
@@ -207,7 +208,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Row 2 — Cash Flow Chart */}
-      <CashFlowChart data={trend?.by_month ?? []} />
+      <CashFlowChart data={trend?.by_month ?? []} year={selectedMonth.year()} />
 
       {/* Row 2b — Category Growth */}
       <CategoryGrowthChart
@@ -221,9 +222,10 @@ export default function DashboardPage() {
         <BudgetPerformance />
       </div>
 
-      {/* Row 4 — Recurring Summary + Recent Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-4">
+      {/* Row 4 — Recurring Summary + Top Transactions + Recent Transactions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <RecurringSummary />
+        <TopTransactions />
         <RecentTransactions />
       </div>
     </div>
